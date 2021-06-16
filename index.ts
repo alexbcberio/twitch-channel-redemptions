@@ -1,16 +1,12 @@
 import { PubSubClient, PubSubRedemptionMessage } from "twitch-pubsub-client";
 import { getApiClient, getAuthProvider } from "./src/backend/helpers/twitch";
+import { listen, sockets } from "./src/backend/webServer";
 
-import { AddressInfo } from "net";
 import { ApiClient } from "twitch";
 import { ChatClient } from "twitch-chat-client";
-import WebSocket from "ws";
-import express from "express";
 import { promises as fs } from "fs";
-import path from "path";
 
 const SCHEDULED_FILE = "./scheduled.json";
-const DEV_MODE = process.env.NODE_ENV === "development";
 
 const scheduledActions: Array<any> = [];
 let saInterval: NodeJS.Timeout;
@@ -19,6 +15,12 @@ const channel = "alexbcberio";
 
 let apiClient: ApiClient;
 let chatClient: ChatClient;
+
+export {
+  handleClientAction,
+  scheduledActions,
+  saveScheduledActions
+}
 
 //! Important: store users & channels by id, not by username
 
@@ -46,6 +48,8 @@ async function init() {
   });
 
   chatClient.connect();
+
+  listen();
 }
 
 init();
@@ -100,57 +104,11 @@ async function onRedemption(message: PubSubRedemptionMessage) {
   }
 
   if (msg) {
+    console.log(msg);
+
     broadcast(msg);
   }
 }
-
-const app = express();
-const wsServer = new WebSocket.Server({
-  noServer: true
-});
-
-let sockets: Array<WebSocket> = [];
-wsServer.on("connection", (socket, req) => {
-  console.log(`[WS] ${req.socket.remoteAddress} New connection established`);
-  sockets.push(socket);
-	socket.send(
-		JSON.stringify({
-    env: DEV_MODE ? "dev" : "prod"
-		})
-	);
-
-  socket.on("message", async (msg: string) => {
-    const data = JSON.parse(msg);
-
-    // broadcast message
-    if (!data.actions || data.actions.length === 0) {
-			sockets
-        .filter(s => s !== socket)
-        .forEach(s => s.send(msg));
-      return;
-    }
-
-    for (const action of data.actions) {
-      if (!action.scheduledAt) {
-        await handleClientAction(action);
-      } else {
-        scheduledActions.push(action);
-        scheduledActions.sort((a, b) => a.scheduledAt - b.scheduledAt);
-        saveScheduledActions();
-      }
-    }
-
-		console.log(
-			`[WS] Received message with ${data.actions.length} actions:`,
-			data
-		);
-  });
-
-  socket.on("close", () => {
-    sockets = sockets.filter(s => s !== socket);
-    console.log("[WS] Connection closed");
-  });
-});
 
 async function handleClientAction(action: any) {
   if (action.channel && !isNaN(action.channel)) {
@@ -325,21 +283,3 @@ async function stealVip(msg: {
 
   return null;
 }
-
-/*
-  Webserver
- */
-app.use(express.static(path.join(__dirname, "client")));
-const server = app.listen(!DEV_MODE ? 8080 : 8081, "0.0.0.0");
-
-server.on("listening", () => {
-	console.log(
-		`[Webserver] Listening on port ${(server.address() as AddressInfo).port}`
-	);
-});
-
-server.on("upgrade", (req, socket, head) => {
-  wsServer.handleUpgrade(req, socket, head, socket => {
-    wsServer.emit("connection", socket, req);
-  });
-});
