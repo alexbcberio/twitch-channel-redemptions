@@ -10,7 +10,7 @@ import path from "path";
 
 const TOKENS_FILE = "./tokens.json";
 const SCHEDULED_FILE = "./scheduled.json";
-const DEV_MODE = process.argv.includes("--dev");
+const DEV_MODE = process.env.NODE_ENV === "development";
 
 const scheduledActions = [];
 let saInterval;
