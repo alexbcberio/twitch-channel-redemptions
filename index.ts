@@ -1,5 +1,5 @@
 import { PubSubClient, PubSubRedemptionMessage } from "twitch-pubsub-client";
-import { RefreshableAuthProvider, StaticAuthProvider } from "twitch-auth";
+import { getApiClient, getAuthProvider } from "./src/backend/helpers/twitch";
 
 import { AddressInfo } from "net";
 import { ApiClient } from "twitch";
@@ -9,7 +9,6 @@ import express from "express";
 import { promises as fs } from "fs";
 import path from "path";
 
-const TOKENS_FILE = "./tokens.json";
 const SCHEDULED_FILE = "./scheduled.json";
 const DEV_MODE = process.env.NODE_ENV === "development";
 
@@ -24,57 +23,9 @@ let chatClient: ChatClient;
 //! Important: store users & channels by id, not by username
 
 async function init() {
-  let tokenData;
-  try {
-      tokenData = JSON.parse((await fs.readFile(TOKENS_FILE)).toString());
-  } catch (error) {
-    console.error(`${TOKENS_FILE} not found, cannot init chatbot.`);
-    process.exit(1);
-  }
+  const authProvider = await getAuthProvider();
 
-  if (
-      !tokenData.refresh_token ||
-      !tokenData.access_token
-  ) {
-      console.error(`Missing parameters in ${TOKENS_FILE}, refresh_token or access_token.`);
-      process.exit(1);
-  }
-
-	if (
-    !process.env.TWITCH_CLIENT_ID ||
-    !process.env.TWITCH_CLIENT_SECRET
-  ) {
-		console.error(
-			`Missing environment parameters TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET`
-		);
-    process.exit(1);
-  }
-
-  const authProvider = new RefreshableAuthProvider(
-		new StaticAuthProvider(
-			process.env.TWITCH_CLIENT_ID,
-			tokenData.access_token
-		),
-		{
-        clientSecret: process.env.TWITCH_CLIENT_SECRET,
-        refreshToken: tokenData.refresh_token,
-			expiry:
-				tokenData.expiryTimestamp === null
-					? null
-					: new Date(tokenData.expiryTimestamp),
-        onRefresh: async ({ accessToken, refreshToken, expiryDate }) => {
-          console.log("Tokens refreshed");
-          const newTokenData = {
-            access_token: accessToken,
-            refresh_token: refreshToken,
-            expiryTimestamp: expiryDate === null ? null : expiryDate.getTime()
-          };
-          await fs.writeFile(TOKENS_FILE, JSON.stringify(newTokenData));
-        }
-      }
-  );
-
-  apiClient = new ApiClient({ authProvider });
+  apiClient = await getApiClient();
 
   const pubSubClient = new PubSubClient();
   const userId = await pubSubClient.registerUserListener(apiClient, channel);
@@ -84,26 +35,7 @@ async function init() {
 
   chatClient = new ChatClient(authProvider, { channels: [channel] });
 
-  chatClient.onConnect(async () => {
-    console.log("[ChatClient] Connected");
-
-    // *Check this, not working
-    if (!saInterval) {
-      let savedActions = [];
-      try {
-				savedActions = JSON.parse(
-					(await fs.readFile(SCHEDULED_FILE)).toString()
-				);
-      } catch (e) {
-        // probably file does not exist
-      }
-      scheduledActions.push.apply(scheduledActions, savedActions);
-      scheduledActions.sort((a, b) => a.scheduledAt - b.scheduledAt);
-
-      setTimeout(checkScheduledActions, 1000 * 5);
-      saInterval = setInterval(checkScheduledActions, 1000 * 60);
-    }
-  });
+  chatClient.onConnect(onConnect);
 
   chatClient.onDisconnect((e: any) => {
     console.log(`[ChatClient] Disconnected ${e.message}`);
@@ -117,6 +49,27 @@ async function init() {
 }
 
 init();
+
+async function onConnect() {
+  console.log("[ChatClient] Connected");
+
+  // *Check this, not working
+  if (!saInterval) {
+    let savedActions = [];
+    try {
+      savedActions = JSON.parse(
+        (await fs.readFile(SCHEDULED_FILE)).toString()
+      );
+    } catch (e) {
+      // probably file does not exist
+    }
+    scheduledActions.push.apply(scheduledActions, savedActions);
+    scheduledActions.sort((a, b) => a.scheduledAt - b.scheduledAt);
+
+    setTimeout(checkScheduledActions, 1000 * 5);
+    saInterval = setInterval(checkScheduledActions, 1000 * 60);
+  }
+}
 
 async function onRedemption(message: PubSubRedemptionMessage) {
 	console.log(
