@@ -1,8 +1,9 @@
+import { PubSubClient, PubSubRedemptionMessage } from "twitch-pubsub-client";
 import { RefreshableAuthProvider, StaticAuthProvider } from "twitch-auth";
 
+import { AddressInfo } from "net";
 import { ApiClient } from "twitch";
 import { ChatClient } from "twitch-chat-client";
-import { PubSubClient } from "twitch-pubsub-client";
 import WebSocket  from "ws";
 import express from "express";
 import { promises as fs } from "fs";
@@ -12,20 +13,20 @@ const TOKENS_FILE = "./tokens.json";
 const SCHEDULED_FILE = "./scheduled.json";
 const DEV_MODE = process.env.NODE_ENV === "development";
 
-const scheduledActions = [];
-let saInterval;
+const scheduledActions: Array<any> = [];
+let saInterval: NodeJS.Timeout;
 
 const channel = "alexbcberio";
 
-let apiClient;
-let chatClient;
+let apiClient: ApiClient;
+let chatClient: ChatClient;
 
 //! Important: store users & channels by id, not by username
 
 async function init() {
   let tokenData;
   try {
-      tokenData = JSON.parse(await fs.readFile(TOKENS_FILE));
+      tokenData = JSON.parse((await fs.readFile(TOKENS_FILE)).toString());
   } catch (error) {
     console.error(`${TOKENS_FILE} not found, cannot init chatbot.`);
     process.exit(1);
@@ -39,20 +40,28 @@ async function init() {
       process.exit(1);
   }
 
+  if (
+    !process.env.TWITCH_CLIENT_ID ||
+    !process.env.TWITCH_CLIENT_SECRET
+  ) {
+    console.error(`Missing environment parameters TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET`);
+    process.exit(1);
+  }
+
   const authProvider = new RefreshableAuthProvider(
       new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, tokenData.access_token), {
-          clientSecret: process.env.TWITCH_CLIENT_SECRET,
-          refreshToken: tokenData.refresh_token,
-          expiry: tokenData.expiryTimestamp === null ? null : new Date(tokenData.expiryTimestamp),
-          onRefresh: async ({ accessToken, refreshToken, expiryDate }) => {
-              console.log("Tokens refreshed");
-              const newTokenData = {
-                  access_token: accessToken,
-                  refresh_token: refreshToken,
-                  expiryTimestamp: expiryDate === null ? null : expiryDate.getTime()
-              };
-              await fs.writeFile(TOKENS_FILE, JSON.stringify(newTokenData));
-          }
+        clientSecret: process.env.TWITCH_CLIENT_SECRET,
+        refreshToken: tokenData.refresh_token,
+        expiry: tokenData.expiryTimestamp === null ? null : new Date(tokenData.expiryTimestamp),
+        onRefresh: async ({ accessToken, refreshToken, expiryDate }) => {
+          console.log("Tokens refreshed");
+          const newTokenData = {
+            access_token: accessToken,
+            refresh_token: refreshToken,
+            expiryTimestamp: expiryDate === null ? null : expiryDate.getTime()
+          };
+          await fs.writeFile(TOKENS_FILE, JSON.stringify(newTokenData));
+        }
       }
   );
 
@@ -73,7 +82,7 @@ async function init() {
     if (!saInterval) {
       let savedActions = [];
       try {
-        savedActions = JSON.parse(await fs.readFile(SCHEDULED_FILE));
+        savedActions = JSON.parse((await fs.readFile(SCHEDULED_FILE)).toString());
       } catch (e) {
         // probably file does not exist
       }
@@ -85,7 +94,7 @@ async function init() {
     }
   });
 
-  chatClient.onDisconnect(e => {
+  chatClient.onDisconnect((e: any) => {
     console.log(`[ChatClient] Disconnected ${e.message}`);
   });
 
@@ -98,11 +107,12 @@ async function init() {
 
 init();
 
-async function onRedemption(message) {
+async function onRedemption(message: PubSubRedemptionMessage) {
   console.log(`Reward: "${message.rewardName}" (${message.rewardId}) redeemed by ${message.userDisplayName}`);
+  // @ts-ignore
   const reward = message._data.data.redemption.reward;
 
-  let msg = {
+  let msg: any = {
     id: message.id,
     channelId: message.channelId,
     rewardId: message.rewardId,
@@ -131,7 +141,7 @@ const wsServer = new WebSocket.Server({
   noServer: true
 });
 
-let sockets = [];
+let sockets: Array<WebSocket> = [];
 wsServer.on("connection", (socket, req) => {
   console.log(`[WS] ${req.socket.remoteAddress} New connection established`);
   sockets.push(socket);
@@ -139,7 +149,7 @@ wsServer.on("connection", (socket, req) => {
     env: DEV_MODE ? "dev" : "prod"
   }));
 
-  socket.on("message", async (msg) => {
+  socket.on("message", async (msg: string) => {
     const data = JSON.parse(msg);
 
     // broadcast message
@@ -170,7 +180,7 @@ wsServer.on("connection", (socket, req) => {
   });
 });
 
-async function handleClientAction(action) {
+async function handleClientAction(action: any) {
 
   if (action.channel && !isNaN(action.channel)) {
     action.channel = await getUsernameFromId(parseInt(action.channel));
@@ -200,7 +210,7 @@ async function handleClientAction(action) {
   }
 }
 
-let ssaTimeout;
+let ssaTimeout: NodeJS.Timeout | null;
 function saveScheduledActions() {
   if (ssaTimeout) {
     clearTimeout(ssaTimeout);
@@ -238,12 +248,12 @@ async function checkScheduledActions() {
 }
 
 // send a chat message
-function say(channel, message) {
+function say(channel: string, message: string) {
   chatClient.say(channel, message);
 }
 
 // timeouts a user in a channel
-async function timeout(channel, username, time, reason) {
+async function timeout(channel: string, username: string, time?: number, reason?: string) {
   if (!time) {
     time = 60;
   }
@@ -260,12 +270,12 @@ async function timeout(channel, username, time, reason) {
 }
 
 // broadcast a message to all clients
-function broadcast(msg) {
+function broadcast(msg: object) {
   sockets.forEach(s => s.send(JSON.stringify(msg)));
 }
 
 // adds a user to vips
-async function addVip(channel, username, message) {
+async function addVip(channel: string, username: string, message?: string) {
   if (!message) {
     message = `Otorgado VIP a @${username}.`;
   }
@@ -274,7 +284,7 @@ async function addVip(channel, username, message) {
   say(channel, message);
 }
 
-async function hasVip(channel, username) {
+async function hasVip(channel: string, username: string) {
   if (!username) {
     return false;
   }
@@ -284,7 +294,7 @@ async function hasVip(channel, username) {
 }
 
 // removes a user from vips
-async function removeVip(channel, username, message) {
+async function removeVip(channel: string, username: string, message?: string) {
   if (!message) {
     message = `Se ha acabado el chollo, VIP de @${username} eliminado.`;
   }
@@ -293,7 +303,7 @@ async function removeVip(channel, username, message) {
   say(channel, message);
 }
 
-async function getUsernameFromId(userId) {
+async function getUsernameFromId(userId: number) {
   const user = await apiClient.helix.users.getUserById(userId);
 
   if (!user) {
@@ -304,8 +314,14 @@ async function getUsernameFromId(userId) {
 }
 
 // remove vip from a user to grant it to yourself
-async function stealVip(msg) {
+async function stealVip(msg: {channelId: string; userDisplayName: string; message: string;}) {
   const channel = await getUsernameFromId(parseInt(msg.channelId));
+
+  if (!channel) {
+    console.log("No channel found");
+    return;
+  }
+
   const addVipUser = msg.userDisplayName;
   const removeVipUser = msg.message;
 
@@ -334,7 +350,7 @@ async function stealVip(msg) {
 const server = app.listen(!DEV_MODE ? 8080 : 8081, '0.0.0.0');
 
 server.on("listening", () => {
-  console.log(`[Webserver] Listening on port ${server.address().port}`);
+  console.log(`[Webserver] Listening on port ${(server.address() as AddressInfo).port}`);
 });
 
 server.on("upgrade", (req, socket, head) => {
