@@ -347,6 +347,7 @@ async function stealVip(msg: {channelId: string; userDisplayName: string; messag
 /*
   Webserver
  */
+app.use(express.static(path.join(__dirname, "client")));
 const server = app.listen(!DEV_MODE ? 8080 : 8081, '0.0.0.0');
 
 server.on("listening", () => {
@@ -357,18 +358,4 @@ server.on("upgrade", (req, socket, head) => {
   wsServer.handleUpgrade(req, socket, head, socket => {
     wsServer.emit("connection", socket, req);
   });
-});
-
-app.get("*", async (req, res) => {
-  try {
-    let rpath = req.path;
-
-    if (rpath.endsWith("/")) {
-      rpath += "index.html";
-    }
-
-    res.sendFile(path.join(process.cwd(), "client", rpath));
-  } catch (e) {
-    res.sendStatus(404);
-  }
 });
