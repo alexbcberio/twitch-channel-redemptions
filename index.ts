@@ -4,7 +4,7 @@ import { RefreshableAuthProvider, StaticAuthProvider } from "twitch-auth";
 import { AddressInfo } from "net";
 import { ApiClient } from "twitch";
 import { ChatClient } from "twitch-chat-client";
-import WebSocket  from "ws";
+import WebSocket from "ws";
 import express from "express";
 import { promises as fs } from "fs";
 import path from "path";
@@ -40,19 +40,28 @@ async function init() {
       process.exit(1);
   }
 
-  if (
+	if (
     !process.env.TWITCH_CLIENT_ID ||
     !process.env.TWITCH_CLIENT_SECRET
   ) {
-    console.error(`Missing environment parameters TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET`);
+		console.error(
+			`Missing environment parameters TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET`
+		);
     process.exit(1);
   }
 
   const authProvider = new RefreshableAuthProvider(
-      new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, tokenData.access_token), {
+		new StaticAuthProvider(
+			process.env.TWITCH_CLIENT_ID,
+			tokenData.access_token
+		),
+		{
         clientSecret: process.env.TWITCH_CLIENT_SECRET,
         refreshToken: tokenData.refresh_token,
-        expiry: tokenData.expiryTimestamp === null ? null : new Date(tokenData.expiryTimestamp),
+			expiry:
+				tokenData.expiryTimestamp === null
+					? null
+					: new Date(tokenData.expiryTimestamp),
         onRefresh: async ({ accessToken, refreshToken, expiryDate }) => {
           console.log("Tokens refreshed");
           const newTokenData = {
@@ -69,7 +78,7 @@ async function init() {
 
   const pubSubClient = new PubSubClient();
   const userId = await pubSubClient.registerUserListener(apiClient, channel);
-  /*const listener = */await pubSubClient.onRedemption(userId, onRedemption);
+	/*const listener = */ await pubSubClient.onRedemption(userId, onRedemption);
 
   console.log("[Twitch PubSub] Connected & registered");
 
@@ -82,7 +91,9 @@ async function init() {
     if (!saInterval) {
       let savedActions = [];
       try {
-        savedActions = JSON.parse((await fs.readFile(SCHEDULED_FILE)).toString());
+				savedActions = JSON.parse(
+					(await fs.readFile(SCHEDULED_FILE)).toString()
+				);
       } catch (e) {
         // probably file does not exist
       }
@@ -108,7 +119,9 @@ async function init() {
 init();
 
 async function onRedemption(message: PubSubRedemptionMessage) {
-  console.log(`Reward: "${message.rewardName}" (${message.rewardId}) redeemed by ${message.userDisplayName}`);
+	console.log(
+		`Reward: "${message.rewardName}" (${message.rewardId}) redeemed by ${message.userDisplayName}`
+	);
   // @ts-ignore
   const reward = message._data.data.redemption.reward;
 
@@ -117,14 +130,16 @@ async function onRedemption(message: PubSubRedemptionMessage) {
     channelId: message.channelId,
     rewardId: message.rewardId,
     rewardName: message.rewardName,
-    rewardImage: message.rewardImage ? message.rewardImage.url_4x : "https://static-cdn.jtvnw.net/custom-reward-images/default-4.png",
+		rewardImage: message.rewardImage
+			? message.rewardImage.url_4x
+			: "https://static-cdn.jtvnw.net/custom-reward-images/default-4.png",
     message: message.message,
     userDisplayName: message.userDisplayName,
     // non directly available values from PubSubRedemptionMessage
     backgroundColor: reward.background_color
   };
 
-  switch(msg.rewardId) {
+	switch (msg.rewardId) {
     // robar vip
     case "ac750bd6-fb4c-4259-b06d-56953601243b":
       msg = await stealVip(msg);
@@ -145,16 +160,18 @@ let sockets: Array<WebSocket> = [];
 wsServer.on("connection", (socket, req) => {
   console.log(`[WS] ${req.socket.remoteAddress} New connection established`);
   sockets.push(socket);
-  socket.send(JSON.stringify({
+	socket.send(
+		JSON.stringify({
     env: DEV_MODE ? "dev" : "prod"
-  }));
+		})
+	);
 
   socket.on("message", async (msg: string) => {
     const data = JSON.parse(msg);
 
     // broadcast message
     if (!data.actions || data.actions.length === 0) {
-      sockets
+			sockets
         .filter(s => s !== socket)
         .forEach(s => s.send(msg));
       return;
@@ -163,7 +180,6 @@ wsServer.on("connection", (socket, req) => {
     for (const action of data.actions) {
       if (!action.scheduledAt) {
         await handleClientAction(action);
-
       } else {
         scheduledActions.push(action);
         scheduledActions.sort((a, b) => a.scheduledAt - b.scheduledAt);
@@ -171,7 +187,10 @@ wsServer.on("connection", (socket, req) => {
       }
     }
 
-    console.log(`[WS] Received message with ${data.actions.length} actions:`, data);
+		console.log(
+			`[WS] Received message with ${data.actions.length} actions:`,
+			data
+		);
   });
 
   socket.on("close", () => {
@@ -181,7 +200,6 @@ wsServer.on("connection", (socket, req) => {
 });
 
 async function handleClientAction(action: any) {
-
   if (action.channel && !isNaN(action.channel)) {
     action.channel = await getUsernameFromId(parseInt(action.channel));
   }
@@ -189,7 +207,7 @@ async function handleClientAction(action: any) {
     action.username = await getUsernameFromId(parseInt(action.username));
   }
 
-  switch(action.action) {
+	switch (action.action) {
     case "say":
       say(channel, action.message);
       break;
@@ -253,7 +271,12 @@ function say(channel: string, message: string) {
 }
 
 // timeouts a user in a channel
-async function timeout(channel: string, username: string, time?: number, reason?: string) {
+async function timeout(
+	channel: string,
+	username: string,
+	time?: number,
+	reason?: string
+) {
   if (!time) {
     time = 60;
   }
@@ -314,7 +337,11 @@ async function getUsernameFromId(userId: number) {
 }
 
 // remove vip from a user to grant it to yourself
-async function stealVip(msg: {channelId: string; userDisplayName: string; message: string;}) {
+async function stealVip(msg: {
+	channelId: string;
+	userDisplayName: string;
+	message: string;
+}) {
   const channel = await getUsernameFromId(parseInt(msg.channelId));
 
   if (!channel) {
@@ -329,7 +356,9 @@ async function stealVip(msg: {channelId: string; userDisplayName: string; messag
     await removeVip(channel, removeVipUser);
     await addVip(channel, addVipUser);
 
-    const scheduledRemoveVipIndex = scheduledActions.findIndex(s => s.action === "removeVip" && s.username === removeVipUser);
+		const scheduledRemoveVipIndex = scheduledActions.findIndex(
+			s => s.action === "removeVip" && s.username === removeVipUser
+		);
 
     if (scheduledRemoveVipIndex > -1) {
       scheduledActions[scheduledRemoveVipIndex].username = addVipUser;
@@ -348,10 +377,12 @@ async function stealVip(msg: {channelId: string; userDisplayName: string; messag
   Webserver
  */
 app.use(express.static(path.join(__dirname, "client")));
-const server = app.listen(!DEV_MODE ? 8080 : 8081, '0.0.0.0');
+const server = app.listen(!DEV_MODE ? 8080 : 8081, "0.0.0.0");
 
 server.on("listening", () => {
-  console.log(`[Webserver] Listening on port ${(server.address() as AddressInfo).port}`);
+	console.log(
+		`[Webserver] Listening on port ${(server.address() as AddressInfo).port}`
+	);
 });
 
 server.on("upgrade", (req, socket, head) => {
