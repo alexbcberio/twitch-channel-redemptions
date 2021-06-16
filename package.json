@@ -1,0 +1,25 @@
+{
+  "name": "twitch-redemption-test",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "node -r dotenv/config index.js",
+    "dev": "nodemon -r dotenv/config index.js -- --dev"
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.5",
+    "twitch": "^4.2.6",
+    "twitch-auth": "^4.2.6",
+    "twitch-chat-client": "^4.2.6",
+    "twitch-pubsub-client": "^4.2.6",
+    "ws": "^7.3.1"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.1",
+    "utf-8-validate": "^5.0.2"
+  }
+}

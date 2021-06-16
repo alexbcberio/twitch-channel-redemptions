@@ -1,0 +1,160 @@
+*::before,
+*,
+*::after {
+  box-sizing: border-box;
+  font-family: "Open Sans", sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: #333;
+  color: #ddd;
+  overflow: hidden;
+}
+
+.alert p {
+  text-align: center;
+  font-size: 1.25rem;
+}
+
+.alert img {
+  display: block;
+  max-height: 200px;
+  margin: auto;
+}
+
+/*
+ * Karaoke time
+ */
+
+.light {
+  position: absolute;
+  z-index: -1;
+  height: 140vh;
+  width: 40%;
+  margin-left: 30%;
+  margin-top: -1rem;
+  clip-path: polygon(
+    45% 0,
+    55% 0,
+    100% 100%,
+    0% 100%
+  );
+
+  transform-origin: top center;
+}
+
+.light-left {
+  animation:
+    rotateLights 1.75s infinite ease-in-out alternate,
+    lightsColor .75s infinite linear alternate;
+}
+
+.light-right {
+  animation:
+    rotateLights 1.75s infinite ease-in-out alternate-reverse,
+    lightsColor .75s infinite linear alternate-reverse;
+}
+
+@keyframes rotateLights {
+  from {
+    transform: rotateZ(-30deg);
+  }
+  to {
+    transform: rotateZ(30deg);
+  }
+}
+
+@keyframes lightsColor {
+  from {
+    background-color: var(--light-color-left);
+  }
+
+  to {
+    background-color: var(--light-color-right);
+  }
+}
+
+/*
+ * Russian roulette
+ */
+
+.shoot {
+  transform-origin: center;
+  animation: shoot .3s ease-in-out -.05s alternate;
+}
+
+@keyframes shoot {
+  from {
+    transform: rotateZ(0deg);
+  }
+
+  50% {
+    transform: rotateZ(4deg);
+  }
+
+  to {
+    transform: rotateZ(0deg);
+  }
+}
+
+/*
+ * Card
+ */
+.card {
+  position: absolute;
+  left: calc(50% - 25rem / 2);
+  top: .5rem;
+  width: 25rem;
+  height: 6.25rem;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--card-border-color);
+  border-radius: .5rem;
+  background-color: var(--card-background-color);
+}
+
+.card.open {
+  animation: cardAnimation .75s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+.card.close {
+  animation: cardAnimation .75s cubic-bezier(0.18, 0.89, 0.32, 1.28) reverse;
+}
+
+@keyframes cardAnimation {
+  from {
+    top: -6.25rem;
+  }
+  to {
+    top: .5rem;
+  }
+}
+
+.card-light {
+  color: #222;
+}
+
+.card .card-image {
+  height: 3.5rem;
+  margin: .5rem;
+}
+
+.card .card-body {
+  width: 100%;
+}
+
+.card .card-body .title,
+.card .card-body .message {
+  margin: 0;
+}
+
+.card .card-body .title {
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.card .card-body .message {
+  font-size: 1rem;
+  margin: 0 .5rem;
+}
