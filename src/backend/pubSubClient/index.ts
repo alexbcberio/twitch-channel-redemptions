@@ -1,15 +1,17 @@
-import { ApiClient, UserIdResolvable } from "twitch";
 import { PubSubClient, PubSubRedemptionMessage } from "twitch-pubsub-client";
 import { broadcast, chatClient, say } from "../chatClient";
+import { getApiClient, getUsernameFromId } from "../helpers/twitch";
 import { saveScheduledActions, scheduledActions } from "../helpers/scheduledActions";
 
-import { getUsernameFromId } from "../helpers/twitch";
+import { UserIdResolvable } from "twitch";
 
 export {
   registerUserListener
 }
 
-async function registerUserListener(apiClient: ApiClient, user?: UserIdResolvable) {
+async function registerUserListener(user: UserIdResolvable) {
+  const apiClient = await getApiClient();
+
   const pubSubClient = new PubSubClient();
   const userId = await pubSubClient.registerUserListener(apiClient, user);
 	/*const listener = */ await pubSubClient.onRedemption(userId, onRedemption);

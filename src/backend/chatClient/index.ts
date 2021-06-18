@@ -1,6 +1,6 @@
-import { AuthProvider } from "twitch-auth";
+import { getApiClient, getAuthProvider } from "../helpers/twitch";
+
 import { ChatClient } from "twitch-chat-client";
-import { getApiClient } from "../helpers/twitch";
 import { sockets } from "../webServer";
 import { start } from "../helpers/scheduledActions";
 
@@ -14,7 +14,10 @@ export {
   say
 };
 
-async function connect(authProvider: AuthProvider, channels: Array<any>) {
+async function connect(channels: Array<any>) {
+  const authProvider = await getAuthProvider(
+
+  );
   if (
     chatClient &&
     (
