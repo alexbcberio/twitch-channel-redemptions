@@ -1,5 +1,6 @@
 import { IncomingMessage, Server } from "http";
-import { handleClientAction, saveScheduledActions, scheduledActions } from "../../..";
+import { broadcast, handleClientAction } from "../chatClient";
+import { saveScheduledActions, scheduledActions } from "../helpers/scheduledActions";
 
 import { AddressInfo } from "net";
 import { Socket } from "net";
@@ -19,6 +20,7 @@ let server: Server;
 
 export {
   listen,
+	// TODO: use intermediate class to handle socket messages
   sockets
 }
 
@@ -67,9 +69,8 @@ function onConnection(socket: WebSocket, req: IncomingMessage) {
 async function onMessage(msg: string, socket: WebSocket) {
 	const data = JSON.parse(msg);
 
-	// broadcast message
 	if (!data.actions || data.actions.length === 0) {
-		sockets.filter(s => s !== socket).forEach(s => s.send(msg));
+		broadcast(msg, socket);
 		return;
 	}
 
@@ -78,7 +79,7 @@ async function onMessage(msg: string, socket: WebSocket) {
 			await handleClientAction(action);
 		} else {
 			scheduledActions.push(action);
-			scheduledActions.sort((a, b) => a.scheduledAt - b.scheduledAt);
+			scheduledActions.sort((a: any, b: any) => a.scheduledAt - b.scheduledAt);
 			saveScheduledActions();
 		}
 	}

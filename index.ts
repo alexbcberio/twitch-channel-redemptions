@@ -1,28 +1,14 @@
 import { PubSubClient, PubSubRedemptionMessage } from "twitch-pubsub-client";
+import { broadcast, chatClient, connect, say, } from "./src/backend/chatClient";
 import { getApiClient, getAuthProvider } from "./src/backend/helpers/twitch";
-import { listen, sockets } from "./src/backend/webServer";
+import { saveScheduledActions, scheduledActions } from "./src/backend/helpers/scheduledActions";
 
 import { ApiClient } from "twitch";
-import { ChatClient } from "twitch-chat-client";
-import { promises as fs } from "fs";
-
-const SCHEDULED_FILE = "./scheduled.json";
-
-const scheduledActions: Array<any> = [];
-let saInterval: NodeJS.Timeout;
+import { listen, } from "./src/backend/webServer";
 
 const channel = "alexbcberio";
 
 let apiClient: ApiClient;
-let chatClient: ChatClient;
-
-export {
-  handleClientAction,
-  scheduledActions,
-  saveScheduledActions
-}
-
-//! Important: store users & channels by id, not by username
 
 async function init() {
   const authProvider = await getAuthProvider();
@@ -35,45 +21,12 @@ async function init() {
 
   console.log("[Twitch PubSub] Connected & registered");
 
-  chatClient = new ChatClient(authProvider, { channels: [channel] });
-
-  chatClient.onConnect(onConnect);
-
-  chatClient.onDisconnect((e: any) => {
-    console.log(`[ChatClient] Disconnected ${e.message}`);
-  });
-
-  chatClient.onNoPermission((channel, message) => {
-    console.log(`[ChatClient] No permission on ${channel}: ${message}`);
-  });
-
-  chatClient.connect();
+  await connect(authProvider, [channel]);
 
   listen();
 }
 
 init();
-
-async function onConnect() {
-  console.log("[ChatClient] Connected");
-
-  // *Check this, not working
-  if (!saInterval) {
-    let savedActions = [];
-    try {
-      savedActions = JSON.parse(
-        (await fs.readFile(SCHEDULED_FILE)).toString()
-      );
-    } catch (e) {
-      // probably file does not exist
-    }
-    scheduledActions.push.apply(scheduledActions, savedActions);
-    scheduledActions.sort((a, b) => a.scheduledAt - b.scheduledAt);
-
-    setTimeout(checkScheduledActions, 1000 * 5);
-    saInterval = setInterval(checkScheduledActions, 1000 * 60);
-  }
-}
 
 async function onRedemption(message: PubSubRedemptionMessage) {
 	console.log(
@@ -108,104 +61,6 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 
     broadcast(msg);
   }
-}
-
-async function handleClientAction(action: any) {
-  if (action.channel && !isNaN(action.channel)) {
-    action.channel = await getUsernameFromId(parseInt(action.channel));
-  }
-  if (action.username && !isNaN(action.username)) {
-    action.username = await getUsernameFromId(parseInt(action.username));
-  }
-
-	switch (action.action) {
-    case "say":
-      say(channel, action.message);
-      break;
-    case "timeout":
-      await timeout(channel, action.username, action.time, action.reason);
-      break;
-    case "broadcast":
-      broadcast(action.message);
-      break;
-    case "addVip":
-      await addVip(action.channel, action.username);
-      break;
-    case "removeVip":
-      await removeVip(action.channel, action.username);
-      break;
-    default:
-      console.log(`Couldn't handle action:`, action);
-  }
-}
-
-let ssaTimeout: NodeJS.Timeout | null;
-function saveScheduledActions() {
-  if (ssaTimeout) {
-    clearTimeout(ssaTimeout);
-    ssaTimeout = null;
-    console.log("[Scheduled] Removed save timeout.");
-  }
-
-  ssaTimeout = setTimeout(async () => {
-    await fs.writeFile(SCHEDULED_FILE, JSON.stringify(scheduledActions));
-    console.log("[Scheduled] Saved actions.");
-    ssaTimeout = null;
-  }, 1000 * 30);
-}
-
-let checkingScheduled = false;
-async function checkScheduledActions() {
-  if (checkingScheduled) return;
-  checkingScheduled = true;
-
-  let hasToSave = false;
-
-  for (let i = 0; i < scheduledActions.length && scheduledActions[i].scheduledAt <= Date.now(); i++) {
-    hasToSave = true;
-
-    const action = scheduledActions.splice(i, 1)[0];
-    await handleClientAction(action);
-    console.log(`[Scheduled] Executed: ${JSON.stringify(action)}`);
-  }
-
-  if (hasToSave) {
-    saveScheduledActions();
-  }
-
-  checkingScheduled = false;
-}
-
-// send a chat message
-function say(channel: string, message: string) {
-  chatClient.say(channel, message);
-}
-
-// timeouts a user in a channel
-async function timeout(
-	channel: string,
-	username: string,
-	time?: number,
-	reason?: string
-) {
-  if (!time) {
-    time = 60;
-  }
-
-  if (!reason) {
-    reason = "";
-  }
-
-  try {
-    await chatClient.timeout(channel, username, time, reason);
-  } catch (e) {
-    // user cannot be timed out
-  }
-}
-
-// broadcast a message to all clients
-function broadcast(msg: object) {
-  sockets.forEach(s => s.send(JSON.stringify(msg)));
 }
 
 // adds a user to vips
