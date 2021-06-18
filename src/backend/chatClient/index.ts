@@ -16,9 +16,11 @@ export {
 
 async function connect(authProvider: AuthProvider, channels: Array<any>) {
   if (
-    !chatClient ||
+    chatClient &&
+    (
     chatClient.isConnecting ||
     chatClient.isConnected
+    )
   ) {
     return;
   }
@@ -52,15 +54,16 @@ async function handleClientAction(action: any) {
     action.username = await getUsernameFromId(parseInt(action.username));
   }
 
+  // TODO: create a interface for action messages
+  if (!action.channel) {
+    action.channel = "alexbcberio";
+  }
+
 	switch (action.action) {
     case "say":
-      // TODO: check if it works
-      // say(channel, action.message);
       say(action.channel, action.message);
       break;
     case "timeout":
-      // TODO: check if it works
-      // await timeout(channel, action.username, action.time, action.reason);
       await timeout(action.channel, action.username, action.time, action.reason);
       break;
     case "broadcast":
