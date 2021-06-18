@@ -93,7 +93,7 @@ async function onRefresh(refreshData: AccessToken): Promise<void> {
 async function getApiClient() {
   const authProvider = await getAuthProvider();
 
-  return new ApiClient({ authProvider });
+  return await new ApiClient({ authProvider });
 }
 
 async function getUsernameFromId(userId: number) {

@@ -16,9 +16,8 @@ export {
 const LOG_PREFIX = "[ChatClient] ";
 
 async function connect(channels: Array<any>) {
-  const authProvider = await getAuthProvider(
+  const authProvider = await getAuthProvider();
 
-  );
   if (
     chatClient &&
     (
@@ -85,8 +84,8 @@ async function handleClientAction(action: any) {
 }
 
 // send a chat message
-function say(channel: string, message: string) {
-  chatClient.say(channel, message);
+async function say(channel: string, message: string) {
+  await chatClient.say(channel, message);
 }
 
 // timeouts a user in a channel

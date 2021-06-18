@@ -27,7 +27,7 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 		`${LOG_PREFIX}Reward: "${message.rewardName}" (${message.rewardId}) redeemed by ${message.userDisplayName}`
 	);
   // @ts-ignore
-  const reward = message._data.data.redemption.rewºard;
+  const reward = message._data.data.redemption.reward;
 
   let msg: any = {
     id: message.id,
