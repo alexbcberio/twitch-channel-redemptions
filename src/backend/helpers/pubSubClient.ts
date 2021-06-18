@@ -1,13 +1,16 @@
 import { PubSubClient, PubSubRedemptionMessage } from "twitch-pubsub-client";
-import { broadcast, chatClient, say } from "./chatClient";
+import { chatClient, say } from "./chatClient";
 import { getApiClient, getUsernameFromId } from "./twitch";
 import { saveScheduledActions, scheduledActions } from "./scheduledActions";
 
 import { UserIdResolvable } from "twitch";
+import { broadcast } from "./webServer";
 
 export {
   registerUserListener
 }
+
+const LOG_PREFIX = "[PubSub] ";
 
 async function registerUserListener(user: UserIdResolvable) {
   const apiClient = await getApiClient();
@@ -16,15 +19,15 @@ async function registerUserListener(user: UserIdResolvable) {
   const userId = await pubSubClient.registerUserListener(apiClient, user);
 	/*const listener = */ await pubSubClient.onRedemption(userId, onRedemption);
 
-  console.log("[Twitch PubSub] Connected & registered");
+  console.log(`${LOG_PREFIX}Connected & registered`);
 }
 
 async function onRedemption(message: PubSubRedemptionMessage) {
 	console.log(
-		`Reward: "${message.rewardName}" (${message.rewardId}) redeemed by ${message.userDisplayName}`
+		`${LOG_PREFIX}Reward: "${message.rewardName}" (${message.rewardId}) redeemed by ${message.userDisplayName}`
 	);
   // @ts-ignore
-  const reward = message._data.data.redemption.reward;
+  const reward = message._data.data.redemption.rewºard;
 
   let msg: any = {
     id: message.id,
@@ -48,7 +51,7 @@ async function onRedemption(message: PubSubRedemptionMessage) {
   }
 
   if (msg) {
-    console.log(msg);
+    console.log(LOG_PREFIX, msg);
 
     if (typeof msg !== "string") {
       msg = JSON.stringify(msg);
@@ -56,6 +59,8 @@ async function onRedemption(message: PubSubRedemptionMessage) {
     broadcast(msg);
   }
 }
+
+// TODO: extract methods
 
 // remove vip from a user to grant it to yourself
 async function stealVip(msg: {
@@ -66,7 +71,7 @@ async function stealVip(msg: {
   const channel = await getUsernameFromId(parseInt(msg.channelId));
 
   if (!channel) {
-    console.log("No channel found");
+    console.log(`${LOG_PREFIX}No channel found`);
     return;
   }
 

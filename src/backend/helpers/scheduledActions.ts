@@ -9,6 +9,7 @@ export {
   saveScheduledActions
 };
 
+const LOG_PREFIX = "[Scheduled] ";
 const SCHEDULED_FILE = resolve(process.cwd(), "scheduled.json");
 const scheduledActions: Array<any> = [];
 
@@ -49,7 +50,7 @@ async function checkScheduledActions() {
 
 		const action = scheduledActions.splice(i, 1)[0];
 		await handleClientAction(action);
-		console.log(`[Scheduled] Executed: ${JSON.stringify(action)}`);
+		console.log(`${LOG_PREFIX}Executed: ${JSON.stringify(action)}`);
 	}
 
 	if (hasToSave) {
@@ -63,12 +64,12 @@ function saveScheduledActions() {
 	if (saveScheduledActionsTimeout) {
 		clearTimeout(saveScheduledActionsTimeout);
 		saveScheduledActionsTimeout = null;
-		console.log("[Scheduled] Removed save timeout.");
+		console.log(`${LOG_PREFIX}Removed save timeout.`);
 	}
 
 	saveScheduledActionsTimeout = setTimeout(async () => {
 		await fs.writeFile(SCHEDULED_FILE, JSON.stringify(scheduledActions));
-		console.log("[Scheduled] Saved actions.");
+		console.log(`${LOG_PREFIX}Saved actions.`);
 		saveScheduledActionsTimeout = null;
 	}, 1000 * 30);
 }
