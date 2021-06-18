@@ -10,7 +10,8 @@ let refreshAuthProvider: RefreshableAuthProvider;
 
 export {
   getAuthProvider,
-  getApiClient
+  getApiClient,
+  getUsernameFromId
 }
 
 interface ClientCredentials {
@@ -93,4 +94,15 @@ async function getApiClient() {
   const authProvider = await getAuthProvider();
 
   return new ApiClient({ authProvider });
+}
+
+async function getUsernameFromId(userId: number) {
+  const apiClient = await getApiClient();
+  const user = await apiClient.helix.users.getUserById(userId);
+
+  if (!user) {
+    return null;
+  }
+
+  return user.displayName;
 }
