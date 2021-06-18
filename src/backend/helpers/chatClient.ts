@@ -1,8 +1,8 @@
-import { getApiClient, getAuthProvider } from "../helpers/twitch";
+import { getApiClient, getAuthProvider } from "./twitch";
 
 import { ChatClient } from "twitch-chat-client";
-import { sockets } from "../webServer";
-import { start } from "../helpers/scheduledActions";
+import { sockets } from "./webServer";
+import { start } from "./scheduledActions";
 
 let chatClient: ChatClient;
 

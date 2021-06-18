@@ -1,7 +1,7 @@
 import { PubSubClient, PubSubRedemptionMessage } from "twitch-pubsub-client";
-import { broadcast, chatClient, say } from "../chatClient";
-import { getApiClient, getUsernameFromId } from "../helpers/twitch";
-import { saveScheduledActions, scheduledActions } from "../helpers/scheduledActions";
+import { broadcast, chatClient, say } from "./chatClient";
+import { getApiClient, getUsernameFromId } from "./twitch";
+import { saveScheduledActions, scheduledActions } from "./scheduledActions";
 
 import { UserIdResolvable } from "twitch";
 

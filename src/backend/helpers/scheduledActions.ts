@@ -1,5 +1,5 @@
 import { promises as fs } from "fs";
-import { handleClientAction } from "../chatClient";
+import { handleClientAction } from "./chatClient";
 import { resolve } from "path";
 
 export {

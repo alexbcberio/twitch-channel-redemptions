@@ -1,12 +1,12 @@
 import { IncomingMessage, Server } from "http";
-import { broadcast, handleClientAction } from "../chatClient";
-import { saveScheduledActions, scheduledActions } from "../helpers/scheduledActions";
+import { broadcast, handleClientAction } from "./chatClient";
+import { saveScheduledActions, scheduledActions } from "./scheduledActions";
 
 import { AddressInfo } from "net";
 import { Socket } from "net";
 import WebSocket from "ws";
 import express from "express";
-import { isDevelopment } from "../helpers/util";
+import { isDevelopment } from "./util";
 import { join } from "path";
 
 const app = express();
