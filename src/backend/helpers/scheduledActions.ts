@@ -11,6 +11,10 @@ export {
 
 const LOG_PREFIX = "[Scheduled] ";
 const SCHEDULED_FILE = resolve(process.cwd(), "scheduled.json");
+const FIRST_CHECK_TIMEOUT = 1000 * 5;
+const SAVE_TIMEOUT = 1000 * 30;
+const CHECK_INTERVAL = 1000 * 60;
+
 const scheduledActions: Array<any> = [];
 
 let checkingScheduled = false;
@@ -33,9 +37,8 @@ async function start(): Promise<void> {
 	scheduledActions.push.apply(scheduledActions, savedActions);
 	scheduledActions.sort((a, b) => a.scheduledAt - b.scheduledAt);
 
-		setTimeout(checkScheduledActions, 1000 * 5);
-		scheduledActionsInterval = setInterval(checkScheduledActions, 1000 * 60);
-	}
+	setTimeout(checkScheduledActions, FIRST_CHECK_TIMEOUT);
+	scheduledActionsInterval = setInterval(checkScheduledActions, CHECK_INTERVAL);
 }
 
 async function checkScheduledActions(): Promise<void> {
@@ -78,5 +81,5 @@ function saveScheduledActions(): void {
 		await fs.writeFile(SCHEDULED_FILE, JSON.stringify(scheduledActions));
 		console.log(`${LOG_PREFIX}Saved actions.`);
 		saveScheduledActionsTimeout = null;
-	}, 1000 * 30);
+	}, SAVE_TIMEOUT);
 }
