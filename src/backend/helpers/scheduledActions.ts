@@ -17,25 +17,32 @@ let checkingScheduled = false;
 let scheduledActionsInterval: NodeJS.Timeout;
 let saveScheduledActionsTimeout: NodeJS.Timeout | null;
 
-async function start() {
-	// *Check this, not working
-	if (!scheduledActionsInterval) {
-		let savedActions = [];
-		try {
-			savedActions = JSON.parse((await fs.readFile(SCHEDULED_FILE)).toString());
-		} catch (e) {
-			// probably file does not exist
-		}
-		scheduledActions.push.apply(scheduledActions, savedActions);
-		scheduledActions.sort((a, b) => a.scheduledAt - b.scheduledAt);
+// *Check this, not working
+async function start(): Promise<void> {
+	if (scheduledActionsInterval) {
+		return;
+	}
+
+	let savedActions = [];
+	try {
+		savedActions = JSON.parse((await fs.readFile(SCHEDULED_FILE)).toString());
+	} catch (e) {
+		// probably file does not exist
+	}
+
+	scheduledActions.push.apply(scheduledActions, savedActions);
+	scheduledActions.sort((a, b) => a.scheduledAt - b.scheduledAt);
 
 		setTimeout(checkScheduledActions, 1000 * 5);
 		scheduledActionsInterval = setInterval(checkScheduledActions, 1000 * 60);
 	}
 }
 
-async function checkScheduledActions() {
-	if (checkingScheduled) return;
+async function checkScheduledActions(): Promise<void> {
+	if (checkingScheduled) {
+		return;
+	};
+
 	checkingScheduled = true;
 
 	let hasToSave = false;
@@ -60,7 +67,7 @@ async function checkScheduledActions() {
 	checkingScheduled = false;
 }
 
-function saveScheduledActions() {
+function saveScheduledActions(): void {
 	if (saveScheduledActionsTimeout) {
 		clearTimeout(saveScheduledActionsTimeout);
 		saveScheduledActionsTimeout = null;

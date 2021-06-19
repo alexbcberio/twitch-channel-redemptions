@@ -10,6 +10,8 @@ export {
   registerUserListener
 }
 
+// TODO: clean/refactor code
+
 const LOG_PREFIX = "[PubSub] ";
 
 async function registerUserListener(user: UserIdResolvable) {
@@ -100,7 +102,7 @@ async function stealVip(msg: {
 }
 
 // adds a user to vips
-async function addVip(channel: string, username: string, message?: string) {
+async function addVip(channel: string, username: string, message?: string): Promise<void> {
   if (!message) {
     message = `Otorgado VIP a @${username}.`;
   }
@@ -109,7 +111,7 @@ async function addVip(channel: string, username: string, message?: string) {
   say(channel, message);
 }
 
-async function hasVip(channel: string, username: string) {
+async function hasVip(channel: string, username: string): Promise<boolean> {
   if (!username) {
     return false;
   }
@@ -119,7 +121,7 @@ async function hasVip(channel: string, username: string) {
 }
 
 // removes a user from vips
-async function removeVip(channel: string, username: string, message?: string) {
+async function removeVip(channel: string, username: string, message?: string): Promise<void> {
   if (!message) {
     message = `Se ha acabado el chollo, VIP de @${username} eliminado.`;
   }

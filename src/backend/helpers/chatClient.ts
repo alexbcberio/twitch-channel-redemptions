@@ -13,9 +13,11 @@ export {
   say
 };
 
+// TODO: clean/refactor code
+
 const LOG_PREFIX = "[ChatClient] ";
 
-async function connect(channels: Array<any>) {
+async function connect(channels: Array<any>): Promise<void> {
   const authProvider = await getAuthProvider();
 
   if (
@@ -43,13 +45,13 @@ async function connect(channels: Array<any>) {
   await chatClient.connect();
 }
 
-async function onConnect() {
+async function onConnect(): Promise<void> {
   console.log(`${LOG_PREFIX}Connected`);
 
   start();
 }
 
-async function handleClientAction(action: any) {
+async function handleClientAction(action: any): Promise<void> {
   if (action.channel && !isNaN(action.channel)) {
     action.channel = await getUsernameFromId(parseInt(action.channel));
   }
@@ -84,7 +86,7 @@ async function handleClientAction(action: any) {
 }
 
 // send a chat message
-async function say(channel: string, message: string) {
+async function say(channel: string, message: string): Promise<void> {
   await chatClient.say(channel, message);
 }
 
@@ -94,7 +96,7 @@ async function timeout(
 	username: string,
 	time?: number,
 	reason?: string
-) {
+): Promise<void> {
   if (!time) {
     time = 60;
   }
@@ -111,7 +113,7 @@ async function timeout(
 }
 
 // adds a user to vips
-async function addVip(channel: string, username: string, message?: string) {
+async function addVip(channel: string, username: string, message?: string): Promise<void> {
   if (!message) {
     message = `Otorgado VIP a @${username}.`;
   }
@@ -121,7 +123,7 @@ async function addVip(channel: string, username: string, message?: string) {
 }
 
 // removes a user from vips
-async function removeVip(channel: string, username: string, message?: string) {
+async function removeVip(channel: string, username: string, message?: string): Promise<void> {
   if (!message) {
     message = `VIP de @${username} eliminado.`;
   }

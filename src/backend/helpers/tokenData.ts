@@ -40,7 +40,7 @@ async function saveTokenData(tokenData: TokenData): Promise<void> {
   console.log(`${LOG_PREFIX}Token data saved`);
 }
 
-function checkTokenData(tokenData: TokenData) {
+function checkTokenData(tokenData: TokenData): void {
   if (
     !tokenData.access_token ||
     !tokenData.refresh_token
