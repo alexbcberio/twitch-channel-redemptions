@@ -31,7 +31,7 @@ async function onRedemption(message: PubSubRedemptionMessage) {
   // @ts-ignore
   const reward = message._data.data.redemption.reward;
 
-  let msg: any = {
+  const msg = {
     id: message.id,
     channelId: message.channelId,
     rewardId: message.rewardId,
@@ -48,17 +48,17 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 	switch (msg.rewardId) {
     // robar vip
     case "ac750bd6-fb4c-4259-b06d-56953601243b":
-      msg = await stealVip(msg);
+      if (await stealVip(msg)) {
+        msg.message = `@${msg.userDisplayName} ha robado el VIP a @${msg.message}.`;
+
+        broadcast(JSON.stringify(msg));
+      }
       break;
-  }
+    default:
+      console.log(LOG_PREFIX, msg);
 
-  if (msg) {
-    console.log(LOG_PREFIX, msg);
-
-    if (typeof msg !== "string") {
-      msg = JSON.stringify(msg);
-    }
-    broadcast(msg);
+      broadcast(JSON.stringify(msg));
+      break;
   }
 }
 
@@ -69,12 +69,13 @@ async function stealVip(msg: {
 	channelId: string;
 	userDisplayName: string;
 	message: string;
-}) {
+}): Promise<boolean> {
   const channel = await getUsernameFromId(parseInt(msg.channelId));
 
   if (!channel) {
     console.log(`${LOG_PREFIX}No channel found`);
-    return;
+
+    return false;
   }
 
   const addVipUser = msg.userDisplayName;
@@ -93,12 +94,10 @@ async function stealVip(msg: {
       saveScheduledActions();
     }
 
-    msg.message = `@${addVipUser} ha robado el VIP a @${removeVipUser}.`;
-
-    return msg;
+    return true;
   }
 
-  return null;
+  return false;
 }
 
 // adds a user to vips
