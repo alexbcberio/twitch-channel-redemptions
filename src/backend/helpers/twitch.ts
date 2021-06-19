@@ -2,6 +2,7 @@ import { AccessToken, RefreshableAuthProvider, StaticAuthProvider } from "twitch
 import { getTokenData, saveTokenData } from "./tokenData";
 
 import { ApiClient } from "twitch";
+import { ClientCredentials } from "../../interfaces/ClientCredentials";
 import { TokenData } from "../../interfaces/TokenData";
 
 const LOG_PREFIX = "[Twitch] ";
@@ -12,11 +13,6 @@ export {
   getAuthProvider,
   getApiClient,
   getUsernameFromId
-}
-
-interface ClientCredentials {
-  clientId: string;
-  clientSecret: string;
 }
 
 function getClientCredentials(): ClientCredentials {
@@ -68,7 +64,7 @@ async function getAuthProvider(): Promise<RefreshableAuthProvider> {
 			expiry,
       onRefresh: onRefresh
     }
-  ) as RefreshableAuthProvider;
+  );
 
   return refreshAuthProvider;
 }
@@ -90,13 +86,13 @@ async function onRefresh(refreshData: AccessToken): Promise<void> {
   await saveTokenData(newTokenData);
 }
 
-async function getApiClient() {
+async function getApiClient(): Promise<ApiClient> {
   const authProvider = await getAuthProvider();
 
   return await new ApiClient({ authProvider });
 }
 
-async function getUsernameFromId(userId: number) {
+async function getUsernameFromId(userId: number): Promise<string | null> {
   const apiClient = await getApiClient();
   const user = await apiClient.helix.users.getUserById(userId);
 
