@@ -3,10 +3,10 @@ import { handleClientAction } from "./chatClient";
 import { resolve } from "path";
 
 export {
-  start,
-  scheduledActions,
-  checkScheduledActions,
-  saveScheduledActions
+	start,
+	scheduledActions,
+	checkScheduledActions,
+	saveScheduledActions
 };
 
 const LOG_PREFIX = "[Scheduled] ";
@@ -44,7 +44,7 @@ async function start(): Promise<void> {
 async function checkScheduledActions(): Promise<void> {
 	if (checkingScheduled) {
 		return;
-	};
+	}
 
 	checkingScheduled = true;
 

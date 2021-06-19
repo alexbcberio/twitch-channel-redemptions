@@ -22,40 +22,44 @@ const wsServer = new WebSocket.Server({
 let server: Server;
 
 export {
-  listen,
+	listen,
 	broadcast
-}
+};
 
 wsServer.on("connection", onConnection);
 
 app.use(express.static(join(process.cwd(), "client")));
 
 function listen() {
-  if (server) {
-    console.log(`${LOG_PREFIX_HTTP}Server is already running`);
-    return;
-  }
+	if (server) {
+		console.log(`${LOG_PREFIX_HTTP}Server is already running`);
+		return;
+	}
 
-  server = app.listen(!isDevelopment ? 8080 : 8081, "0.0.0.0");
+	server = app.listen(!isDevelopment ? 8080 : 8081, "0.0.0.0");
 
-  server.on("listening", onListening);
-  server.on("upgrade", onUpgrade);
+	server.on("listening", onListening);
+	server.on("upgrade", onUpgrade);
 }
 
 function onListening() {
-  console.log(
-    `${LOG_PREFIX_HTTP}Listening on port ${(server.address() as AddressInfo).port}`
-  );
+	console.log(
+		`${LOG_PREFIX_HTTP}Listening on port ${
+			(server.address() as AddressInfo).port
+		}`
+	);
 }
 
 function onUpgrade(req: IncomingMessage, socket: Socket, head: Buffer) {
-  wsServer.handleUpgrade(req, socket, head, socket => {
-    wsServer.emit("connection", socket, req);
-  });
+	wsServer.handleUpgrade(req, socket, head, socket => {
+		wsServer.emit("connection", socket, req);
+	});
 }
 
 function onConnection(socket: WebSocket, req: IncomingMessage) {
-	console.log(`${LOG_PREFIX_WS}${req.socket.remoteAddress} New connection established`);
+	console.log(
+		`${LOG_PREFIX_WS}${req.socket.remoteAddress} New connection established`
+	);
 	sockets.push(socket);
 	socket.send(
 		JSON.stringify({
@@ -69,11 +73,11 @@ function onConnection(socket: WebSocket, req: IncomingMessage) {
 
 // broadcast a message to all clients
 function broadcast(msg: string, socket?: any) {
-  const filteredSockets = socket
-    ? sockets.filter(s => s !== socket)
-    : sockets;
+	const filteredSockets = socket
+		? sockets.filter(s => s !== socket)
+		: sockets;
 
-  filteredSockets.forEach(s => s.send(msg));
+	filteredSockets.forEach(s => s.send(msg));
 }
 
 async function onMessage(msg: string) {
@@ -81,7 +85,10 @@ async function onMessage(msg: string) {
 	const socket = this as WebSocket;
 	const data = JSON.parse(msg);
 
-	if (!data.actions || data.actions.length === 0) {
+	if (
+		!data.actions ||
+		data.actions.length === 0
+	) {
 		broadcast(msg, socket);
 		return;
 	}
@@ -96,14 +103,17 @@ async function onMessage(msg: string) {
 		}
 	}
 
-	console.log(`${LOG_PREFIX_WS}Received message with ${data.actions.length} actions:`, data);
+	console.log(
+		`${LOG_PREFIX_WS}Received message with ${data.actions.length} actions:`,
+		data
+	);
 }
 
 function onClose() {
 	// @ts-ignore
 	const socket: WebSocket = this as WebSocket;
 
-  const socketIdx = sockets.indexOf(socket);
-  sockets.splice(socketIdx, 1);
-  console.log(`${LOG_PREFIX_WS}Connection closed`);
+	const socketIdx = sockets.indexOf(socket);
+	sockets.splice(socketIdx, 1);
+	console.log(`${LOG_PREFIX_WS}Connection closed`);
 }
