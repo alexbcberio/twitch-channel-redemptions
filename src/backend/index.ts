@@ -1,6 +1,6 @@
 import { connect } from "./chatClient";
 import { listen } from "./helpers/webServer";
-import { registerUserListener } from "./helpers/pubSubClient";
+import { registerUserListener } from "./pubSubClient";
 
 const channel = "alexbcberio";
 
