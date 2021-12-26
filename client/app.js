@@ -54,7 +54,7 @@ async function checkEvent(e) {
             break;
           // ruleta rusa
           case "a73247ee-e33e-4e9b-9105-bd9d11e111fc":
-            await russianRoulette(data.userDisplayName);
+            await russianRoulette(data);
             break;
           // timeout a un amigo
           case "638c642d-23d8-4264-9702-e77eeba134de":
@@ -77,8 +77,12 @@ async function checkEvent(e) {
           case "232e951f-93d1-4138-a0e3-9e822b4852e0":
             data.message = `@${data.userDisplayName} ha invitado a una ronda.`;
             sendWsActions({
-              action: "say",
-              message: "FunnyCatTastingTHEWATER FunnyCatTastingTHEWATER FunnyCatTastingTHEWATER"
+              type: "say",
+              channelId: data.channelId,
+              userId: data.userId,
+              data: {
+                message: "waterGang waterGang waterGang"
+              }
             });
             await createCard(data.rewardName, data.message, data.backgroundColor, data.rewardImage);
             break;
@@ -148,7 +152,7 @@ function karaokeTime(username, message) {
 }
 
 let rrAttemps = 0;
-function russianRoulette(username) {
+function russianRoulette({ channelId, userId, userDisplayName }) {
   return new Promise(res =>  {
     const win = rando(5 - rrAttemps) !== 0;
 
@@ -161,10 +165,10 @@ function russianRoulette(username) {
     const p = createText();
 
     if (win) {
-      p.innerText = `${username} ha sido afortunado y aún sigue entre nosotros`;
+      p.innerText = `${userDisplayName} ha sido afortunado y aún sigue entre nosotros`;
       rrAttemps = 0;
     } else {
-      p.innerText = `${username} se ha ido a un mundo mejor, siempre te recordaremos`;
+      p.innerText = `${userDisplayName} se ha ido a un mundo mejor, siempre te recordaremos`;
       rrAttemps++;
     }
 
@@ -181,21 +185,33 @@ function russianRoulette(username) {
         img.classList.add("shoot");
 
         actions.push({
-          action: "timeout",
-          username: username,
-          time: "60",
-          reason: "F en la ruleta."
+          type: "timeout",
+          userId,
+          channelId,
+          data: {
+            username: userDisplayName,
+            time: "60",
+            reason: "F en la ruleta."
+          }
         });
 
         actions.push({
-          action: "say",
-          message: `PepeHands ${username} no ha sobrevivido para contarlo.`
+          type: "say",
+          userId,
+          channelId,
+          data: {
+            message: `PepeHands ${userDisplayName} no ha sobrevivido para contarlo.`
+          }
         });
 
       } else {
         actions.push({
-          action: "say",
-          message: `rdCool Clap ${username}`
+          type: "say",
+          userId,
+          channelId,
+          data: {
+            message: `rdCool Clap ${userDisplayName}`
+          }
         });
       }
 
@@ -220,10 +236,14 @@ async function timeoutFriend(data) {
   const receptorUser = data.message.split(" ")[0];
 
   sendWsActions({
-    action: "timeout",
-    username: receptorUser,
-    time: "60",
-    reason: `Timeout dado por @${senderUser} con puntos del canal.`
+    type: "timeout",
+    userId: data.userId,
+    channelId: data.channelId,
+    data: {
+      username: receptorUser,
+      time: "60",
+      reason: `Timeout dado por @${senderUser} con puntos del canal.`
+    }
   });
 
   const cardMessage = `@${senderUser} ha expulsado a @${receptorUser} por 60 segundos.`;
@@ -235,10 +255,14 @@ async function highlightMessage(data) {
 
   if (urlRegex.test(data.message)) {
     sendWsActions({
-      action: "timeout",
-      username: data.userDisplayName,
-      time: "10",
-      reason: "No esta permitido enviar enlaces en mensajes destacados."
+      type: "timeout",
+      userId: data.userId,
+      channelId: data.channelId,
+      data: {
+        username: data.userDisplayName,
+        time: "10",
+        reason: "No esta permitido enviar enlaces en mensajes destacados."
+      }
     });
     return;
   }
@@ -247,18 +271,15 @@ async function highlightMessage(data) {
 }
 
 async function giveTempVip(data) {
-  const username = data.userDisplayName;
-  const channel = data.channelId;
-
   sendWsActions([{
-      action: "addVip",
-      channel,
-      username
+      type: "addVip",
+      userId: data.userId,
+      channelId: data.channelId
     }, {
       scheduledAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
-      action: "removeVip",
-      channel,
-      username
+      type: "removeVip",
+      userId: data.userId,
+      channelId: data.channelId
     }]);
 }
 
@@ -274,13 +295,11 @@ function sendWsActions(actions) {
   }
 
   if (ws.readyState === WebSocket.OPEN) {
-
     if (actions.length > 0) {
       ws.send(JSON.stringify({
         actions: actions
       }));
     }
-
   }
 }
 
