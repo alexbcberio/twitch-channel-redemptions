@@ -1,11 +1,12 @@
 import { IncomingMessage, Server } from "http";
 import { saveScheduledActions, scheduledActions } from "./scheduledActions";
 
+import { Action } from "../../interfaces/actions/Action";
 import { AddressInfo } from "net";
 import { Socket } from "net";
 import WebSocket from "ws";
 import express from "express";
-import { handleClientAction } from "./chatClient";
+import { handleClientAction } from "../chatClient";
 import { isDevelopment } from "./util";
 import { join } from "path";
 
@@ -93,7 +94,9 @@ async function onMessage(msg: string) {
 		return;
 	}
 
-	for (const action of data.actions) {
+	const actions: Array<Action> = data.actions;
+
+	for (const action of actions) {
 		if (!action.scheduledAt) {
 			await handleClientAction(action);
 		} else {
