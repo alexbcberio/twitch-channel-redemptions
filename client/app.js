@@ -183,7 +183,11 @@ function russianRoulette({ userDisplayName, message }) {
         }, 1250);
       }
 
-      audio.play();
+      try {
+        audio.play();
+      } catch(e) {
+        // user didn't interact with the document first
+      }
     }
   });
 }
