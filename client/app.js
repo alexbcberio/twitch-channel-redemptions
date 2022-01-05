@@ -56,10 +56,6 @@ async function checkEvent(e) {
           case "a73247ee-e33e-4e9b-9105-bd9d11e111fc":
             await russianRoulette(data);
             break;
-          // highlight message
-          case "a26c0d9e-fd2c-4943-bc94-c5c2f2c974e4":
-            await highlightMessage(data);
-            break;
           // robar el vip
           case "ac750bd6-fb4c-4259-b06d-56953601243b":
             await createCard(data.rewardName, data.message, data.backgroundColor, data.rewardImage);
@@ -173,26 +169,6 @@ function russianRoulette({ userDisplayName, message }) {
       }
     }
   });
-}
-
-async function highlightMessage(data) {
-  const urlRegex = /(https?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
-
-  if (urlRegex.test(data.message)) {
-    sendWsActions({
-      type: "timeout",
-      userId: data.userId,
-      channelId: data.channelId,
-      data: {
-        username: data.userDisplayName,
-        time: "10",
-        reason: "No esta permitido enviar enlaces en mensajes destacados."
-      }
-    });
-    return;
-  }
-
-  await createCard(data.rewardName, data.message, data.backgroundColor, data.rewardImage);
 }
 
 // send actions to be performed by the server

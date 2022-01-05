@@ -7,6 +7,7 @@ import { broadcast } from "../helpers/webServer";
 import { getApiClient } from "../helpers/twitch";
 import { getVip } from "./actions/getVip";
 import { hidrate } from "./actions/hidrate";
+import { highlightMessage } from "./actions/highlightMessage";
 import { russianRoulette } from "./actions/russianRoulette";
 import { stealVip } from "./actions/stealVip";
 import { timeoutFriend } from "./actions/timeoutFriend";
@@ -51,6 +52,9 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 			break;
 		case RedemptionIds.TimeoutFriend:
 			await timeoutFriend(msg);
+			break;
+		case RedemptionIds.HighlightMessage:
+			await highlightMessage(msg);
 			break;
 		case RedemptionIds.GetVip:
 			msg.message = `@${msg.userDisplayName} ha encontrado diamantes!`;
