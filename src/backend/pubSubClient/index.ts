@@ -1,8 +1,11 @@
 import { PubSubClient, PubSubRedemptionMessage } from "twitch-pubsub-client";
 
+import { RedemptionIds } from "../../enums/Redemptions";
+import { RedemptionMessage } from "../../interfaces/RedemptionMessage";
 import { UserIdResolvable } from "twitch";
 import { broadcast } from "../helpers/webServer";
 import { getApiClient } from "../helpers/twitch";
+import { getVip } from "./actions/getVip";
 import { stealVip } from "./actions/stealVip";
 
 const LOG_PREFIX = "[PubSub] ";
@@ -24,7 +27,7 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 	// @ts-ignore
 	const reward = message._data.data.redemption.reward;
 
-	const msg = {
+	const msg: RedemptionMessage = {
 		id: message.id,
 		channelId: message.channelId,
 		rewardId: message.rewardId,
@@ -40,11 +43,17 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 	};
 
 	switch (msg.rewardId) {
-		// robar vip
-		case "ac750bd6-fb4c-4259-b06d-56953601243b":
+		case RedemptionIds.StealVip:
 			if (await stealVip(msg)) {
-				msg.message = `@${msg.userDisplayName} ha robado el VIP a @${msg.message}.`;
+				msg.message = `@${msg.userDisplayName} ha "tomado prestado" el VIP de @${msg.message}`;
 
+				broadcast(JSON.stringify(msg));
+			}
+			break;
+		case RedemptionIds.GetVip:
+			msg.message = `@${msg.userDisplayName} ha encontrado diamantes!`;
+
+			if (await getVip(msg)) {
 				broadcast(JSON.stringify(msg));
 			}
 			break;

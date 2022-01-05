@@ -1,18 +1,22 @@
 import { chatClient } from "../..";
 import { say } from "..";
 
-// removes a user from vips
 async function removeVip(
 	channel: string,
 	username: string,
 	message?: string
-): Promise<void> {
-	if (!message) {
-		message = `VIP de @${username} eliminado.`;
+): Promise<boolean> {
+	try {
+		await chatClient.removeVip(channel, username);
+	} catch (e) {
+		return false;
 	}
 
-	await chatClient.removeVip(channel, username);
-	say(channel, message);
+	if (message) {
+		await say(channel, message);
+	}
+
+	return true;
 }
 
 export { removeVip };

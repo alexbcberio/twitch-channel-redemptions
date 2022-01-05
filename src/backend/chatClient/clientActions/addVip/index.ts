@@ -1,18 +1,22 @@
 import { chatClient } from "../..";
 import { say } from "..";
 
-// adds a user to vips
 async function addVip(
 	channel: string,
 	username: string,
 	message?: string
-): Promise<void> {
-	if (!message) {
-		message = `Otorgado VIP a @${username}.`;
+): Promise<boolean> {
+	try {
+		await chatClient.addVip(channel, username);
+	} catch (e) {
+		return false;
 	}
 
-	await chatClient.addVip(channel, username);
-	say(channel, message);
+	if (message) {
+		await say(channel, message);
+	}
+
+	return true;
 }
 
 export { addVip };

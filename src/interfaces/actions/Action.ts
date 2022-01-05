@@ -1,7 +1,9 @@
+import { ActionType } from "../../enums/ActionType";
+
 export interface Action {
-  type: string;
-  channelId: string;
-  userId: string;
-  scheduledAt?: number;
-  data: any;
+	type: ActionType;
+	channelId: string;
+	userId: string;
+	scheduledAt?: number;
+	data: any;
 }

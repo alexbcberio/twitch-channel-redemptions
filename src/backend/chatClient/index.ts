@@ -2,6 +2,7 @@ import { addVip, removeVip, say, timeout } from "./clientActions";
 import { getAuthProvider, getUsernameFromId } from "../helpers/twitch";
 
 import { Action } from "../../interfaces/actions/Action";
+import { ActionType } from "../../enums/ActionType";
 import { ChatClient } from "twitch-chat-client";
 import { broadcast } from "../helpers/webServer";
 import { start } from "../helpers/scheduledActions";
@@ -52,20 +53,20 @@ async function handleClientAction(action: Action): Promise<void> {
 	}
 
 	switch (action.type) {
-		case "say":
+		case ActionType.Say:
 			say(channel, action.data.message);
 			break;
-		case "timeout":
+		case ActionType.Timeout:
 			await timeout(channel, username, action.data.time, action.data.reason);
 			break;
-		case "broadcast":
+		case ActionType.Broadcast:
 			broadcast(action.data.message);
 			break;
-		case "addVip":
-			await addVip(channel, username);
+		case ActionType.AddVip:
+			await addVip(channel, username, `Otorgado VIP a @${username}`);
 			break;
-		case "removeVip":
-			await removeVip(channel, username);
+		case ActionType.RemoveVip:
+			await removeVip(channel, username, `Eliminado VIP de @${username}`);
 			break;
 		default:
 			console.log(`${[LOG_PREFIX]}Couldn't handle action:`, action);
