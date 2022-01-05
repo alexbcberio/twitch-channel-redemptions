@@ -64,11 +64,6 @@ async function checkEvent(e) {
           case "a26c0d9e-fd2c-4943-bc94-c5c2f2c974e4":
             await highlightMessage(data);
             break;
-          case "a215d6a0-2c11-4503-bb29-1ca98ef046ac":
-            await giveTempVip(data);
-            data.message = `@${data.userDisplayName} ha encontrado diamantes!`;
-            await createCard(data.rewardName, data.message, data.backgroundColor, data.rewardImage);
-            break;
           // robar el vip
           case "ac750bd6-fb4c-4259-b06d-56953601243b":
             await createCard(data.rewardName, data.message, data.backgroundColor, data.rewardImage);
@@ -151,10 +146,9 @@ function karaokeTime(username, message) {
 
 }
 
-let rrAttemps = 0;
-function russianRoulette({ channelId, userId, userDisplayName }) {
+function russianRoulette({ userDisplayName, message }) {
   return new Promise(res =>  {
-    const win = rando(5 - rrAttemps) !== 0;
+    const gotShot = Boolean(message);
 
     const div = document.createElement("div");
     div.classList.add("alert");
@@ -164,59 +158,22 @@ function russianRoulette({ channelId, userId, userDisplayName }) {
 
     const p = createText();
 
-    if (win) {
-      p.innerText = `${userDisplayName} ha sido afortunado y aún sigue entre nosotros`;
-      rrAttemps = 0;
-    } else {
+    if (gotShot) {
       p.innerText = `${userDisplayName} se ha ido a un mundo mejor, siempre te recordaremos`;
-      rrAttemps++;
+    } else {
+      p.innerText = `${userDisplayName} ha sido afortunado y aún sigue entre nosotros`;
     }
 
     div.appendChild(img);
     div.appendChild(p);
 
     img.onload = () => {
-      const audio = createAudio(`/sfx/toy-gun/${win ? 'stuck' : 'shot'}.mp3`);
+      const audio = createAudio(`/sfx/toy-gun/${gotShot ? 'shot' : 'stuck'}.mp3`);
 
       document.body.appendChild(div);
 
-      const actions = [];
-      if (!win) {
+      if (gotShot) {
         img.classList.add("shoot");
-
-        actions.push({
-          type: "timeout",
-          userId,
-          channelId,
-          data: {
-            username: userDisplayName,
-            time: "60",
-            reason: "F en la ruleta."
-          }
-        });
-
-        actions.push({
-          type: "say",
-          userId,
-          channelId,
-          data: {
-            message: `PepeHands ${userDisplayName} no ha sobrevivido para contarlo.`
-          }
-        });
-
-      } else {
-        actions.push({
-          type: "say",
-          userId,
-          channelId,
-          data: {
-            message: `rdCool Clap ${userDisplayName}`
-          }
-        });
-      }
-
-      if (actions.length > 0) {
-        sendWsActions(actions);
       }
 
       audio.onended = () => {
@@ -268,19 +225,6 @@ async function highlightMessage(data) {
   }
 
   await createCard(data.rewardName, data.message, data.backgroundColor, data.rewardImage);
-}
-
-async function giveTempVip(data) {
-  sendWsActions([{
-      type: "addVip",
-      userId: data.userId,
-      channelId: data.channelId
-    }, {
-      scheduledAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
-      type: "removeVip",
-      userId: data.userId,
-      channelId: data.channelId
-    }]);
 }
 
 // send actions to be performed by the server

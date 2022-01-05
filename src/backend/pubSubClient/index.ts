@@ -6,6 +6,7 @@ import { UserIdResolvable } from "twitch";
 import { broadcast } from "../helpers/webServer";
 import { getApiClient } from "../helpers/twitch";
 import { getVip } from "./actions/getVip";
+import { russianRoulette } from "./actions/russianRoulette";
 import { stealVip } from "./actions/stealVip";
 
 const LOG_PREFIX = "[PubSub] ";
@@ -43,12 +44,10 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 	};
 
 	switch (msg.rewardId) {
-		case RedemptionIds.StealVip:
-			if (await stealVip(msg)) {
-				msg.message = `@${msg.userDisplayName} ha "tomado prestado" el VIP de @${msg.message}`;
-
-				broadcast(JSON.stringify(msg));
-			}
+		case RedemptionIds.RussianRoulette:
+			await russianRoulette(msg);
+			break;
+		case RedemptionIds.TimeoutFriend:
 			break;
 		case RedemptionIds.GetVip:
 			msg.message = `@${msg.userDisplayName} ha encontrado diamantes!`;
@@ -56,6 +55,15 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 			if (await getVip(msg)) {
 				broadcast(JSON.stringify(msg));
 			}
+			break;
+		case RedemptionIds.StealVip:
+			if (await stealVip(msg)) {
+				msg.message = `@${msg.userDisplayName} ha "tomado prestado" el VIP de @${msg.message}`;
+
+				broadcast(JSON.stringify(msg));
+			}
+			break;
+		case RedemptionIds.Hidrate:
 			break;
 		default:
 			console.log(LOG_PREFIX, msg);
