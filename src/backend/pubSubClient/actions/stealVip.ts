@@ -1,4 +1,5 @@
-import { addVip, hasVip, removeVip } from "../../chatClient/clientActions";
+import { addVip, hasVip, removeVip, say } from "../../chatClient/clientActions";
+import { save, vipUsers } from "../../helpers/miniDb";
 
 import { LOG_PREFIX } from "..";
 import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
@@ -14,7 +15,8 @@ async function stealVip(
 		return;
 	}
 
-	const channel = await getUsernameFromId(parseInt(msg.channelId));
+	const channelId = parseInt(msg.channelId);
+	const channel = await getUsernameFromId(channelId);
 
 	if (!channel) {
 		console.log(`${LOG_PREFIX}No channel found`);
@@ -23,15 +25,20 @@ async function stealVip(
 	}
 
 	const addVipUser = msg.userDisplayName;
-	const removeVipUser = msg.message;
+	const removeVipUser = msg.message.toLowerCase();
+	const channelVips = vipUsers[channelId];
 
-	if (!(await hasVip(channel, removeVipUser))) {
-		console.log(`${LOG_PREFIX}@${removeVipUser} is not VIP`);
+	if (!channelVips.find(u => u.toLowerCase() === removeVipUser)) {
+		const message =
+			channelVips.length === 0
+				? "No hay nadie a quien puedas robar el VIP"
+				: `Solo puedes robar el VIP de: "${channelVips.sort().join('", "')}"`;
+		await say(channel, message);
 
 		return;
 	}
 
-	if (await hasVip(channel, addVipUser)) {
+	if (channelVips.includes(addVipUser) || (await hasVip(channel, addVipUser))) {
 		console.log(`${LOG_PREFIX}@${addVipUser} is already VIP`);
 
 		return;
@@ -39,7 +46,8 @@ async function stealVip(
 
 	const removed = await removeVip(channel, removeVipUser);
 
-	if (!removed) {
+	if (!removed && (await hasVip(channel, removeVipUser))) {
+		console.log(`${LOG_PREFIX}Could not remove VIP of @${removeVipUser}`);
 		return;
 	}
 
@@ -51,7 +59,16 @@ async function stealVip(
 		return;
 	}
 
+	const removeIdx = channelVips.findIndex(
+		u => u.toLowerCase() === removeVipUser
+	);
+
+	channelVips.splice(removeIdx);
+	channelVips.push(addVipUser);
+	save();
+
 	msg.message = `@${addVipUser} ha "tomado prestado" el VIP de @${removeVipUser}`;
+	await say(channel, msg.message);
 
 	return msg;
 }
