@@ -46,38 +46,36 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 		backgroundColor: reward.background_color
 	};
 
+	let handledMessage: RedemptionMessage | undefined;
+
 	switch (msg.rewardId) {
 		case RedemptionIds.RussianRoulette:
-			await russianRoulette(msg);
+			handledMessage = await russianRoulette(msg);
 			break;
 		case RedemptionIds.TimeoutFriend:
-			await timeoutFriend(msg);
+			handledMessage = await timeoutFriend(msg);
 			break;
 		case RedemptionIds.HighlightMessage:
-			await highlightMessage(msg);
+			handledMessage = await highlightMessage(msg);
 			break;
 		case RedemptionIds.GetVip:
-			msg.message = `@${msg.userDisplayName} ha encontrado diamantes!`;
-
-			if (await getVip(msg)) {
-				broadcast(JSON.stringify(msg));
-			}
+			handledMessage = await getVip(msg);
 			break;
 		case RedemptionIds.StealVip:
-			if (await stealVip(msg)) {
-				msg.message = `@${msg.userDisplayName} ha "tomado prestado" el VIP de @${msg.message}`;
-
-				broadcast(JSON.stringify(msg));
-			}
+			handledMessage = await stealVip(msg);
 			break;
 		case RedemptionIds.Hidrate:
-			await hidrate(msg);
+			handledMessage = await hidrate(msg);
 			break;
 		default:
-			console.log(LOG_PREFIX, msg);
+			console.log(`${LOG_PREFIX}Unhandled redemption ${msg.rewardId}`);
 
-			broadcast(JSON.stringify(msg));
+			handledMessage = msg;
 			break;
+	}
+
+	if (handledMessage) {
+		broadcast(JSON.stringify(handledMessage));
 	}
 }
 

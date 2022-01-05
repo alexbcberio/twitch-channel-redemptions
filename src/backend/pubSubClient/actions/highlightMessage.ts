@@ -1,10 +1,11 @@
 import { LOG_PREFIX } from "..";
 import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
-import { broadcast } from "../../helpers/webServer";
 import { getUsernameFromId } from "../../helpers/twitch";
 import { timeout } from "../../chatClient/clientActions";
 
-async function highlightMessage(msg: RedemptionMessage): Promise<void> {
+async function highlightMessage(
+	msg: RedemptionMessage
+): Promise<RedemptionMessage | undefined> {
 	if (!msg.message) {
 		console.log(`${LOG_PREFIX}Redemption has no message`);
 
@@ -35,7 +36,7 @@ async function highlightMessage(msg: RedemptionMessage): Promise<void> {
 		return;
 	}
 
-	broadcast(JSON.stringify(msg));
+	return msg;
 }
 
 export { highlightMessage };

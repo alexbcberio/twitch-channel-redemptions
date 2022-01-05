@@ -9,14 +9,18 @@ import { randomInt } from "crypto";
 type GunsSafeShots = Record<string, number>;
 const gunsSafeShots: GunsSafeShots = {};
 
+const timeoutSeconds = 60;
 const maxSafeShots = 5;
 
-async function russianRoulette(msg: RedemptionMessage): Promise<void> {
+async function russianRoulette(
+	msg: RedemptionMessage
+): Promise<RedemptionMessage | undefined> {
 	const { channelId, userDisplayName } = msg;
 	const channel = await getUsernameFromId(parseInt(channelId));
 
 	if (!channel) {
 		console.log(`${LOG_PREFIX}No channel found`);
+
 		return;
 	}
 
@@ -32,18 +36,16 @@ async function russianRoulette(msg: RedemptionMessage): Promise<void> {
 		gunsSafeShots[channelId] = maxSafeShots;
 	}
 
-	if (win) {
-		msg.message = "";
-	} else {
-		msg.message = "got shot";
-	}
+	msg.message = win ? "" : "got shot";
 
 	broadcast(JSON.stringify(msg));
 
 	const promises: Array<Promise<unknown>> = [];
 
 	if (!win) {
-		promises.push(timeout(channel, userDisplayName, 60, "F en la ruleta"));
+		promises.push(
+			timeout(channel, userDisplayName, timeoutSeconds, "F en la ruleta")
+		);
 		promises.push(
 			say(
 				channel,

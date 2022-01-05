@@ -4,13 +4,15 @@ import { LOG_PREFIX } from "..";
 import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
 import { getUsernameFromId } from "../../helpers/twitch";
 
-async function getVip(msg: RedemptionMessage): Promise<boolean> {
+async function getVip(
+	msg: RedemptionMessage
+): Promise<RedemptionMessage | undefined> {
 	const channel = await getUsernameFromId(parseInt(msg.channelId));
 
 	if (!channel) {
 		console.log(`${LOG_PREFIX}No channel found`);
 
-		return false;
+		return;
 	}
 
 	const addVipUser = msg.userDisplayName;
@@ -18,12 +20,12 @@ async function getVip(msg: RedemptionMessage): Promise<boolean> {
 	if (await hasVip(channel, addVipUser)) {
 		console.log(`${LOG_PREFIX}@${addVipUser} is already VIP`);
 
-		return false;
+		return;
 	}
 
-	const addedVip = await addVip(channel, addVipUser, msg.message);
+	await addVip(channel, addVipUser);
 
-	return addedVip;
+	return msg;
 }
 
 export { getVip };

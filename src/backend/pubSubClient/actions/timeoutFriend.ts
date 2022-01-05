@@ -4,12 +4,14 @@ import { broadcast } from "../../helpers/webServer";
 import { getUsernameFromId } from "../../helpers/twitch";
 import { timeout } from "../../chatClient/clientActions";
 
-async function timeoutFriend(msg: RedemptionMessage): Promise<boolean> {
+async function timeoutFriend(
+	msg: RedemptionMessage
+): Promise<RedemptionMessage | undefined> {
 	const { message, channelId, userDisplayName } = msg;
 	if (!msg.message) {
 		console.log(`${LOG_PREFIX}Redemption has no message`);
 
-		return false;
+		return;
 	}
 
 	const channel = await getUsernameFromId(parseInt(channelId));
@@ -17,7 +19,7 @@ async function timeoutFriend(msg: RedemptionMessage): Promise<boolean> {
 	if (!channel) {
 		console.log(`${LOG_PREFIX}No channel found`);
 
-		return false;
+		return;
 	}
 
 	const time = 60;
@@ -35,10 +37,10 @@ async function timeoutFriend(msg: RedemptionMessage): Promise<boolean> {
 			console.error(`${LOG_PREFIX} ${e.message}`);
 		}
 
-		return false;
+		return;
 	}
 
-	return true;
+	return msg;
 }
 
 export { timeoutFriend };
