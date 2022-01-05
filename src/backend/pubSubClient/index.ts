@@ -75,6 +75,15 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 	}
 
 	if (handledMessage) {
+		const rewardEnumValues = Object.values(RedemptionIds);
+		const rewardIdValueIndex = rewardEnumValues.indexOf(
+			// @ts-expect-error String is not assignable to... but all keys are strings
+			handledMessage.rewardId
+		);
+		const rewardName = Object.keys(RedemptionIds)[rewardIdValueIndex];
+
+		handledMessage.rewardId = rewardName;
+
 		broadcast(JSON.stringify(handledMessage));
 	}
 }

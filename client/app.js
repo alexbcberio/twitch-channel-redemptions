@@ -48,17 +48,11 @@ async function checkEvent(e) {
 
       if (data.channelId) {
         switch (data.rewardId) {
-          // karaoke time
-          case "27faa7e4-f496-4e91-92ae-a51f99b9e854":
+          case "KaraokeTime":
             await karaokeTime(data.userDisplayName, data.message);
             break;
-          // ruleta rusa
-          case "a73247ee-e33e-4e9b-9105-bd9d11e111fc":
+          case "RussianRoulette":
             await russianRoulette(data);
-            break;
-          // robar el vip
-          case "ac750bd6-fb4c-4259-b06d-56953601243b":
-            await createCard(data.rewardName, data.message, data.backgroundColor, data.rewardImage);
             break;
           default:
             await createCard(data.rewardName, data.message ? data.message : "", data.backgroundColor, data.rewardImage);
