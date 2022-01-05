@@ -57,7 +57,11 @@ async function handleClientAction(action: Action): Promise<void> {
 			say(channel, action.data.message);
 			break;
 		case ActionType.Timeout:
-			await timeout(channel, username, action.data.time, action.data.reason);
+			try {
+				await timeout(channel, username, action.data.time, action.data.reason);
+			} catch (e) {
+				// user cannot be timed out
+			}
 			break;
 		case ActionType.Broadcast:
 			broadcast(action.data.message);

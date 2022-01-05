@@ -15,11 +15,7 @@ async function timeout(
 		reason = "";
 	}
 
-	try {
-		await chatClient.timeout(channel, username, time, reason);
-	} catch (e) {
-		// user cannot be timed out
-	}
+	await chatClient.timeout(channel, username, time, reason);
 }
 
 export { timeout };
