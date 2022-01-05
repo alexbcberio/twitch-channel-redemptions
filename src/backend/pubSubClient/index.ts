@@ -6,6 +6,7 @@ import { UserIdResolvable } from "twitch";
 import { broadcast } from "../helpers/webServer";
 import { getApiClient } from "../helpers/twitch";
 import { getVip } from "./actions/getVip";
+import { hidrate } from "./actions/hidrate";
 import { russianRoulette } from "./actions/russianRoulette";
 import { stealVip } from "./actions/stealVip";
 import { timeoutFriend } from "./actions/timeoutFriend";
@@ -66,6 +67,7 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 			}
 			break;
 		case RedemptionIds.Hidrate:
+			await hidrate(msg);
 			break;
 		default:
 			console.log(LOG_PREFIX, msg);

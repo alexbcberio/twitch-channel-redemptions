@@ -64,19 +64,6 @@ async function checkEvent(e) {
           case "ac750bd6-fb4c-4259-b06d-56953601243b":
             await createCard(data.rewardName, data.message, data.backgroundColor, data.rewardImage);
             break;
-           // hidratate
-          case "232e951f-93d1-4138-a0e3-9e822b4852e0":
-            data.message = `@${data.userDisplayName} ha invitado a una ronda.`;
-            sendWsActions({
-              type: "say",
-              channelId: data.channelId,
-              userId: data.userId,
-              data: {
-                message: "waterGang waterGang waterGang"
-              }
-            });
-            await createCard(data.rewardName, data.message, data.backgroundColor, data.rewardImage);
-            break;
           default:
             await createCard(data.rewardName, data.message ? data.message : "", data.backgroundColor, data.rewardImage);
         }
