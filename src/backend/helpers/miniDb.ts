@@ -3,12 +3,17 @@ import { handleClientAction } from "../chatClient";
 import { resolve } from "path";
 
 const LOG_PREFIX = "[Scheduled] ";
-const SCHEDULED_FILE = resolve(process.cwd(), "./storage/scheduled.json");
+
 const FIRST_CHECK_TIMEOUT = 5e3;
 const SAVE_TIMEOUT = 5e3;
 const CHECK_INTERVAL = 60e3;
 
+const FILES_BASE = resolve(process.cwd(), "./storage");
+const SCHEDULED_FILE = resolve(FILES_BASE, "./scheduled.json");
+const VIP_USERS_FILE = resolve(FILES_BASE, "./vips.json");
+
 const scheduledActions: Array<any> = [];
+const vipUsers: Record<string, Array<string>> = {};
 
 let checkingScheduled = false;
 let scheduledActionsInterval: NodeJS.Timeout;
@@ -35,6 +40,21 @@ async function start(): Promise<void> {
 
 	setTimeout(checkScheduledActions, FIRST_CHECK_TIMEOUT);
 	scheduledActionsInterval = setInterval(checkScheduledActions, CHECK_INTERVAL);
+
+	try {
+		const savedVipUsers = JSON.parse(
+			await (await fs.readFile(VIP_USERS_FILE)).toString()
+		);
+
+		for (const key of Object.keys(savedVipUsers)) {
+			vipUsers[key] = savedVipUsers[key];
+		}
+	} catch (e) {
+		// probably file does not exist
+		if (e instanceof Error) {
+			console.log(`${LOG_PREFIX}${e.message}`);
+		}
+	}
 }
 
 async function checkScheduledActions(): Promise<void> {
@@ -60,13 +80,13 @@ async function checkScheduledActions(): Promise<void> {
 	}
 
 	if (hasToSave) {
-		saveScheduledActions();
+		save();
 	}
 
 	checkingScheduled = false;
 }
 
-function saveScheduledActions(): void {
+function save(): void {
 	if (saveScheduledActionsTimeout) {
 		clearTimeout(saveScheduledActionsTimeout);
 		saveScheduledActionsTimeout = null;
@@ -74,22 +94,22 @@ function saveScheduledActions(): void {
 	}
 
 	saveScheduledActionsTimeout = setTimeout(async () => {
-		const normalizedPath = SCHEDULED_FILE.replace(/\\/g, "/");
-
 		try {
-			await fs.stat(normalizedPath);
+			await fs.stat(FILES_BASE);
 		} catch (e) {
-			const dirs = normalizedPath.split("/");
-			dirs.pop();
-			await fs.mkdir(dirs.join("/"));
+			await fs.mkdir(FILES_BASE);
 		}
 
-		await fs.writeFile(SCHEDULED_FILE, JSON.stringify(scheduledActions));
+		await Promise.all([
+			fs.writeFile(SCHEDULED_FILE, JSON.stringify(scheduledActions)),
+			fs.writeFile(VIP_USERS_FILE, JSON.stringify(vipUsers))
+		]);
+
 		console.log(`${LOG_PREFIX}Saved actions.`);
 		saveScheduledActionsTimeout = null;
 	}, SAVE_TIMEOUT);
 }
 
-saveScheduledActions();
+save();
 
-export { start, scheduledActions, saveScheduledActions };
+export { start, scheduledActions, save, vipUsers };
