@@ -86,6 +86,14 @@ async function checkScheduledActions(): Promise<void> {
 	checkingScheduled = false;
 }
 
+async function createSaveDirectory() {
+	try {
+		await fs.stat(FILES_BASE);
+	} catch (e) {
+		await fs.mkdir(FILES_BASE);
+	}
+}
+
 function save(): void {
 	if (saveScheduledActionsTimeout) {
 		clearTimeout(saveScheduledActionsTimeout);
@@ -94,12 +102,6 @@ function save(): void {
 	}
 
 	saveScheduledActionsTimeout = setTimeout(async () => {
-		try {
-			await fs.stat(FILES_BASE);
-		} catch (e) {
-			await fs.mkdir(FILES_BASE);
-		}
-
 		await Promise.all([
 			fs.writeFile(SCHEDULED_FILE, JSON.stringify(scheduledActions)),
 			fs.writeFile(VIP_USERS_FILE, JSON.stringify(vipUsers))
@@ -110,6 +112,6 @@ function save(): void {
 	}, SAVE_TIMEOUT);
 }
 
-save();
+createSaveDirectory();
 
 export { start, scheduledActions, save, vipUsers };
