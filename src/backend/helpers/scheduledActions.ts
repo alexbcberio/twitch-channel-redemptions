@@ -2,18 +2,11 @@ import { promises as fs } from "fs";
 import { handleClientAction } from "../chatClient";
 import { resolve } from "path";
 
-export {
-	start,
-	scheduledActions,
-	checkScheduledActions,
-	saveScheduledActions
-};
-
 const LOG_PREFIX = "[Scheduled] ";
-const SCHEDULED_FILE = resolve(process.cwd(), "scheduled.json");
-const FIRST_CHECK_TIMEOUT = 1000 * 5;
-const SAVE_TIMEOUT = 1000 * 30;
-const CHECK_INTERVAL = 1000 * 60;
+const SCHEDULED_FILE = resolve(process.cwd(), "./storage/scheduled.json");
+const FIRST_CHECK_TIMEOUT = 5e3;
+const SAVE_TIMEOUT = 5e3;
+const CHECK_INTERVAL = 60e3;
 
 const scheduledActions: Array<any> = [];
 
@@ -32,6 +25,9 @@ async function start(): Promise<void> {
 		savedActions = JSON.parse((await fs.readFile(SCHEDULED_FILE)).toString());
 	} catch (e) {
 		// probably file does not exist
+		if (e instanceof Error) {
+			console.log(`${LOG_PREFIX}${e.message}`);
+		}
 	}
 
 	scheduledActions.push.apply(scheduledActions, savedActions);
@@ -78,8 +74,22 @@ function saveScheduledActions(): void {
 	}
 
 	saveScheduledActionsTimeout = setTimeout(async () => {
+		const normalizedPath = SCHEDULED_FILE.replace(/\\/g, "/");
+
+		try {
+			await fs.stat(normalizedPath);
+		} catch (e) {
+			const dirs = normalizedPath.split("/");
+			dirs.pop();
+			await fs.mkdir(dirs.join("/"));
+		}
+
 		await fs.writeFile(SCHEDULED_FILE, JSON.stringify(scheduledActions));
 		console.log(`${LOG_PREFIX}Saved actions.`);
 		saveScheduledActionsTimeout = null;
 	}, SAVE_TIMEOUT);
 }
+
+saveScheduledActions();
+
+export { start, scheduledActions, saveScheduledActions };

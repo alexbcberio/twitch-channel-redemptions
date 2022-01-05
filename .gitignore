@@ -1,6 +1,6 @@
 node_modules
 .env
 tokens.json
-scheduled.json
+storage/*.json
 *.log
 TODO.md
