@@ -8,6 +8,7 @@ import { getApiClient } from "../helpers/twitch";
 import { getVip } from "./actions/getVip";
 import { russianRoulette } from "./actions/russianRoulette";
 import { stealVip } from "./actions/stealVip";
+import { timeoutFriend } from "./actions/timeoutFriend";
 
 const LOG_PREFIX = "[PubSub] ";
 
@@ -48,6 +49,7 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 			await russianRoulette(msg);
 			break;
 		case RedemptionIds.TimeoutFriend:
+			await timeoutFriend(msg);
 			break;
 		case RedemptionIds.GetVip:
 			msg.message = `@${msg.userDisplayName} ha encontrado diamantes!`;

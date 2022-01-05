@@ -56,10 +56,6 @@ async function checkEvent(e) {
           case "a73247ee-e33e-4e9b-9105-bd9d11e111fc":
             await russianRoulette(data);
             break;
-          // timeout a un amigo
-          case "638c642d-23d8-4264-9702-e77eeba134de":
-            await timeoutFriend(data);
-            break;
           // highlight message
           case "a26c0d9e-fd2c-4943-bc94-c5c2f2c974e4":
             await highlightMessage(data);
@@ -190,25 +186,6 @@ function russianRoulette({ userDisplayName, message }) {
       }
     }
   });
-}
-
-async function timeoutFriend(data) {
-  const senderUser = data.userDisplayName;
-  const receptorUser = data.message.split(" ")[0];
-
-  sendWsActions({
-    type: "timeout",
-    userId: data.userId,
-    channelId: data.channelId,
-    data: {
-      username: receptorUser,
-      time: "60",
-      reason: `Timeout dado por @${senderUser} con puntos del canal.`
-    }
-  });
-
-  const cardMessage = `@${senderUser} ha expulsado a @${receptorUser} por 60 segundos.`;
-  await createCard(data.rewardName, cardMessage, data.backgroundColor, data.rewardImage);
 }
 
 async function highlightMessage(data) {
