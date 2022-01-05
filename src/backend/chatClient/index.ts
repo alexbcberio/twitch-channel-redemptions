@@ -5,7 +5,7 @@ import { Action } from "../../interfaces/actions/Action";
 import { ActionType } from "../../enums/ActionType";
 import { ChatClient } from "twitch-chat-client";
 import { broadcast } from "../helpers/webServer";
-import { start } from "../helpers/scheduledActions";
+import { start } from "../helpers/miniDb";
 
 let chatClient: ChatClient;
 

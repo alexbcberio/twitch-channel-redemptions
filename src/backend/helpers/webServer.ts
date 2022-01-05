@@ -1,5 +1,5 @@
 import { IncomingMessage, Server } from "http";
-import { saveScheduledActions, scheduledActions } from "./scheduledActions";
+import { saveScheduledActions, scheduledActions } from "./miniDb";
 
 import { Action } from "../../interfaces/actions/Action";
 import { AddressInfo } from "net";
@@ -22,10 +22,7 @@ const wsServer = new WebSocket.Server({
 
 let server: Server;
 
-export {
-	listen,
-	broadcast
-};
+export { listen, broadcast };
 
 wsServer.on("connection", onConnection);
 
@@ -74,9 +71,7 @@ function onConnection(socket: WebSocket, req: IncomingMessage) {
 
 // broadcast a message to all clients
 function broadcast(msg: string, socket?: any) {
-	const filteredSockets = socket
-		? sockets.filter(s => s !== socket)
-		: sockets;
+	const filteredSockets = socket ? sockets.filter(s => s !== socket) : sockets;
 
 	filteredSockets.forEach(s => s.send(msg));
 }
@@ -86,10 +81,7 @@ async function onMessage(msg: string) {
 	const socket = this as WebSocket;
 	const data = JSON.parse(msg);
 
-	if (
-		!data.actions ||
-		data.actions.length === 0
-	) {
+	if (!data.actions || data.actions.length === 0) {
 		broadcast(msg, socket);
 		return;
 	}
