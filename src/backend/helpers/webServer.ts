@@ -1,5 +1,5 @@
 import { IncomingMessage, Server } from "http";
-import { saveScheduledActions, scheduledActions } from "./miniDb";
+import { save, scheduledActions } from "./miniDb";
 
 import { Action } from "../../interfaces/actions/Action";
 import { AddressInfo } from "net";
@@ -94,7 +94,7 @@ async function onMessage(msg: string) {
 		} else {
 			scheduledActions.push(action);
 			scheduledActions.sort((a: any, b: any) => a.scheduledAt - b.scheduledAt);
-			saveScheduledActions();
+			save();
 		}
 	}
 
