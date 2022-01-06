@@ -1,14 +1,16 @@
 import { AccessToken, RefreshingAuthProvider } from "@twurple/auth";
+import {
+	ApiClient,
+	HelixCreateCustomRewardData,
+	UserIdResolvable
+} from "@twurple/api";
 import { getTokenData, saveTokenData } from "./tokenData";
 
-import { ApiClient } from "@twurple/api";
 import { ClientCredentials } from "../../interfaces/ClientCredentials";
 
 const LOG_PREFIX = "[Twitch] ";
 
 let refreshAuthProvider: RefreshingAuthProvider;
-
-export { getAuthProvider, getApiClient, getUsernameFromId };
 
 function getClientCredentials(): ClientCredentials {
 	if (!process.env.TWITCH_CLIENT_ID || !process.env.TWITCH_CLIENT_SECRET) {
@@ -59,7 +61,7 @@ async function getApiClient(): Promise<ApiClient> {
 
 async function getUsernameFromId(userId: number): Promise<string | null> {
 	const apiClient = await getApiClient();
-	const user = await apiClient.helix.users.getUserById(userId);
+	const user = await apiClient.users.getUserById(userId);
 
 	if (!user) {
 		return null;
@@ -67,3 +69,59 @@ async function getUsernameFromId(userId: number): Promise<string | null> {
 
 	return user.displayName;
 }
+
+async function createReward(
+	channel: UserIdResolvable,
+	data: HelixCreateCustomRewardData
+) {
+	const apiClient = await getApiClient();
+
+	await apiClient.channelPoints.createCustomReward(channel, data);
+}
+
+async function completeRewards(
+	channel: UserIdResolvable,
+	rewardId: string,
+	redemptionIds: Array<string> | string
+) {
+	if (!Array.isArray(redemptionIds)) {
+		redemptionIds = [redemptionIds];
+	}
+
+	const apiClient = await getApiClient();
+
+	await apiClient.channelPoints.updateRedemptionStatusByIds(
+		channel,
+		rewardId,
+		redemptionIds,
+		"FULFILLED"
+	);
+}
+
+async function cancelRewards(
+	channel: UserIdResolvable,
+	rewardId: string,
+	redemptionIds: Array<string> | string
+) {
+	if (!Array.isArray(redemptionIds)) {
+		redemptionIds = [redemptionIds];
+	}
+
+	const apiClient = await getApiClient();
+
+	await apiClient.channelPoints.updateRedemptionStatusByIds(
+		channel,
+		rewardId,
+		redemptionIds,
+		"CANCELED"
+	);
+}
+
+export {
+	getAuthProvider,
+	getApiClient,
+	getUsernameFromId,
+	completeRewards,
+	cancelRewards,
+	createReward
+};
