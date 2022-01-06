@@ -7,6 +7,7 @@ import { ChatClient } from "@twurple/chat";
 import { ChatCommands } from "../../enums/ChatCommands";
 import { TwitchPrivateMessage } from "@twurple/chat/lib/commands/TwitchPrivateMessage";
 import { broadcast } from "../helpers/webServer";
+import { createReward } from "./commands/createReward";
 import { start } from "../helpers/miniDb";
 
 let chatClient: ChatClient;
@@ -104,6 +105,9 @@ async function onMessage(
 					channel,
 					`Comandos disponibles: "${Object.values(ChatCommands).join('", "')}"`
 				);
+				break;
+			case ChatCommands.CreateReward:
+				await createReward(channel, user, args.join(" "), msg);
 				break;
 			default:
 				console.log(
