@@ -9,10 +9,7 @@ async function hasVip(channel: string, username: string): Promise<boolean> {
 	}
 
 	if (!cache[channel]) {
-		const vips = await chatClient.getVips(channel);
-
-		// * last VIP has a "." at the end of the username (bug on library?)
-		cache[channel] = vips.map(vip => vip.replace(/\.$/, ""));
+		cache[channel] = await chatClient.getVips(channel);
 
 		setTimeout(() => {
 			delete cache[channel];
