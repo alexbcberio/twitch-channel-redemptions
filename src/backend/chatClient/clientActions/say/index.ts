@@ -3,7 +3,7 @@ import { chatClient } from "../..";
 const maxMessageLength = 500;
 
 async function say(channel: string, message: string): Promise<void> {
-	message = `MrDestructoid ${message}`;
+	// message = `MrDestructoid ${message}`;
 
 	if (message.length > 500) {
 		const suffix = "...";
