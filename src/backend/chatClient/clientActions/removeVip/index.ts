@@ -1,22 +1,29 @@
+import { hasVip, say } from "..";
+
 import { chatClient } from "../..";
-import { say } from "..";
 
 async function removeVip(
-	channel: string,
-	username: string,
-	message?: string
+  channel: string,
+  username: string,
+  message?: string
 ): Promise<boolean> {
-	try {
-		await chatClient.removeVip(channel, username);
-	} catch (e) {
-		return false;
-	}
+  username = username.toLowerCase();
 
-	if (message) {
-		await say(channel, message);
-	}
+  if (await hasVip(channel, username)) {
+    return false;
+  }
 
-	return true;
+  try {
+    await chatClient.removeVip(channel, username);
+  } catch (e) {
+    return false;
+  }
+
+  if (message) {
+    await say(channel, message);
+  }
+
+  return true;
 }
 
 export { removeVip };

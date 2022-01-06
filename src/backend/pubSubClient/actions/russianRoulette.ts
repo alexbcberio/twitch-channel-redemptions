@@ -12,56 +12,60 @@ const timeoutSeconds = 60;
 const maxSafeShots = 5;
 
 async function russianRoulette(
-	msg: RedemptionMessage
+  msg: RedemptionMessage
 ): Promise<RedemptionMessage | undefined> {
-	const { channelId, userDisplayName } = msg;
-	const channel = await getUsernameFromId(parseInt(channelId));
+  const { channelId, userDisplayName } = msg;
+  const channel = await getUsernameFromId(parseInt(channelId));
 
-	if (!channel) {
-		console.log(`${LOG_PREFIX}No channel found`);
+  if (!channel) {
+    console.log(`${LOG_PREFIX}No channel found`);
 
-		return;
-	}
+    return;
+  }
 
-	if (!gunsSafeShots[channelId]) {
-		gunsSafeShots[channelId] = maxSafeShots;
-	}
+  if (!gunsSafeShots[channelId]) {
+    gunsSafeShots[channelId] = maxSafeShots;
+  }
 
-	const win =
-		gunsSafeShots[channelId] > 0 &&
-		randomInt(gunsSafeShots[channelId]-- + 1) !== 0;
+  const noShots = 0;
 
-	if (gunsSafeShots[channelId] < 0 || !win) {
-		gunsSafeShots[channelId] = maxSafeShots;
-	}
+  const win =
+    gunsSafeShots[channelId] > noShots &&
+    // eslint-disable-next-line no-magic-numbers
+    randomInt(gunsSafeShots[channelId]-- + 1) !== 0;
 
-	msg.message = win ? "" : "got shot";
+  if (gunsSafeShots[channelId] < noShots || !win) {
+    gunsSafeShots[channelId] = maxSafeShots;
+  }
 
-	const promises: Array<Promise<unknown>> = [];
+  // eslint-disable-next-line require-atomic-updates
+  msg.message = win ? "" : "got shot";
 
-	if (!win) {
-		promises.push(
-			timeout(channel, userDisplayName, timeoutSeconds, "F en la ruleta")
-		);
-		promises.push(
-			say(
-				channel,
-				`PepeHands ${userDisplayName} no ha sobrevivido para contarlo`
-			)
-		);
-	} else {
-		promises.push(say(channel, `rdCool Clap ${userDisplayName}`));
-	}
+  const promises: Array<Promise<unknown>> = [];
 
-	try {
-		await Promise.allSettled(promises);
-	} catch (e) {
-		if (e instanceof Error) {
-			console.log(`${LOG_PREFIX}${e.message}`);
-		}
-	}
+  if (!win) {
+    promises.push(
+      timeout(channel, userDisplayName, timeoutSeconds, "F en la ruleta")
+    );
+    promises.push(
+      say(
+        channel,
+        `PepeHands ${userDisplayName} no ha sobrevivido para contarlo`
+      )
+    );
+  } else {
+    promises.push(say(channel, `rdCool Clap ${userDisplayName}`));
+  }
 
-	return msg;
+  try {
+    await Promise.allSettled(promises);
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(`${LOG_PREFIX}${e.message}`);
+    }
+  }
+
+  return msg;
 }
 
 export { russianRoulette };

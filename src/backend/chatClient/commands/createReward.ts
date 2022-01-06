@@ -1,42 +1,42 @@
-import { LOG_PREFIX, say } from "..";
+import { sayError, saySuccess } from "../clientActions";
 
+import { LOG_PREFIX } from "..";
 import { TwitchPrivateMessage } from "@twurple/chat/lib/commands/TwitchPrivateMessage";
 import { createReward as createChannelPointsReward } from "../../helpers/twitch";
 
 async function createReward(
-	channel: string,
-	user: string,
-	message: string,
-	msg: TwitchPrivateMessage
+  channel: string,
+  _user: string,
+  message: string,
+  msg: TwitchPrivateMessage
 ): Promise<void> {
-	const args = message.split(" ");
+  const args = message.split(" ");
 
-	const title = args.shift();
-	const cost = Math.max(1, parseInt(args.shift() ?? "0"));
+  const title = args.shift();
 
-	if (!title || !cost) {
-		await say(
-			channel,
-			"No se ha especificado el nombre de la recompensa o costo"
-		);
-		return;
-	}
+  if (!title) {
+    await sayError(channel, "Debes indicar el título de la recompensa");
+    return;
+  }
 
-	try {
-		await createChannelPointsReward(msg.channelId as string, {
-			title,
-			cost
-		});
+  const minRewardPrice = 1;
+  const cost = Math.max(minRewardPrice, parseInt(args.shift() ?? "0"));
 
-		say(
-			channel,
-			`✅ Creada recompensa de canal "${title}" con un costo de ${cost}`
-		);
-	} catch (e) {
-		if (e instanceof Error) {
-			console.log(`${LOG_PREFIX}${e.message}`);
-		}
-	}
+  try {
+    await createChannelPointsReward(msg.channelId as string, {
+      title,
+      cost,
+    });
+
+    saySuccess(
+      channel,
+      `Creada recompensa de canal "${title}" con un costo de ${cost}`
+    );
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(`${LOG_PREFIX}${e.message}`);
+    }
+  }
 }
 
 export { createReward };

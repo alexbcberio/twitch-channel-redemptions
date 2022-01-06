@@ -1,21 +1,22 @@
 import { chatClient } from "../..";
 
-// timeouts a user in a channel
+const defaultTime = 60;
+
 async function timeout(
-	channel: string,
-	username: string,
-	time?: number,
-	reason?: string
+  channel: string,
+  username: string,
+  time?: number,
+  reason?: string
 ): Promise<void> {
-	if (!time) {
-		time = 60;
-	}
+  if (!time) {
+    time = defaultTime;
+  }
 
-	if (!reason) {
-		reason = "";
-	}
+  if (!reason) {
+    reason = "";
+  }
 
-	await chatClient.timeout(channel, username, time, reason);
+  await chatClient.timeout(channel, username, time, reason);
 }
 
 export { timeout };

@@ -1,7 +1,18 @@
+import { say, sayError, sayInfo, saySuccess, sayWarn } from "./say";
+
 import { addVip } from "./addVip";
 import { hasVip } from "./hasVip";
 import { removeVip } from "./removeVip";
-import { say } from "./say";
 import { timeout } from "./timeout";
 
-export { say, timeout, addVip, removeVip, hasVip };
+export {
+  addVip,
+  hasVip,
+  removeVip,
+  say,
+  sayError,
+  sayInfo,
+  saySuccess,
+  sayWarn,
+  timeout,
+};

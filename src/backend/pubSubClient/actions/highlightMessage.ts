@@ -4,39 +4,40 @@ import { getUsernameFromId } from "../../helpers/twitch";
 import { timeout } from "../../chatClient/clientActions";
 
 async function highlightMessage(
-	msg: RedemptionMessage
+  msg: RedemptionMessage
 ): Promise<RedemptionMessage | undefined> {
-	if (!msg.message) {
-		console.log(`${LOG_PREFIX}Redemption has no message`);
+  if (!msg.message) {
+    console.log(`${LOG_PREFIX}Redemption has no message`);
 
-		return;
-	}
+    return;
+  }
 
-	const urlRegex =
-		/(https?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&/=]*)/;
+  const urlRegex =
+    /(https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
-	if (urlRegex.test(msg.message)) {
-		console.log(`${LOG_PREFIX}Message contains a url`);
-		const channel = await getUsernameFromId(parseInt(msg.channelId));
+  if (urlRegex.test(msg.message)) {
+    console.log(`${LOG_PREFIX}Message contains a url`);
+    const channel = await getUsernameFromId(parseInt(msg.channelId));
 
-		if (!channel) {
-			console.log(`${LOG_PREFIX}No channel found`);
+    if (!channel) {
+      console.log(`${LOG_PREFIX}No channel found`);
 
-			return;
-		}
+      return;
+    }
 
-		try {
-			const reason = "No se permite enviar enlaces en mensajes destacados";
+    try {
+      const reason = "No se permite enviar enlaces en mensajes destacados";
+      const timeoutSeconds = 10;
 
-			await timeout(channel, msg.userDisplayName, 10, reason);
-		} catch (e) {
-			// user probably cannot be timed out
-		}
+      await timeout(channel, msg.userDisplayName, timeoutSeconds, reason);
+    } catch (e) {
+      // user probably cannot be timed out
+    }
 
-		return;
-	}
+    return;
+  }
 
-	return msg;
+  return msg;
 }
 
 export { highlightMessage };
