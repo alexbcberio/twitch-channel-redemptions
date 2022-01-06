@@ -56,19 +56,19 @@ POST https://id.twitch.tv/oauth2/token
 
 This will return a JSON-encoded response. Copy the whole response into a file
 called `tokens.json` and place it on the root of this project (same place as
-is this file).
+is this file). You have to change the key names from kebab_case to camelCase.
 
-The JSON has this format:
+The JSON file must have this format (the order is not relevant):
 
 ```json
 {
-  "access_token": "the access token",
-  "expires_in": 14361,
-  "refresh_token": "the refresh token",
+  "accessToken": "the access token",
+  "expiresIn": 14361,
+  "refreshToken": "the refresh token",
   "scope": [
     // list of the scopes
   ],
-  "token_type": "bearer"
+  "tokenType": "bearer"
 }
 ```
 
