@@ -1,6 +1,5 @@
 import { LOG_PREFIX } from "..";
 import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
-import { broadcast } from "../../helpers/webServer";
 import { getUsernameFromId } from "../../helpers/twitch";
 import { timeout } from "../../chatClient/clientActions";
 
@@ -29,8 +28,6 @@ async function timeoutFriend(
 		await timeout(channel, msg.message, time, reason);
 
 		msg.message = `@${userDisplayName} ha expulsado a @${message} por ${time} segundos`;
-
-		broadcast(JSON.stringify(msg));
 	} catch (e) {
 		// user can not be timed out
 		if (e instanceof Error) {

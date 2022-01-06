@@ -2,7 +2,6 @@ import { say, timeout } from "../../chatClient/clientActions";
 
 import { LOG_PREFIX } from "..";
 import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
-import { broadcast } from "../../helpers/webServer";
 import { getUsernameFromId } from "../../helpers/twitch";
 import { randomInt } from "crypto";
 
@@ -38,8 +37,6 @@ async function russianRoulette(
 
 	msg.message = win ? "" : "got shot";
 
-	broadcast(JSON.stringify(msg));
-
 	const promises: Array<Promise<unknown>> = [];
 
 	if (!win) {
@@ -56,7 +53,15 @@ async function russianRoulette(
 		promises.push(say(channel, `rdCool Clap ${userDisplayName}`));
 	}
 
-	await Promise.all(promises);
+	try {
+		await Promise.allSettled(promises);
+	} catch (e) {
+		if (e instanceof Error) {
+			console.log(`${LOG_PREFIX}${e.message}`);
+		}
+	}
+
+	return msg;
 }
 
 export { russianRoulette };
