@@ -41,24 +41,17 @@ async function russianRoulette(
   // eslint-disable-next-line require-atomic-updates
   msg.message = win ? "" : "got shot";
 
-  const promises: Array<Promise<unknown>> = [];
+  try {
+    if (!win) {
+      await timeout(channel, userDisplayName, timeoutSeconds, "F en la ruleta");
 
-  if (!win) {
-    promises.push(
-      timeout(channel, userDisplayName, timeoutSeconds, "F en la ruleta")
-    );
-    promises.push(
-      say(
+      await say(
         channel,
         `PepeHands ${userDisplayName} no ha sobrevivido para contarlo`
-      )
-    );
-  } else {
-    promises.push(say(channel, `rdCool Clap ${userDisplayName}`));
-  }
-
-  try {
-    await Promise.allSettled(promises);
+      );
+    } else {
+      await say(channel, `rdCool Clap ${userDisplayName}`);
+    }
   } catch (e) {
     if (e instanceof Error) {
       console.log(`${LOG_PREFIX}${e.message}`);

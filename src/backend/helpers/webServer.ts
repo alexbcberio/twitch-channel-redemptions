@@ -1,10 +1,11 @@
+import * as WebSocket from "ws";
+import * as express from "express";
+
 import { AddressInfo, Socket } from "net";
 import { IncomingMessage, Server } from "http";
 import { save, scheduledActions } from "./miniDb";
 
 import { Action } from "../../interfaces/actions/Action";
-import WebSocket from "ws";
-import express from "express";
 import { handleClientAction } from "../chatClient";
 import { isDevelopment } from "./util";
 import { join } from "path";
@@ -73,7 +74,7 @@ function onListening() {
 }
 
 function onUpgrade(req: IncomingMessage, socket: Socket, head: Buffer) {
-  wsServer.handleUpgrade(req, socket, head, (socket) => {
+  wsServer.handleUpgrade(req, socket, head, (socket: WebSocket) => {
     wsServer.emit("connection", socket, req);
   });
 }
