@@ -71,12 +71,12 @@ async function getUsernameFromId(userId: number): Promise<string | null> {
 }
 
 async function createReward(
-	channel: UserIdResolvable,
+	userId: UserIdResolvable,
 	data: HelixCreateCustomRewardData
 ) {
 	const apiClient = await getApiClient();
 
-	await apiClient.channelPoints.createCustomReward(channel, data);
+	await apiClient.channelPoints.createCustomReward(userId, data);
 }
 
 async function completeRewards(
