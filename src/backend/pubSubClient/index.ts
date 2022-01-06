@@ -93,6 +93,15 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 		broadcast(JSON.stringify(handledMessage));
 	}
 
+	// TODO: improve this check
+	const keepInQueueRewards = [RedemptionIds.KaraokeTime];
+
+	// @ts-expect-error String is not assignable to... but all keys are strings
+	if (keepInQueueRewards.includes(message.rewardId)) {
+		console.log(`${LOG_PREFIX}Reward kept in queue due to config`);
+		return;
+	}
+
 	const completeOrCancelReward =
 		handledMessage && isProduction ? completeRewards : cancelRewards;
 
@@ -102,6 +111,9 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 				message.channelId,
 				message.rewardId,
 				message.id
+			);
+			console.log(
+				`${LOG_PREFIX}Reward removed from queue (completed or canceled)`
 			);
 		} catch (e) {
 			if (e instanceof Error) {
