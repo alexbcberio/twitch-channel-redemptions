@@ -1,29 +1,17 @@
-import {
-	AccessToken,
-	RefreshableAuthProvider,
-	StaticAuthProvider
-} from "twitch-auth";
+import { AccessToken, RefreshingAuthProvider } from "@twurple/auth";
 import { getTokenData, saveTokenData } from "./tokenData";
 
-import { ApiClient } from "twitch";
+import { ApiClient } from "@twurple/api";
 import { ClientCredentials } from "../../interfaces/ClientCredentials";
-import { TokenData } from "../../interfaces/TokenData";
 
 const LOG_PREFIX = "[Twitch] ";
 
-let refreshAuthProvider: RefreshableAuthProvider;
+let refreshAuthProvider: RefreshingAuthProvider;
 
-export {
-  getAuthProvider,
-  getApiClient,
-  getUsernameFromId
-};
+export { getAuthProvider, getApiClient, getUsernameFromId };
 
 function getClientCredentials(): ClientCredentials {
-	if (
-		!process.env.TWITCH_CLIENT_ID ||
-		!process.env.TWITCH_CLIENT_SECRET
-	) {
+	if (!process.env.TWITCH_CLIENT_ID || !process.env.TWITCH_CLIENT_SECRET) {
 		console.error(
 			`${LOG_PREFIX}Missing environment parameters TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET`
 		);
@@ -36,57 +24,31 @@ function getClientCredentials(): ClientCredentials {
 	};
 }
 
-async function createStaticAuthProvider(): Promise<StaticAuthProvider> {
-	let tokenData = await getTokenData();
-	const credentials = getClientCredentials();
-
-	return new StaticAuthProvider(credentials.clientId, tokenData.access_token);
-}
-
-async function getAuthProvider(): Promise<RefreshableAuthProvider> {
+async function getAuthProvider(): Promise<RefreshingAuthProvider> {
 	if (refreshAuthProvider) {
 		return refreshAuthProvider;
 	}
 
 	let tokenData = await getTokenData();
 
-	const staticAuthProvider = await createStaticAuthProvider();
 	const credentials = getClientCredentials();
 
-	const expiry =
-		tokenData.expiryTimestamp === null
-			? null
-			: new Date(tokenData.expiryTimestamp);
-
-	refreshAuthProvider = new RefreshableAuthProvider(staticAuthProvider, {
-		clientSecret: credentials.clientSecret,
-		refreshToken: tokenData.refresh_token,
-		expiry,
-		onRefresh: onRefresh
-	});
+	refreshAuthProvider = new RefreshingAuthProvider(
+		{
+			clientId: credentials.clientId,
+			clientSecret: credentials.clientSecret,
+			onRefresh
+		},
+		tokenData
+	);
 
 	return refreshAuthProvider;
 }
 
 async function onRefresh(refreshData: AccessToken): Promise<void> {
-	const {
-    accessToken,
-    refreshToken,
-    expiryDate
-  } = refreshData;
 	console.log(`${LOG_PREFIX}Tokens refreshed`);
 
-	const expiryTimestamp = expiryDate === null
-		? 0
-		: expiryDate.getTime();
-
-	const newTokenData: TokenData = {
-		access_token: accessToken,
-		refresh_token: refreshToken,
-		expiryTimestamp
-	};
-
-	await saveTokenData(newTokenData);
+	await saveTokenData(refreshData);
 }
 
 async function getApiClient(): Promise<ApiClient> {

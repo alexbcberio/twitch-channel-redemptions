@@ -3,7 +3,7 @@ import { getAuthProvider, getUsernameFromId } from "../helpers/twitch";
 
 import { Action } from "../../interfaces/actions/Action";
 import { ActionType } from "../../enums/ActionType";
-import { ChatClient } from "twitch-chat-client";
+import { ChatClient } from "@twurple/chat";
 import { broadcast } from "../helpers/webServer";
 import { start } from "../helpers/miniDb";
 
@@ -20,7 +20,10 @@ async function connect(channels: Array<any>): Promise<void> {
 		return;
 	}
 
-	chatClient = new ChatClient(authProvider, { channels: channels });
+	chatClient = new ChatClient({
+		authProvider,
+		channels
+	});
 
 	chatClient.onConnect(onConnect);
 

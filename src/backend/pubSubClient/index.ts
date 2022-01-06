@@ -1,13 +1,14 @@
-import { PubSubClient, PubSubRedemptionMessage } from "twitch-pubsub-client";
+import { PubSubClient, PubSubRedemptionMessage } from "@twurple/pubsub";
 
 import { RedemptionIds } from "../../enums/Redemptions";
 import { RedemptionMessage } from "../../interfaces/RedemptionMessage";
-import { UserIdResolvable } from "twitch";
+import { UserIdResolvable } from "@twurple/api";
 import { broadcast } from "../helpers/webServer";
-import { getApiClient } from "../helpers/twitch";
+import { getAuthProvider } from "../helpers/twitch";
 import { getVip } from "./actions/getVip";
 import { hidrate } from "./actions/hidrate";
 import { highlightMessage } from "./actions/highlightMessage";
+import { rawDataSymbol } from "@twurple/common";
 import { russianRoulette } from "./actions/russianRoulette";
 import { stealVip } from "./actions/stealVip";
 import { timeoutFriend } from "./actions/timeoutFriend";
@@ -15,10 +16,11 @@ import { timeoutFriend } from "./actions/timeoutFriend";
 const LOG_PREFIX = "[PubSub] ";
 
 async function registerUserListener(user: UserIdResolvable) {
-	const apiClient = await getApiClient();
-
 	const pubSubClient = new PubSubClient();
-	const userId = await pubSubClient.registerUserListener(apiClient, user);
+	const userId = await pubSubClient.registerUserListener(
+		await getAuthProvider(),
+		user
+	);
 	/*const listener = */ await pubSubClient.onRedemption(userId, onRedemption);
 
 	console.log(`${LOG_PREFIX}Connected & registered`);
@@ -26,24 +28,23 @@ async function registerUserListener(user: UserIdResolvable) {
 
 async function onRedemption(message: PubSubRedemptionMessage) {
 	console.log(
-		`${LOG_PREFIX}Reward: "${message.rewardName}" (${message.rewardId}) redeemed by ${message.userDisplayName}`
+		`${LOG_PREFIX}Reward: "${message.rewardTitle}" (${message.rewardId}) redeemed by ${message.userDisplayName}`
 	);
-	// @ts-ignore
-	const reward = message._data.data.redemption.reward;
+
+	const raw = message[rawDataSymbol];
 
 	const msg: RedemptionMessage = {
 		id: message.id,
 		channelId: message.channelId,
 		rewardId: message.rewardId,
-		rewardName: message.rewardName,
+		rewardName: message.rewardTitle,
 		rewardImage: message.rewardImage
 			? message.rewardImage.url_4x
 			: "https://static-cdn.jtvnw.net/custom-reward-images/default-4.png",
 		message: message.message,
 		userId: message.userId,
 		userDisplayName: message.userDisplayName,
-		// non directly available values from PubSubRedemptionMessage
-		backgroundColor: reward.background_color
+		backgroundColor: raw.data.redemption.reward.background_color
 	};
 
 	let handledMessage: RedemptionMessage | undefined;

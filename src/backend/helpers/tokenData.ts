@@ -1,20 +1,17 @@
-import { TokenData } from "../../interfaces/TokenData";
+import { AccessToken } from "@twurple/auth";
 import { promises as fs } from "fs";
 import { resolve } from "path";
 
 const TOKENS_FILE = "tokens.json";
 const LOG_PREFIX = "[TokenData] ";
 
-export {
-  getTokenData,
-  saveTokenData
-};
+export { getTokenData, saveTokenData };
 
 function getTokenDataFilePath(): string {
 	return resolve(process.cwd(), TOKENS_FILE);
 }
 
-async function getTokenData(): Promise<TokenData> {
+async function getTokenData(): Promise<AccessToken> {
 	const tokenDataFilePath = getTokenDataFilePath();
 	let buffer: Buffer;
 
@@ -34,7 +31,7 @@ async function getTokenData(): Promise<TokenData> {
 	return tokenData;
 }
 
-async function saveTokenData(tokenData: TokenData): Promise<void> {
+async function saveTokenData(tokenData: AccessToken): Promise<void> {
 	const tokenDataFilePath = getTokenDataFilePath();
 	const jsonTokenData = JSON.stringify(tokenData);
 
@@ -42,8 +39,8 @@ async function saveTokenData(tokenData: TokenData): Promise<void> {
 	console.log(`${LOG_PREFIX}Token data saved`);
 }
 
-function checkTokenData(tokenData: TokenData): void {
-	if (!tokenData.access_token || !tokenData.refresh_token) {
+function checkTokenData(tokenData: AccessToken): void {
+	if (!tokenData.accessToken || !tokenData.refreshToken) {
 		console.error(
 			`${LOG_PREFIX}Missing refresh_token or access_token in ${TOKENS_FILE}.`
 		);
