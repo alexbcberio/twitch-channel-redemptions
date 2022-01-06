@@ -4,6 +4,8 @@ import { getAuthProvider, getUsernameFromId } from "../helpers/twitch";
 import { Action } from "../../interfaces/actions/Action";
 import { ActionType } from "../../enums/ActionType";
 import { ChatClient } from "@twurple/chat";
+import { ChatCommands } from "../../enums/ChatCommands";
+import { TwitchPrivateMessage } from "@twurple/chat/lib/commands/TwitchPrivateMessage";
 import { broadcast } from "../helpers/webServer";
 import { start } from "../helpers/miniDb";
 
@@ -34,6 +36,8 @@ async function connect(channels: Array<any>): Promise<void> {
 	chatClient.onNoPermission((channel, message) => {
 		console.log(`${LOG_PREFIX}No permission on ${channel}: ${message}`);
 	});
+
+	chatClient.onMessage(onMessage);
 
 	await chatClient.connect();
 }
@@ -77,5 +81,34 @@ async function handleClientAction(action: Action): Promise<void> {
 			break;
 		default:
 			console.log(`${[LOG_PREFIX]}Couldn't handle action:`, action);
+	}
+}
+
+const commandPrefix = "!";
+
+async function onMessage(
+	channel: string,
+	user: string,
+	message: string,
+	msg: TwitchPrivateMessage
+): Promise<void> {
+	if (msg.userInfo.isBroadcaster && message.startsWith(commandPrefix)) {
+		message = message.substring(commandPrefix.length);
+
+		const args = message.split(" ");
+		const commandName = args.shift();
+
+		switch (commandName) {
+			case ChatCommands.Commands:
+				await say(
+					channel,
+					`Comandos disponibles: "${Object.values(ChatCommands).join('", "')}"`
+				);
+				break;
+			default:
+				console.log(
+					`${LOG_PREFIX}Command ${commandPrefix}${commandName} not handled`
+				);
+		}
 	}
 }
