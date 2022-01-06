@@ -1,13 +1,18 @@
 import { PubSubClient, PubSubRedemptionMessage } from "@twurple/pubsub";
+import {
+	cancelRewards,
+	completeRewards,
+	getAuthProvider
+} from "../helpers/twitch";
 
 import { RedemptionIds } from "../../enums/Redemptions";
 import { RedemptionMessage } from "../../interfaces/RedemptionMessage";
 import { UserIdResolvable } from "@twurple/api";
 import { broadcast } from "../helpers/webServer";
-import { getAuthProvider } from "../helpers/twitch";
 import { getVip } from "./actions/getVip";
 import { hidrate } from "./actions/hidrate";
 import { highlightMessage } from "./actions/highlightMessage";
+import { isProduction } from "../helpers/util";
 import { rawDataSymbol } from "@twurple/common";
 import { russianRoulette } from "./actions/russianRoulette";
 import { stealVip } from "./actions/stealVip";
@@ -86,6 +91,23 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 		handledMessage.rewardId = rewardName;
 
 		broadcast(JSON.stringify(handledMessage));
+	}
+
+	const completeOrCancelReward =
+		handledMessage && isProduction ? completeRewards : cancelRewards;
+
+	if (message.rewardIsQueued) {
+		try {
+			await completeOrCancelReward(
+				message.channelId,
+				message.rewardId,
+				message.id
+			);
+		} catch (e) {
+			if (e instanceof Error) {
+				console.log(`${LOG_PREFIX}${e.message}`);
+			}
+		}
 	}
 }
 
