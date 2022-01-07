@@ -13,6 +13,7 @@ import { getVip } from "./actions/getVip";
 import { hidrate } from "./actions/hidrate";
 import { highlightMessage } from "./actions/highlightMessage";
 import { isProduction } from "../helpers/util";
+import { lightTheme } from "./actions/lightTheme";
 import { rawDataSymbol } from "@twurple/common";
 import { russianRoulette } from "./actions/russianRoulette";
 import { stealVip } from "./actions/stealVip";
@@ -35,6 +36,9 @@ function getRedemptionHandlerFromRewardId(rewardId: string): RedemptionHandler {
       return hidrate;
     case RedemptionIds.HighlightMessage:
       return highlightMessage;
+    case RedemptionIds.LightTheme2m:
+    case RedemptionIds.LightTheme5m:
+      return lightTheme;
     case RedemptionIds.RussianRoulette:
       return russianRoulette;
     case RedemptionIds.StealVip:
