@@ -1,6 +1,5 @@
 import { say, timeout } from "../../chatClient/clientActions";
 
-import { LOG_PREFIX } from "..";
 import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
 import { getUsernameFromId } from "../../helpers/twitch";
 import { randomInt } from "crypto";
@@ -13,14 +12,12 @@ const maxSafeShots = 5;
 
 async function russianRoulette(
   msg: RedemptionMessage
-): Promise<RedemptionMessage | undefined> {
+): Promise<RedemptionMessage> {
   const { channelId, userDisplayName } = msg;
   const channel = await getUsernameFromId(parseInt(channelId));
 
   if (!channel) {
-    console.log(`${LOG_PREFIX}No channel found`);
-
-    return;
+    throw new Error("No channel found");
   }
 
   if (!gunsSafeShots[channelId]) {
@@ -41,21 +38,15 @@ async function russianRoulette(
   // eslint-disable-next-line require-atomic-updates
   msg.message = win ? "" : "got shot";
 
-  try {
-    if (!win) {
-      await timeout(channel, userDisplayName, timeoutSeconds, "F en la ruleta");
+  if (!win) {
+    await timeout(channel, userDisplayName, timeoutSeconds, "F en la ruleta");
 
-      await say(
-        channel,
-        `PepeHands ${userDisplayName} no ha sobrevivido para contarlo`
-      );
-    } else {
-      await say(channel, `rdCool Clap ${userDisplayName}`);
-    }
-  } catch (e) {
-    if (e instanceof Error) {
-      console.log(`${LOG_PREFIX}${e.message}`);
-    }
+    await say(
+      channel,
+      `PepeHands ${userDisplayName} no ha sobrevivido para contarlo`
+    );
+  } else {
+    await say(channel, `rdCool Clap ${userDisplayName}`);
   }
 
   return msg;

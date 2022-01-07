@@ -5,11 +5,9 @@ import { timeout } from "../../chatClient/clientActions";
 
 async function highlightMessage(
   msg: RedemptionMessage
-): Promise<RedemptionMessage | undefined> {
+): Promise<RedemptionMessage> {
   if (!msg.message) {
-    console.log(`${LOG_PREFIX}Redemption has no message`);
-
-    return;
+    throw new Error("Redemption has no message");
   }
 
   const urlRegex =
@@ -20,9 +18,7 @@ async function highlightMessage(
     const channel = await getUsernameFromId(parseInt(msg.channelId));
 
     if (!channel) {
-      console.log(`${LOG_PREFIX}No channel found`);
-
-      return;
+      throw new Error("No channel found");
     }
 
     try {
@@ -34,7 +30,7 @@ async function highlightMessage(
       // user probably cannot be timed out
     }
 
-    return;
+    throw new Error("The message cannot contain a url");
   }
 
   return msg;

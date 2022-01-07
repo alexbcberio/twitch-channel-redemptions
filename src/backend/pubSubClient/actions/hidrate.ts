@@ -1,24 +1,19 @@
-import { LOG_PREFIX } from "..";
 import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
 import { getUsernameFromId } from "../../helpers/twitch";
 import { say } from "../../chatClient";
 
-async function hidrate(
-	msg: RedemptionMessage
-): Promise<RedemptionMessage | undefined> {
-	const channel = await getUsernameFromId(parseInt(msg.channelId));
+async function hidrate(msg: RedemptionMessage): Promise<RedemptionMessage> {
+  const channel = await getUsernameFromId(parseInt(msg.channelId));
 
-	if (!channel) {
-		console.log(`${LOG_PREFIX}No channel found`);
+  if (!channel) {
+    throw new Error("No channel found");
+  }
 
-		return;
-	}
+  msg.message = `@${msg.userDisplayName} ha invitado a una ronda`;
 
-	msg.message = `@${msg.userDisplayName} ha invitado a una ronda`;
+  await say(channel, "waterGang waterGang waterGang");
 
-	await say(channel, "waterGang waterGang waterGang");
-
-	return msg;
+  return msg;
 }
 
 export { hidrate };

@@ -1,27 +1,19 @@
 import { addVip, hasVip, removeVip, say } from "../../chatClient/clientActions";
 import { save, vipUsers } from "../../helpers/miniDb";
 
-import { LOG_PREFIX } from "..";
 import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
 import { getUsernameFromId } from "../../helpers/twitch";
 
-// remove vip from a user to grant it to yourself
-async function stealVip(
-  msg: RedemptionMessage
-): Promise<RedemptionMessage | undefined> {
+async function stealVip(msg: RedemptionMessage): Promise<RedemptionMessage> {
   if (!msg.message) {
-    console.log(`${LOG_PREFIX}Redemption has no message`);
-
-    return;
+    throw new Error("Redemption has no message");
   }
 
   const channelId = parseInt(msg.channelId);
   const channel = await getUsernameFromId(channelId);
 
   if (!channel) {
-    console.log(`${LOG_PREFIX}No channel found`);
-
-    return;
+    throw new Error("No channel found");
   }
 
   const addVipUser = msg.userDisplayName;
@@ -29,27 +21,27 @@ async function stealVip(
   const channelVips = vipUsers[channelId];
 
   if (!channelVips.find((u) => u.toLowerCase() === removeVipUser)) {
-    const message =
-      // eslint-disable-next-line no-magic-numbers
-      channelVips.length === 0
-        ? "No hay nadie a quien puedas robar el VIP"
-        : `Solo puedes robar el VIP de: "${channelVips.sort().join('", "')}"`;
+    const noVips = 0;
+    const hasVips = channelVips.length === noVips;
+
+    const message = !hasVips
+      ? "No hay nadie a quien puedas robar el VIP"
+      : `Solo puedes robar el VIP de: "${channelVips.sort().join('", "')}"`;
     await say(channel, message);
 
-    return;
+    if (!hasVips) {
+      throw new Error("No VIP users to steal from");
+    }
   }
 
   if (channelVips.includes(addVipUser) || (await hasVip(channel, addVipUser))) {
-    console.log(`${LOG_PREFIX}@${addVipUser} is already VIP`);
-
-    return;
+    throw new Error(`@${addVipUser} is already VIP`);
   }
 
   const removed = await removeVip(channel, removeVipUser);
 
   if (!removed && (await hasVip(channel, removeVipUser))) {
-    console.log(`${LOG_PREFIX}Could not remove VIP of @${removeVipUser}`);
-    return;
+    throw new Error(`Could not remove VIP of @${removeVipUser}`);
   }
 
   const added = await addVip(channel, addVipUser);
@@ -57,7 +49,7 @@ async function stealVip(
   if (!added) {
     await addVip(channel, removeVipUser);
 
-    return;
+    throw new Error(`Could not add VIP to ${addVipUser}`);
   }
 
   const removeIdx = channelVips.findIndex(

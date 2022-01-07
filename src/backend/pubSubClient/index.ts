@@ -20,9 +20,7 @@ import { timeoutFriend } from "./actions/timeoutFriend";
 
 const LOG_PREFIX = "[PubSub] ";
 
-type RedemptionHandler = (
-  msg: RedemptionMessage
-) => Promise<RedemptionMessage | undefined>;
+type RedemptionHandler = (msg: RedemptionMessage) => Promise<RedemptionMessage>;
 
 function getRedemptionHandlerFromRewardId(rewardId: string): RedemptionHandler {
   const noop = (message: RedemptionMessage): Promise<RedemptionMessage> => {
@@ -81,6 +79,8 @@ async function onRedemption(message: PubSubRedemptionMessage) {
     }
   }
 
+  let completeOrCancelReward = cancelRewards;
+
   if (typeof handledMessage !== "undefined") {
     const rewardEnumValues = Object.values(RedemptionIds);
     const rewardIdValueIndex = rewardEnumValues.indexOf(
@@ -92,6 +92,10 @@ async function onRedemption(message: PubSubRedemptionMessage) {
     handledMessage.rewardId = rewardName;
 
     broadcast(JSON.stringify(handledMessage));
+
+    if (isProduction) {
+      completeOrCancelReward = completeRewards;
+    }
   }
 
   // TODO: improve this check
@@ -99,12 +103,11 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 
   // @ts-expect-error String is not assignable to... but all keys are strings
   if (keepInQueueRewards.includes(message.rewardId)) {
+    completeOrCancelReward = cancelRewards;
+
     console.log(`${LOG_PREFIX}Reward kept in queue due to config`);
     return;
   }
-
-  const completeOrCancelReward =
-    handledMessage && isProduction ? completeRewards : cancelRewards;
 
   if (message.rewardIsQueued) {
     try {
