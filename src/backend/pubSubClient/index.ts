@@ -46,6 +46,68 @@ function getRedemptionHandlerFromRewardId(rewardId: string): RedemptionHandler {
   }
 }
 
+function keepInQueue(rewardId: string): boolean {
+  const keepInQueueRewards = [RedemptionIds.KaraokeTime];
+
+  // @ts-expect-error String is not assignable to... but all keys are strings
+  if (keepInQueueRewards.includes(rewardId)) {
+    return true;
+  }
+
+  return false;
+}
+
+async function cancelReward(message: PubSubRedemptionMessage): Promise<void> {
+  if (!message.rewardIsQueued) {
+    return;
+  }
+
+  if (keepInQueue(message.rewardId)) {
+    console.log(`${LOG_PREFIX}Reward kept in queue due to config`);
+
+    return;
+  }
+
+  try {
+    await cancelRewards(message.channelId, message.rewardId, message.id);
+    console.log(`${LOG_PREFIX}Reward removed from queue (canceled)`);
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(`${LOG_PREFIX}${e.message}`);
+    }
+  }
+}
+
+async function completeReward(message: PubSubRedemptionMessage): Promise<void> {
+  if (!message.rewardIsQueued) {
+    return;
+  }
+
+  if (keepInQueue(message.rewardId)) {
+    console.log(`${LOG_PREFIX}Reward kept in queue due to config`);
+
+    return;
+  }
+
+  try {
+    await completeRewards(message.channelId, message.rewardId, message.id);
+    console.log(`${LOG_PREFIX}Reward removed from queue (completed)`);
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(`${LOG_PREFIX}${e.message}`);
+    }
+  }
+}
+
+function rewardNameFromRewardId(rewardId: string): string {
+  const rewardEnumValues = Object.values(RedemptionIds);
+  // @ts-expect-error String is not assignable to... but all keys are strings
+  const rewardIdValueIndex = rewardEnumValues.indexOf(rewardId);
+  const rewardName = Object.keys(RedemptionIds)[rewardIdValueIndex];
+
+  return rewardName;
+}
+
 async function onRedemption(message: PubSubRedemptionMessage) {
   console.log(
     `${LOG_PREFIX}Reward: "${message.rewardTitle}" (${message.rewardId}) redeemed by ${message.userDisplayName}`
@@ -67,63 +129,31 @@ async function onRedemption(message: PubSubRedemptionMessage) {
     backgroundColor: raw.data.redemption.reward.background_color,
   };
 
-  let handledMessage: RedemptionMessage | undefined;
+  let handledMessage: RedemptionMessage;
 
   const redemptionHandler = getRedemptionHandlerFromRewardId(msg.rewardId);
 
   try {
-    handledMessage = await redemptionHandler(msg);
+    handledMessage = {
+      ...(await redemptionHandler(msg)),
+      rewardId: rewardNameFromRewardId(message.rewardId),
+    };
   } catch (e) {
     if (e instanceof Error) {
       console.error(`${LOG_PREFIX}${e.message}`);
     }
-  }
 
-  let completeOrCancelReward = cancelRewards;
+    await cancelReward(message);
 
-  if (typeof handledMessage !== "undefined") {
-    const rewardEnumValues = Object.values(RedemptionIds);
-    const rewardIdValueIndex = rewardEnumValues.indexOf(
-      // @ts-expect-error String is not assignable to... but all keys are strings
-      handledMessage.rewardId
-    );
-    const rewardName = Object.keys(RedemptionIds)[rewardIdValueIndex];
-
-    handledMessage.rewardId = rewardName;
-
-    broadcast(JSON.stringify(handledMessage));
-
-    if (isProduction) {
-      completeOrCancelReward = completeRewards;
-    }
-  }
-
-  // TODO: improve this check
-  const keepInQueueRewards = [RedemptionIds.KaraokeTime];
-
-  // @ts-expect-error String is not assignable to... but all keys are strings
-  if (keepInQueueRewards.includes(message.rewardId)) {
-    completeOrCancelReward = cancelRewards;
-
-    console.log(`${LOG_PREFIX}Reward kept in queue due to config`);
     return;
   }
 
-  if (message.rewardIsQueued) {
-    try {
-      await completeOrCancelReward(
-        message.channelId,
-        message.rewardId,
-        message.id
-      );
-      console.log(
-        `${LOG_PREFIX}Reward removed from queue (completed or canceled)`
-      );
-    } catch (e) {
-      if (e instanceof Error) {
-        console.log(`${LOG_PREFIX}${e.message}`);
-      }
-    }
+  broadcast(JSON.stringify(handledMessage));
+
+  if (isProduction) {
+    await completeReward(message);
+  } else {
+    await cancelReward(message);
   }
 }
 
