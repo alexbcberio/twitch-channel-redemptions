@@ -17,6 +17,5 @@
     "noUnusedParameters": true,
     "strict": true
   },
-  "files": ["src/index.ts"],
   "include": ["src/**/*"]
 }
