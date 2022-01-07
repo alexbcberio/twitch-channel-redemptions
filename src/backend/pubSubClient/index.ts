@@ -123,6 +123,7 @@ async function onRedemption(message: PubSubRedemptionMessage) {
     rewardImage: message.rewardImage
       ? message.rewardImage.url_4x
       : "https://static-cdn.jtvnw.net/custom-reward-images/default-4.png",
+    rewardCost: message.rewardCost,
     message: message.message,
     userId: message.userId,
     userDisplayName: message.userDisplayName,
