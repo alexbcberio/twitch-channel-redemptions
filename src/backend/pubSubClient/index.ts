@@ -20,6 +20,34 @@ import { timeoutFriend } from "./actions/timeoutFriend";
 
 const LOG_PREFIX = "[PubSub] ";
 
+type RedemptionHandler = (
+  msg: RedemptionMessage
+) => Promise<RedemptionMessage | undefined>;
+
+function getRedemptionHandlerFromRewardId(rewardId: string): RedemptionHandler {
+  const noop = (message: RedemptionMessage): Promise<RedemptionMessage> => {
+    console.log(`${LOG_PREFIX}Unhandled redemption ${rewardId}`);
+    return Promise.resolve(message);
+  };
+
+  switch (rewardId) {
+    case RedemptionIds.GetVip:
+      return getVip;
+    case RedemptionIds.Hidrate:
+      return hidrate;
+    case RedemptionIds.HighlightMessage:
+      return highlightMessage;
+    case RedemptionIds.RussianRoulette:
+      return russianRoulette;
+    case RedemptionIds.StealVip:
+      return stealVip;
+    case RedemptionIds.TimeoutFriend:
+      return timeoutFriend;
+    default:
+      return noop;
+  }
+}
+
 async function onRedemption(message: PubSubRedemptionMessage) {
   console.log(
     `${LOG_PREFIX}Reward: "${message.rewardTitle}" (${message.rewardId}) redeemed by ${message.userDisplayName}`
@@ -43,41 +71,17 @@ async function onRedemption(message: PubSubRedemptionMessage) {
 
   let handledMessage: RedemptionMessage | undefined;
 
-  try {
-    // TODO: extract to function
-    // Returns the executor function, then call it inside a try/catch
-    switch (msg.rewardId) {
-      case RedemptionIds.GetVip:
-        handledMessage = await getVip(msg);
-        break;
-      case RedemptionIds.Hidrate:
-        handledMessage = await hidrate(msg);
-        break;
-      case RedemptionIds.HighlightMessage:
-        handledMessage = await highlightMessage(msg);
-        break;
-      case RedemptionIds.RussianRoulette:
-        handledMessage = await russianRoulette(msg);
-        break;
-      case RedemptionIds.StealVip:
-        handledMessage = await stealVip(msg);
-        break;
-      case RedemptionIds.TimeoutFriend:
-        handledMessage = await timeoutFriend(msg);
-        break;
-      default:
-        console.log(`${LOG_PREFIX}Unhandled redemption ${msg.rewardId}`);
+  const redemptionHandler = getRedemptionHandlerFromRewardId(msg.rewardId);
 
-        handledMessage = msg;
-        break;
-    }
+  try {
+    handledMessage = await redemptionHandler(msg);
   } catch (e) {
     if (e instanceof Error) {
       console.error(`${LOG_PREFIX}${e.message}`);
     }
   }
 
-  if (handledMessage) {
+  if (typeof handledMessage !== "undefined") {
     const rewardEnumValues = Object.values(RedemptionIds);
     const rewardIdValueIndex = rewardEnumValues.indexOf(
       // @ts-expect-error String is not assignable to... but all keys are strings
