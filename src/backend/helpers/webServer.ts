@@ -1,36 +1,34 @@
-import * as WebSocket from "ws";
-import * as express from "express";
-
-import { AddressInfo, Socket } from "net";
-import { IncomingMessage, Server } from "http";
-import { save, scheduledActions } from "./miniDb";
+import fastify, { FastifyReply, FastifyRequest } from "fastify";
+import fastifyWebsocket, { SocketStream } from "fastify-websocket";
+import { save, scheduledActions } from "../helpers/miniDb";
 
 import { Action } from "../../interfaces/actions/Action";
+import { createReadStream } from "fs";
+import fastifyStatic from "fastify-static";
 import { handleClientAction } from "../chatClient";
-import { isDevelopment } from "./util";
+import { isDevelopment } from "../helpers/util";
 import { join } from "path";
 
 const LOG_PREFIX_HTTP = "[HTTP] ";
 const LOG_PREFIX_WS = "[WS] ";
 
-const app = express();
-const sockets: Array<WebSocket> = [];
+const staticPath = join(process.cwd(), "client");
 
-const wsServer = new WebSocket.Server({
-  noServer: true,
-});
+type WebSocket = SocketStream["socket"];
 
-let server: Server;
+const server = fastify();
+const sockets = new Set<WebSocket>();
 
 function broadcast(msg: string, socket?: WebSocket) {
-  const filteredSockets = socket
-    ? sockets.filter((s) => s !== socket)
-    : sockets;
-
-  filteredSockets.forEach((s) => s.send(msg));
+  sockets.forEach((s) => {
+    if (s !== socket) {
+      s.send(msg);
+    }
+  });
 }
 
-async function onMessage(this: WebSocket, msg: string) {
+async function onMessage(this: WebSocket, rawMsg: Buffer) {
+  const msg = rawMsg.toString();
   const data = JSON.parse(msg);
 
   if (!data.actions) {
@@ -40,13 +38,17 @@ async function onMessage(this: WebSocket, msg: string) {
 
   const actions: Array<Action> = data.actions;
 
-  for (const action of actions) {
+  for (let i = 0; i < actions.length; i++) {
+    const action = actions[i];
+
     if (!action.scheduledAt) {
       await handleClientAction(action);
     } else {
       scheduledActions.push(action);
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       scheduledActions.sort((a: any, b: any) => a.scheduledAt - b.scheduledAt);
+
       save();
     }
   }
@@ -58,51 +60,43 @@ async function onMessage(this: WebSocket, msg: string) {
 }
 
 function onClose(this: WebSocket) {
-  const socketIdx = sockets.indexOf(this);
-  const deleteCount = 1;
-
-  sockets.splice(socketIdx, deleteCount);
+  sockets.delete(this);
   console.log(`${LOG_PREFIX_WS}Connection closed`);
 }
 
-function onListening() {
-  console.log(
-    `${LOG_PREFIX_HTTP}Listening on port ${
-      (server.address() as AddressInfo).port
-    }`
-  );
-}
+function wsHandler(con: SocketStream, req: FastifyRequest) {
+  const { socket } = con;
 
-function onUpgrade(req: IncomingMessage, socket: Socket, head: Buffer) {
-  wsServer.handleUpgrade(req, socket, head, (socket: WebSocket) => {
-    wsServer.emit("connection", socket, req);
-  });
-}
+  console.log(`${LOG_PREFIX_WS}${req.ip} New connection established`);
 
-function onConnection(socket: WebSocket, req: IncomingMessage) {
-  console.log(
-    `${LOG_PREFIX_WS}${req.socket.remoteAddress} New connection established`
-  );
-  sockets.push(socket);
-  socket.send(
-    JSON.stringify({
-      env: isDevelopment ? "dev" : "prod",
-    })
-  );
+  sockets.add(socket);
+
+  socket.send(JSON.stringify({ env: isDevelopment ? "dev" : "prod" }));
 
   socket.on("message", onMessage);
   socket.on("close", onClose);
 }
 
-wsServer.on("connection", onConnection);
+function handler(_req: FastifyRequest, reply: FastifyReply) {
+  const filePath = join(staticPath, "index.html");
+  const readStream = createReadStream(filePath);
 
-app.use(express.static(join(process.cwd(), "client")));
+  reply.type("text/html").send(readStream);
+}
 
-function listen() {
-  if (server) {
-    console.log(`${LOG_PREFIX_HTTP}Server is already running`);
-    return;
-  }
+async function listen(): Promise<void> {
+  await server.register(fastifyWebsocket);
+
+  await server.register(fastifyStatic, {
+    root: staticPath,
+  });
+
+  server.route({
+    method: "GET",
+    url: "/",
+    wsHandler,
+    handler,
+  });
 
   let port = 8080;
 
@@ -110,10 +104,17 @@ function listen() {
     port++;
   }
 
-  server = app.listen(port, "0.0.0.0");
+  return new Promise((res, rej) => {
+    server.listen(port, "0.0.0.0", (err) => {
+      if (err) {
+        rej(err);
+        return;
+      }
 
-  server.on("listening", onListening);
-  server.on("upgrade", onUpgrade);
+      console.log(`${LOG_PREFIX_HTTP}Listening on port ${port}`);
+      res();
+    });
+  });
 }
 
 export { listen, broadcast };
