@@ -164,20 +164,24 @@ Repeat this same step for all any channel point reward you want to set up.
 
 ## Start the service
 
-Open a terminal and install the dependencies with `yarn`, then start the service
-using `yarn start`. Keep the terminal open until you want to close the service.
+Open a terminal and install the dependencies with `yarn`, compile the TypeScript
+code using `yarn build`. You only have to do this the first time you run it,
+after updating or if you make any changes to the code under `src`.
 
-To close the service press `ctrl + c` to close it gracefully, you can close the
-terminal once the prompt is displayed again.
+Once the compilation ends run it with `yarn start`. Keep the terminal open until
+you want to close the service.
+
+To close it press `ctrl + c` to close it gracefully, you can close the terminal
+once the prompt is displayed again.
 
 ## Development
 
-Run it using `start:dev` script `yarn start:dev`, this will restart everything
-whenever you make any change. Keep in mind that some features might be disabled
-under this environment.
+Open a terminal and use `yarn start:dev`, this will restart everything whenever
+you make any change. Keep in mind that some features might be disabled under this
+environment or work in a special way.
 
-For convenience all channel point reward redemptions will be canceled, returning
-the channel points to the users (when applicable see [create channel point reward](#create-channel-point-rewards),
+For convenience, all channel point reward redemptions will be canceled, returning
+the channel points to the users (when applicable see [create channel point rewards](#create-channel-point-rewards),
 very useful for testing.
 
 ### Create new rewards
