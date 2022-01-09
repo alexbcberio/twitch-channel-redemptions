@@ -4,3 +4,4 @@ tokens.json
 storage/*.json
 *.log
 TODO.md
+dist
