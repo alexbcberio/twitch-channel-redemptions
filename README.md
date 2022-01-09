@@ -106,27 +106,59 @@ its better if you make it manually (you only have to remove the underscore and
 set the following character to capital). Finally copy it into a file called
 `tokens.json` and place it on the root of this project (same place as this file).
 
-The JSON file must have this format (the order is not relevant):
+The JSON file must have this format, the values of the keys could vary:
 
 ```json
 {
-  "accessToken": "the access token",
+  "accessToken": "<the access token>",
   "expiresIn": 0,
-  "refreshToken": "the refresh token",
+  "refreshToken": "<the refresh token>",
   "scope": [
-    "channel:manage:redemptions"
+    "channel:manage:redemptions",
     "channel:moderate",
     "chat:edit",
     "chat:read"
-    ],
+  ],
   "tokenType": "bearer"
 }
 ```
 
 ### Configure the channel point rewards
 
-- TODO: document how to configure the channel point rewards.
-- TODO: document how "light theme" action works (relative to reward pricing).
+Once finished the [installation process](#installation) you have to set up the
+channel point rewards on the tool. The tool can handle the redemptions automatically,
+to do so the redemptions have to be created with the application itself. This restriction
+is imposed by Twitch ([see it in their docs](https://dev.twitch.tv/docs/api/reference#update-redemption-status)).
+
+#### Create a channel point reward
+
+There's a small utility chatbot do help performing some tasks such as this one,
+write this command in the chat to create a channel point reward.
+
+```txt
+!createReward <title> <cost>
+```
+
+#### Link channel point reward with an action
+
+We call actions to the different integrations that can be set up with channel point
+rewards. The available actions are stored in [`src/backend/pobSubClient/actions`](,/tree/main/src/backend/../../../src/backend/pubSubClient/actions)
+
+The actions are mapped to a reward in [`src/enums/Redemptions.ts`](./tree/main/src/enums/Redemptions.ts),
+set the ID of the reward as the value.
+
+To get the ID of a reward start the service start the tool in [development mode](#development)
+and send the redeem the redemption you want to set up. It will show a message on
+the console like this one. The ID is shown up twice, in this case `ddcb6566-6b02-447c-a396-6b93ade3b480`.
+
+![Logs of unhandled channel point reward](./docs/img/unhandled-channel-point-reward-redemption.jpg)
+
+Once the ID is correctly set up (remember to save the file) redeem again the reward
+it now should not show up a message telling that the redemption was not handled.
+
+![Logs of handled channel point reward](./docs/img/handled-channel-point-reward-redemption.jpg)
+
+Repeat this same step for all any channel point reward you want to set up.
 
 ## Start the service
 
