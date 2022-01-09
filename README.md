@@ -57,6 +57,7 @@ The file content of the file should be something similar to this:
 ```env
 TWITCH_CLIENT_ID=theClientIdProvidedByTwitch
 TWITCH_CLIENT_SECRET=aSecretYouHaveToKeepSafe
+TWITCH_CHANNEL_NAME=<username of the Twitch streamer>
 ```
 
 ### Create OAuth2 user token
