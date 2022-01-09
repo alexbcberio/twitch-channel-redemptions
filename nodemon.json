@@ -1,7 +1,3 @@
 {
-    "ignore": [
-        "*.json",
-        "*.(jpe?g|png)",
-        "*.mp3"
-    ]
+  "ignore": ["*.json", "*.(jpe?g|png)", "*.mp3", "www/**/*"]
 }

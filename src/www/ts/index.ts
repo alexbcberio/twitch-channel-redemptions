@@ -1,16 +1,29 @@
+// TODO: clean the code and fix all linting error/warnings
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-magic-numbers */
+/* eslint-disable no-use-before-define */
 document.addEventListener("DOMContentLoaded", init);
 
-let ws;
-let env;
+import * as tinycolor from "tinycolor2";
+
+// send actions to be performed by the server
+import { Action } from "../../interfaces/actions/Action";
+import { RedemptionMessage } from "../../interfaces/RedemptionMessage";
+
+let ws: WebSocket;
+let env: "dev" | "prod";
 
 function init() {
-  ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}`);
+  ws = new WebSocket(
+    `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}`
+  );
 
   ws.onopen = () => {
     console.log("Connected");
 
     ws.onmessage = checkEvent;
-  }
+  };
   ws.onclose = reconnect;
 }
 
@@ -23,10 +36,9 @@ function reconnect() {
   setTimeout(init, 5000);
 }
 
-const events = [];
-let handlingEvents = false;
+const events: Array<any> = [];
 
-async function checkEvent(e) {
+async function checkEvent(this: WebSocket, e: MessageEvent<any>) {
   if (!env) {
     env = JSON.parse(e.data).env.toLowerCase();
 
@@ -36,7 +48,7 @@ async function checkEvent(e) {
   const message = JSON.parse(e.data);
 
   if (message.song) {
-    updateSong(message.song)
+    updateSong(message.song);
     return;
   }
 
@@ -55,13 +67,17 @@ async function checkEvent(e) {
             await russianRoulette(data);
             break;
           default:
-            await createCard(data.rewardName, data.message ? data.message : "", data.backgroundColor, data.rewardImage);
+            await createCard(
+              data.rewardName,
+              data.message ? data.message : "",
+              data.backgroundColor,
+              data.rewardImage
+            );
         }
       }
 
       events.shift();
       await waitTime();
-
     } while (events.length > 0);
   }
 
@@ -71,13 +87,13 @@ async function checkEvent(e) {
 function waitTime() {
   const WAIT_TIME_MS = 500;
 
-  return new Promise(res => {
+  return new Promise((res) => {
     setTimeout(res, WAIT_TIME_MS);
   });
 }
 
-function karaokeTime(username, message) {
-  return new Promise(res => {
+function karaokeTime(username: string, message: string): Promise<void> {
+  return new Promise((res) => {
     console.log(username, message);
 
     const div = document.createElement("div");
@@ -91,12 +107,18 @@ function karaokeTime(username, message) {
     lightRight.classList.add("light", "light-right");
     div.appendChild(lightRight);
 
-    const randomLeft = tinycolor.random().setAlpha(.45).saturate(100).toRgbString();
-    const randomRight = tinycolor(randomLeft).spin(Math.floor(Math.random() * 90) + 90).toRgbString();
+    const randomLeft = tinycolor
+      .random()
+      .setAlpha(0.45)
+      .saturate(100)
+      .toRgbString();
+    const randomRight = tinycolor(randomLeft)
+      .spin(Math.floor(Math.random() * 90) + 90)
+      .toRgbString();
 
     insertCssVariables({
       "--light-color-left": randomLeft,
-      "--light-color-right": randomRight
+      "--light-color-right": randomRight,
     });
 
     const img = createImg("/img/karaoke-time.png");
@@ -107,20 +129,20 @@ function karaokeTime(username, message) {
     img.onload = () => {
       const audio = createAudio("/sfx/karaoke-time.mp3");
 
-      audio.onended = function() {
+      audio.onended = function () {
         div.remove();
         res();
-      }
+      };
 
       document.body.appendChild(div);
       audio.play();
     };
   });
-
 }
 
-function russianRoulette({ userDisplayName, message }) {
-  return new Promise(res =>  {
+function russianRoulette(msg: RedemptionMessage): Promise<void> {
+  const { userDisplayName, message } = msg;
+  return new Promise((res) => {
     const gotShot = Boolean(message);
 
     const div = document.createElement("div");
@@ -141,7 +163,9 @@ function russianRoulette({ userDisplayName, message }) {
     div.appendChild(p);
 
     img.onload = () => {
-      const audio = createAudio(`/sfx/toy-gun/${gotShot ? 'shot' : 'stuck'}.mp3`);
+      const audio = createAudio(
+        `/sfx/toy-gun/${gotShot ? "shot" : "stuck"}.mp3`
+      );
 
       document.body.appendChild(div);
 
@@ -154,19 +178,20 @@ function russianRoulette({ userDisplayName, message }) {
           div.remove();
           res();
         }, 1250);
-      }
+      };
 
       try {
         audio.play();
-      } catch(e) {
+      } catch (e) {
         // user didn't interact with the document first
       }
-    }
+    };
   });
 }
 
-// send actions to be performed by the server
-function sendWsActions(actions) {
+// TODO: Check this
+// @ts-expect-error Check git history and give it use
+function sendWsActions(actions: Array<Action>) {
   if (!Array.isArray(actions)) {
     actions = [actions];
   }
@@ -178,18 +203,25 @@ function sendWsActions(actions) {
 
   if (ws.readyState === WebSocket.OPEN) {
     if (actions.length > 0) {
-      ws.send(JSON.stringify({
-        actions: actions
-      }));
+      ws.send(
+        JSON.stringify({
+          actions,
+        })
+      );
     }
   }
 }
 
-function createCard(title, message, color, image) {
+function createCard(
+  title: string,
+  message: string,
+  hexColor: string,
+  image: string
+): Promise<void> {
   const maxMessageLength = 120;
   const darkenLighten = 10;
 
-  return new Promise(res => {
+  return new Promise((res) => {
     const card = document.createElement("div");
     card.classList.add("card", "open");
 
@@ -217,26 +249,25 @@ function createCard(title, message, color, image) {
     msg.classList.add("message");
     body.appendChild(msg);
 
-    color = tinycolor(color);
+    let color = tinycolor(hexColor);
 
     if (!color.isValid()) {
       color = tinycolor("#2EC90C");
     }
 
-    let backgroundColor = color;
-    let borderColor = new tinycolor(backgroundColor.toHexString());
+    const backgroundColor = color;
+    const borderColor = new tinycolor(backgroundColor.toHexString());
 
     if (backgroundColor.isLight()) {
       card.classList.add("card-light");
       borderColor.darken(darkenLighten).toHexString();
-
     } else {
       borderColor.lighten(darkenLighten).toHexString();
     }
 
     insertCssVariables({
       "--card-background-color": backgroundColor.toHexString(),
-      "--card-border-color": borderColor.toHexString()
+      "--card-border-color": borderColor.toHexString(),
     });
 
     card.addEventListener("animationend", () => {
@@ -249,7 +280,6 @@ function createCard(title, message, color, image) {
         setTimeout(() => {
           card.classList.add("close");
         }, timeOpen * 1000);
-
       } else {
         card.remove();
         res();
@@ -263,14 +293,14 @@ function createCard(title, message, color, image) {
 }
 
 // creates a img and sets its src
-function createImg(path) {
+function createImg(path: string) {
   const img = document.createElement("img");
   img.src = path;
   return img;
 }
 
 // creates a paragraph and sets a text inside
-function createText(txt) {
+function createText(txt?: string) {
   const p = document.createElement("p");
 
   if (txt) {
@@ -281,34 +311,38 @@ function createText(txt) {
 }
 
 // creates and initializes an audio element with given audio src
-function createAudio(path) {
+function createAudio(path: string) {
   const audio = new Audio(path);
-  audio.volume = .025;
+  audio.volume = 0.025;
 
   return audio;
 }
 
 // get a internal style sheet or create it if it does not exist, used to set css variables on :root
-function cssSheet() {
+function cssSheet(): CSSStyleSheet {
   const targetValue = "cssVariables";
-  let style = document.querySelector(`style[data-target="${targetValue}"]`);
+  let style = document.querySelector<HTMLStyleElement>(
+    `style[data-target="${targetValue}"]`
+  );
 
   if (style) {
-    return style.sheet;
+    // TODO: improve
+    return style.sheet as CSSStyleSheet;
   }
 
   style = document.createElement("style");
   style.setAttribute("data-target", targetValue);
   document.head.appendChild(style);
 
-  return style.sheet;
+  // TODO: improve
+  return style.sheet as CSSStyleSheet;
 }
 
 // add css rules to :root element
-function insertCssVariables(rules) {
+function insertCssVariables(rules: Record<string, string>) {
   const sheet = cssSheet();
 
-  while (sheet.rules.length > 0) {
+  while (sheet.cssRules.length > 0) {
     sheet.deleteRule(0);
   }
 
@@ -321,19 +355,30 @@ function insertCssVariables(rules) {
   sheet.insertRule(rulesTxt);
 }
 
-// playing song overlay
-function updateSong({ title, artist, coverArt}) {
+function updateSong(song: any) {
+  const { title, artist, coverArt } = song;
   const playing = document.getElementById("playing");
-  if (
-    !title &&
-    !artist
-  ) {
+
+  if (!playing) {
+    return;
+  }
+
+  if (!title && !artist) {
     playing.style.display = "none";
     return;
   }
 
-  playing.style.display = null;
-  playing.querySelector(".coverArt").src = coverArt;
-  playing.querySelector(".trackName").innerText = title;
-  playing.querySelector(".trackArtist").innerText = artist;
+  playing.style.display = "";
+
+  const img = playing.querySelector<HTMLImageElement>(".coverArt");
+  const trackName = playing.querySelector<HTMLElement>(".trackName");
+  const trackArtist = playing.querySelector<HTMLElement>(".trackArtist");
+
+  if (!img || !trackName || !trackArtist) {
+    return;
+  }
+
+  img.src = coverArt;
+  trackName.innerText = title;
+  trackArtist.innerText = artist;
 }

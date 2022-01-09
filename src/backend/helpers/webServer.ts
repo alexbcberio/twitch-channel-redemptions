@@ -12,7 +12,7 @@ import { join } from "path";
 const LOG_PREFIX_HTTP = "[HTTP] ";
 const LOG_PREFIX_WS = "[WS] ";
 
-const staticPath = join(process.cwd(), "client");
+const staticPath = join(process.cwd(), "dist/www");
 
 type WebSocket = SocketStream["socket"];
 
