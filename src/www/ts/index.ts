@@ -121,13 +121,13 @@ function karaokeTime(username: string, message: string): Promise<void> {
       "--light-color-right": randomRight,
     });
 
-    const img = createImg("/img/karaoke-time.png");
+    const img = createImg("/assets/img/karaoke-time.png");
     const p = createText(`${username} ha sugerido cantar un tema`);
 
     div.appendChild(img);
     div.appendChild(p);
     img.onload = () => {
-      const audio = createAudio("/sfx/karaoke-time.mp3");
+      const audio = createAudio("/assets/sfx/karaoke-time.mp3");
 
       audio.onended = function () {
         div.remove();
@@ -149,7 +149,7 @@ function russianRoulette(msg: RedemptionMessage): Promise<void> {
     div.classList.add("alert");
     div.style.margin = ".5rem";
 
-    const img = createImg("/img/toy-gun.png");
+    const img = createImg("/assets/img/toy-gun.png");
 
     const p = createText();
 
@@ -164,7 +164,7 @@ function russianRoulette(msg: RedemptionMessage): Promise<void> {
 
     img.onload = () => {
       const audio = createAudio(
-        `/sfx/toy-gun/${gotShot ? "shot" : "stuck"}.mp3`
+        `/assets/sfx/toy-gun/${gotShot ? "shot" : "stuck"}.mp3`
       );
 
       document.body.appendChild(div);
