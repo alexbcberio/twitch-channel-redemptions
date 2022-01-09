@@ -142,9 +142,9 @@ write this command in the chat to create a channel point reward.
 #### Link channel point reward with an action
 
 We call actions to the different integrations that can be set up with channel point
-rewards. The available actions are stored in [`src/backend/pobSubClient/actions`](,/tree/main/src/backend/../../../src/backend/pubSubClient/actions)
+rewards. The available actions are stored in [`src/backend/pobSubClient/actions`](./src/backend/pubSubClient/actions)
 
-The actions are mapped to a reward in [`src/enums/Redemptions.ts`](./tree/main/src/enums/Redemptions.ts),
+The actions are mapped to a reward in [`src/enums/Redemptions.ts`](./src/enums/Redemptions.ts),
 set the ID of the reward as the value.
 
 To get the ID of a reward start the service start the tool in [development mode](#development)
