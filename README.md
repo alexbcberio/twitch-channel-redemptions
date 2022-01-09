@@ -1,23 +1,69 @@
-# Readme
+# Twitch Channel Redemptions
 
-Hello and thanks for choosing this tool for your streams!
+This tool let's you manage Twitch [channel point redemptions](https://help.twitch.tv/s/article/channel-points-guide)
+and create unique experiences. When a viewer redeems a channel reward the tool
+checks it and makes something. The limit is the sky! _and the programming skills
+you have_
 
-## Setting up
+The tool is freely available for anyone, keep in mind that you will have to
+adapt it to your needs as its set it up for my [Twitch channel](https://twitch.tv/alexbcberio).
+Don't worry, I will try to guide you the best I can so you can adapt it for yourself.
 
-First you have to create the application, go to
-[Twitch developer console](https://dev.twitch.tv/console) and create it. Once done
-make a copy of the `.env.example` named `.env` and fill the CLIENT_ID and
-CLIENT_SECRET field values provided by Twitch.
+These are some of the things you can already do with the tool:
 
-You will have something similar to this:
+- Timeout user: it times out a user for a minute (configurable).
+- Get VIP role: assigns VIP to a user up to a limit, once the limit of users is
+  reached it removes the VIP of the first one who got it and assigns it to the new
+  user.
+- Steal VIP from a user: it steals the VIP from anyone who got it **using channel
+  points** and assigns it to this user. It cannot be used to take the VIP of a user
+  who obtained it using other methods.
 
-```txt
+Feel free to contact me if you need any help via [Twitter](https://twitter.com/alexbcberio)
+or [Discord](https://discord.com/users/202915432175239169).
+
+![Emote of a cat with a heart (nekolove) from FrankerFacez](https://cdn.frankerfacez.com/emote/244375/1)
+
+## Important
+
+### Channel points acceptable use policy
+
+Remember to follow Twitch's [Channel Points Acceptable Use Policy](https://www.twitch.tv/p/en/legal/channel-points-acceptable-use-policy/)
+whenever you use this tool. We will not take any responsibility for its bad use.
+
+### Report bugs
+
+Bugs? We do not want them, please [open a issue](https://github.com/alexbcberio/twitch-channel-redemptions/issues/new?labels=bug&template=bug_report.md).
+
+### Request new features
+
+Would you like me to implement something? Feel free to tell me everything [here](https://github.com/alexbcberio/twitch-channel-redemptions/issues/new?labels=enhancement&template=feature_request.md),
+I will considerate it and implement it if it is interesting and not available
+anywhere else.
+
+## Installation
+
+Follow this steps to set up the tool for your streams.
+
+### Create a Twitch application
+
+First [create a application](https://dev.twitch.tv/console/apps/create) through
+Twitch developer console. For the OAuth Redirect URL set up the following
+`http://localhost`. Take the client id and client secret and store
+them in a file called `.env`. You have a template of this file available as `.env.example`.
+
+The file content of the file should be something similar to this:
+
+```env
 TWITCH_CLIENT_ID=theClientIdProvidedByTwitch
 TWITCH_CLIENT_SECRET=aSecretYouHaveToKeepSafe
 ```
 
-Now we have to authenticate the account we are going to use using OAuth. In order
-to get it we have to make a `GET` request to the following endpoint.
+### Create OAuth2 user token
+
+Authenticate the account of the streamer using OAuth. Make a `GET` request to the
+following url. You can paste it directly on the browser, be sure that everything
+is in one line and that there are no white spaces between the lines.
 
 ```txt
 GET https://id.twitch.tv/oauth2/authorize
@@ -27,23 +73,22 @@ GET https://id.twitch.tv/oauth2/authorize
   &scope=<space-separated list of scopes>
 ```
 
-You can get all the available scopes on [here](https://dev.twitch.tv/docs/authentication/#scopes).
-Don't forget to set the exact same redirect_url as you did on the application.
+The scopes are the permissions you will be granting to the app. You can get all
+the available scopes from [here](https://dev.twitch.tv/docs/authentication/#scopes),
+some required scopes are: `channel:manage:redemptions`, `channel:moderate`,
+`chat:edit` and `chat:read`.
+Don't forget to set the exact same redirect_url as you did on the [application](#create-a-twitch-application).
 
-**Important**: you have to perform this operation with the account you want to use
-to send the messages. You can have two different accounts, the owner of the
-application and the authorized account, aka "the chatter". But I recommend you
-to use the same account for simplicity.
-
-Once authorized, we will get redirected to the specified address. The url will
-have a `GET` parameter called `code` that we will use to obtain the access token.
+Once authorized, you will get redirected to the specified address. The url will
+have a `GET` parameter called `code` used to obtain the access token.
 
 ```txt
-http://localhost/?code=<code of the authorization>
-  &scope=channel:manage:redemptions channel:read:hype_train channel:read:polls channel:read:predictions channel:read:redemptions channel:moderate chat:edit chat:read
+GET http://localhost/?code=<code of the authorization>
+  &scope=<list of the authorized scopes>
 ```
 
-Finally make a `POST` request to the following url.
+Finally make a `POST` request to the following url, you can use a REST online tool
+as [hoppscotch](https://hoppscotch.io/) or a desktop one such as [Insomnia](https://insomnia.rest/download).
 
 ```txt
 POST https://id.twitch.tv/oauth2/token
@@ -54,27 +99,37 @@ POST https://id.twitch.tv/oauth2/token
   &redirect_uri=<your registered redirect URI>
 ```
 
-This will return a JSON-encoded response. Copy the whole response into a file
-called `tokens.json` and place it on the root of this project (same place as
-is this file). You have to change the key names from kebab_case to camelCase.
+You will get a JSON-encoded response, first transform the keys from kebab_case
+to camelCase, there are free online tools as [this one](https://caseconverter.pro/use-cases/convert-json-keys-to-camel-case-online)
+its better if you make it manually (you only have to remove the underscore and
+set the following character to capital). Finally copy it into a file called
+`tokens.json` and place it on the root of this project (same place as this file).
 
 The JSON file must have this format (the order is not relevant):
 
 ```json
 {
   "accessToken": "the access token",
-  "expiresIn": 14361,
+  "expiresIn": 0,
   "refreshToken": "the refresh token",
   "scope": [
-    // list of the scopes
-  ],
+    "channel:manage:redemptions"
+    "channel:moderate",
+    "chat:edit",
+    "chat:read"
+    ],
   "tokenType": "bearer"
 }
 ```
 
-## Starting the service
+### Configure the channel point rewards
 
-Install any dependencies executing the following command `yarn`, then you can
+- TODO: document how to configure the channel point rewards.
+- TODO: document how "light theme" action works (relative to reward pricing).
+
+## Start the service
+
+Install the dependencies executing the following command `yarn`, then you can
 start the service using the start script `yarn start`. Keep the terminal open
 until you want to close the service.
 
@@ -83,3 +138,11 @@ until you want to close the service.
 In order to start the service in development mode use the dev script `yarn dev`,
 this will reload the backend whenever you make any change. Keep in mind that some
 of the features might be disabled in this environment.
+
+### Add new rewards
+
+- TODO: document how to add new rewards
+
+### Create own rewards
+
+- TODO: document how to create new rewards.
