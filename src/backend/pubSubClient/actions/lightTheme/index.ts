@@ -27,30 +27,6 @@ function calculateEventDurationMs(rewardCost: number): number {
   return eventDuration * ms;
 }
 
-function msText(ms: number): string {
-  let amountTime: number;
-  let amountUnit: string;
-
-  const second = 1e3;
-  const minute = 60e3;
-
-  if (ms >= minute) {
-    amountTime = ms / minute;
-    amountUnit = "minuto";
-  } else {
-    amountTime = ms / second;
-    amountUnit = "segundo";
-  }
-
-  const decimalPrecision = 1e2;
-  const roundedAmountTime =
-    Math.round(amountTime * decimalPrecision) / decimalPrecision;
-  // eslint-disable-next-line no-magic-numbers
-  const pluralize = roundedAmountTime > 1 ? "s" : "";
-
-  return `${roundedAmountTime} ${amountUnit}${pluralize}`;
-}
-
 async function lightTheme(msg: RedemptionMessage): Promise<RedemptionMessage> {
   if (!isWindows) {
     throw new Error("Only available on Windows platform");
