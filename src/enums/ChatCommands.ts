@@ -1,4 +1,4 @@
 export enum ChatCommands {
-	Commands = "commands",
-	CreateReward = "createreward"
+  Commands = "commands",
+  CreateReward = "createReward",
 }

@@ -36,14 +36,14 @@ async function onMessage(
     const args = message.split(" ");
     const commandName = args.shift();
 
-    switch (commandName) {
-      case ChatCommands.Commands:
+    switch (commandName?.toLowerCase()) {
+      case ChatCommands.Commands.toLowerCase():
         await say(
           channel,
           `Comandos disponibles: "${Object.values(ChatCommands).join('", "')}"`
         );
         break;
-      case ChatCommands.CreateReward:
+      case ChatCommands.CreateReward.toLowerCase():
         await createReward(channel, user, args.join(" "), msg);
         break;
       default:
