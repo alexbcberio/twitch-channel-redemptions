@@ -6,7 +6,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node -r dotenv/config dist",
     "start:dev": "cross-env NODE_ENV=development nodemon -r dotenv/config src/index.ts",
-    "build": "rimraf dist && tsc",
+    "build": "rimraf dist && tsc && yarn build:frontend",
     "build:frontend": "cross-env NODE_ENV=production ts-node ./runWebpack.ts"
   },
   "dependencies": {
