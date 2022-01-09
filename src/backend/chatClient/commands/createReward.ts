@@ -3,6 +3,9 @@ import { sayError, saySuccess } from "../clientActions";
 import { LOG_PREFIX } from "..";
 import { TwitchPrivateMessage } from "@twurple/chat/lib/commands/TwitchPrivateMessage";
 import { createReward as createChannelPointsReward } from "../../helpers/twitch";
+import { messages } from "../../../localization";
+
+const createRewardMessages = messages.chatClient.commands.createReward;
 
 async function createReward(
   channel: string,
@@ -15,7 +18,7 @@ async function createReward(
   const title = args.shift();
 
   if (!title) {
-    await sayError(channel, "Debes indicar el título de la recompensa");
+    await sayError(channel, createRewardMessages.missingTitle);
     return;
   }
 
@@ -28,10 +31,7 @@ async function createReward(
       cost,
     });
 
-    saySuccess(
-      channel,
-      `Creada recompensa de canal "${title}" con un costo de ${cost}`
-    );
+    saySuccess(channel, createRewardMessages.rewardCreated(title, cost));
   } catch (e) {
     if (e instanceof Error) {
       console.log(`${LOG_PREFIX}${e.message}`);

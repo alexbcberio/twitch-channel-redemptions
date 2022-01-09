@@ -4,16 +4,19 @@ import {
   existsVsCodeSettings,
   isWindows,
 } from "./helpers";
+import { isProduction, msText } from "../../../helpers/util";
 
 import { ColorTheme } from "./types";
 import { LOG_PREFIX } from "../..";
 import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
-import { isProduction } from "../../../helpers/util";
+import { messages } from "../../../../localization";
 
 const vsCodeLightTheme = "Min Light";
 const vsCodeDarkTheme = "Min Dark";
 
 const minEventDuration = 10;
+
+const lightThemeMessages = messages.pubSubClient.actions.lightTheme;
 
 let restoreAt = 0;
 let restoreTimeout: NodeJS.Timeout | null;
@@ -51,20 +54,20 @@ async function lightTheme(msg: RedemptionMessage): Promise<RedemptionMessage> {
   if (restoreTimeout) {
     clearTimeout(restoreTimeout);
 
-    msg.message = `Aumentado el tiempo con tema claro por ${msText(
-      eventDuration
-    )}`;
+    msg.message = lightThemeMessages.messageTimeIncreased(
+      msText(eventDuration)
+    );
   } else {
     restoreAt = Date.now();
 
-    msg.message = `Disfruta de un dia iluminado`;
+    msg.message = lightThemeMessages.message;
   }
 
   restoreAt += eventDuration;
 
   const timeoutTime = restoreAt - Date.now();
 
-  msg.message += ` (tiempo acumulado ${msText(timeoutTime)})`;
+  msg.message += ` ${lightThemeMessages.cumulatedTime(msText(timeoutTime))}`;
 
   restoreTimeout = setTimeout(async () => {
     const colorTheme: ColorTheme = "dark";

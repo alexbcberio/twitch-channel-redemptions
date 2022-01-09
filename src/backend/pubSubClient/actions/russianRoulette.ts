@@ -2,6 +2,7 @@ import { say, timeout } from "../../chatClient/clientActions";
 
 import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
 import { getUsernameFromId } from "../../helpers/twitch";
+import { messages } from "../../../localization";
 import { randomInt } from "crypto";
 
 type GunsSafeShots = Record<string, number>;
@@ -9,6 +10,8 @@ const gunsSafeShots: GunsSafeShots = {};
 
 const timeoutSeconds = 60;
 const maxSafeShots = 5;
+
+const russianRouletteMessages = messages.pubSubClient.actions.russianRoulette;
 
 async function russianRoulette(
   msg: RedemptionMessage
@@ -39,14 +42,19 @@ async function russianRoulette(
   msg.message = win ? "" : "got shot";
 
   if (!win) {
-    await timeout(channel, userDisplayName, timeoutSeconds, "F en la ruleta");
+    await timeout(
+      channel,
+      userDisplayName,
+      timeoutSeconds,
+      russianRouletteMessages.timeoutReason
+    );
 
+    await say(channel, russianRouletteMessages.gotShotMessage(userDisplayName));
+  } else {
     await say(
       channel,
-      `PepeHands ${userDisplayName} no ha sobrevivido para contarlo`
+      russianRouletteMessages.survivedMessage(userDisplayName)
     );
-  } else {
-    await say(channel, `rdCool Clap ${userDisplayName}`);
   }
 
   return msg;

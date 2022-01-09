@@ -1,7 +1,10 @@
 import { LOG_PREFIX } from "..";
 import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
 import { getUsernameFromId } from "../../helpers/twitch";
+import { messages } from "../../../localization";
 import { timeout } from "../../chatClient/clientActions";
+
+const highlightMessageMessages = messages.pubSubClient.actions.highlightMessage;
 
 async function highlightMessage(
   msg: RedemptionMessage
@@ -22,7 +25,7 @@ async function highlightMessage(
     }
 
     try {
-      const reason = "No se permite enviar enlaces en mensajes destacados";
+      const reason = highlightMessageMessages.noLinksAllowed;
       const timeoutSeconds = 10;
 
       await timeout(channel, msg.userDisplayName, timeoutSeconds, reason);

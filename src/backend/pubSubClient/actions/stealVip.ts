@@ -3,6 +3,9 @@ import { save, vipUsers } from "../../helpers/miniDb";
 
 import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
 import { getUsernameFromId } from "../../helpers/twitch";
+import { messages } from "../../../localization";
+
+const stealVipMessages = messages.pubSubClient.actions.stealVip;
 
 async function stealVip(msg: RedemptionMessage): Promise<RedemptionMessage> {
   if (!msg.message) {
@@ -22,11 +25,11 @@ async function stealVip(msg: RedemptionMessage): Promise<RedemptionMessage> {
 
   if (!channelVips.find((u) => u.toLowerCase() === removeVipUser)) {
     const noVips = 0;
-    const hasVips = channelVips.length === noVips;
+    const hasVips = channelVips.length > noVips;
 
     const message = !hasVips
-      ? "No hay nadie a quien puedas robar el VIP"
-      : `Solo puedes robar el VIP de: "${channelVips.sort().join('", "')}"`;
+      ? stealVipMessages.noVipUsers
+      : stealVipMessages.allowedUsers(channelVips.sort());
     await say(channel, message);
 
     if (!hasVips) {
@@ -61,7 +64,7 @@ async function stealVip(msg: RedemptionMessage): Promise<RedemptionMessage> {
   save();
 
   // eslint-disable-next-line require-atomic-updates
-  msg.message = `@${addVipUser} ha "tomado prestado" el VIP de @${removeVipUser}`;
+  msg.message = stealVipMessages.message(addVipUser, removeVipUser);
 
   await say(channel, msg.message);
 

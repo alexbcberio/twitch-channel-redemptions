@@ -1,12 +1,17 @@
 import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
 import { getUsernameFromId } from "../../helpers/twitch";
+import { messages } from "../../../localization";
+import { msText } from "../../helpers/util";
 import { timeout } from "../../chatClient/clientActions";
+
+const timeoutFriendMessages = messages.pubSubClient.actions.timeoutFriend;
 
 async function timeoutFriend(
   msg: RedemptionMessage
 ): Promise<RedemptionMessage> {
   const { message, channelId, userDisplayName } = msg;
-  if (!msg.message) {
+
+  if (!message) {
     throw new Error("Redemption has no message");
   }
 
@@ -17,12 +22,18 @@ async function timeoutFriend(
   }
 
   const time = 60;
-  const reason = `Timeout dado por @${userDisplayName} con puntos del canal`;
+  const reason = timeoutFriendMessages.timeoutReason(userDisplayName);
 
-  await timeout(channel, msg.message, time, reason);
+  await timeout(channel, message, time, reason);
+
+  const msPerSecond = 1e3;
 
   // eslint-disable-next-line require-atomic-updates
-  msg.message = `@${userDisplayName} ha expulsado a @${message} por ${time} segundos`;
+  msg.message = timeoutFriendMessages.message(
+    userDisplayName,
+    message,
+    msText(time * msPerSecond)
+  );
 
   return msg;
 }

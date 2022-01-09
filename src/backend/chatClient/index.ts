@@ -8,11 +8,13 @@ import { ChatCommands } from "../../enums/ChatCommands";
 import { TwitchPrivateMessage } from "@twurple/chat/lib/commands/TwitchPrivateMessage";
 import { broadcast } from "../helpers/webServer";
 import { createReward } from "./commands/createReward";
+import { messages } from "../../localization";
 import { start } from "../helpers/miniDb";
 
 let chatClient: ChatClient;
 
 const LOG_PREFIX = "[ChatClient] ";
+const chatClientMessages = messages.chatClient;
 
 function onConnect(): Promise<void> {
   console.log(`${LOG_PREFIX}Connected`);
@@ -40,7 +42,7 @@ async function onMessage(
       case ChatCommands.Commands.toLowerCase():
         await say(
           channel,
-          `Comandos disponibles: "${Object.values(ChatCommands).join('", "')}"`
+          chatClientMessages.availableCommands(Object.values(ChatCommands))
         );
         break;
       case ChatCommands.CreateReward.toLowerCase():
@@ -113,10 +115,14 @@ async function handleClientAction(action: Action): Promise<void> {
       broadcast(action.data.message);
       break;
     case ActionType.AddVip:
-      await addVip(channel, username, `Otorgado VIP a @${username}`);
+      await addVip(channel, username, chatClientMessages.addedVip(username));
       break;
     case ActionType.RemoveVip:
-      await removeVip(channel, username, `Eliminado VIP de @${username}`);
+      await removeVip(
+        channel,
+        username,
+        chatClientMessages.removeVip(username)
+      );
       break;
     default:
       console.log(`${[LOG_PREFIX]}Couldn't handle action:`, action);
