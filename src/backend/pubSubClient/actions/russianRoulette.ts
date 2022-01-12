@@ -29,25 +29,29 @@ async function russianRoulette(
 
   const noShots = 0;
 
-  const win =
+  const gotShot =
     gunsSafeShots[channelId] > noShots &&
     // eslint-disable-next-line no-magic-numbers
     randomInt(gunsSafeShots[channelId]-- + 1) !== 0;
 
-  if (gunsSafeShots[channelId] < noShots || !win) {
+  if (gunsSafeShots[channelId] < noShots || !gotShot) {
     gunsSafeShots[channelId] = maxSafeShots;
   }
 
   // eslint-disable-next-line require-atomic-updates
-  msg.message = win ? "" : "got shot";
+  msg.message = gotShot ? "got shot" : "";
 
-  if (!win) {
-    await timeout(
-      channel,
-      userDisplayName,
-      timeoutSeconds,
-      russianRouletteMessages.timeoutReason
-    );
+  if (gotShot) {
+    try {
+      await timeout(
+        channel,
+        userDisplayName,
+        timeoutSeconds,
+        russianRouletteMessages.timeoutReason
+      );
+    } catch (e) {
+      // user cannot be timed out
+    }
 
     await say(channel, russianRouletteMessages.gotShotMessage(userDisplayName));
   } else {
