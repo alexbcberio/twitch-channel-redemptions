@@ -49,10 +49,10 @@ const es = {
       russianRoulette: {
         timeoutReason: "F en la ruleta",
         survivedMessage(username: string) {
-          return `PepeHands ${username} no ha sobrevivido para contarlo`;
+          return `rdCool Clap ${username}`;
         },
         gotShotMessage(username: string) {
-          return `rdCool Clap ${username}`;
+          return `PepeHands ${username} no ha sobrevivido para contarlo`;
         },
       },
       stealVip: {

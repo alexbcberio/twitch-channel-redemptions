@@ -54,12 +54,12 @@ const en: Messages = {
       russianRoulette: {
         timeoutReason: "F in roulette",
         survivedMessage(username: string) {
-          return `PepeHands ${username} has not survived to tell the tale`;
-        },
-        gotShotMessage(username: string) {
-          return fallbackMessages.pubSubClient.actions.russianRoulette.gotShotMessage(
+          return fallbackMessages.pubSubClient.actions.russianRoulette.survivedMessage(
             username
           );
+        },
+        gotShotMessage(username: string) {
+          return `PepeHands ${username} has not survived to tell the tale`;
         },
       },
       stealVip: {
