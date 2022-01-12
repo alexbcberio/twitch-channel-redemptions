@@ -137,6 +137,8 @@ function runWebpack(): Promise<void> {
         rej(err);
       } else if (stats?.hasErrors() || stats?.hasWarnings()) {
         console.error(stats.toString());
+      } else {
+        console.log(`${LOG_PREFIX}Compiled ok`);
       }
 
       res();
