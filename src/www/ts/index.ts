@@ -5,7 +5,12 @@
 /* eslint-disable no-use-before-define */
 document.addEventListener("DOMContentLoaded", init);
 
+import * as gunShotSfx from "../static/sfx/toy-gun/shot.mp3";
+import * as gunStuckSfx from "../static/sfx/toy-gun/stuck.mp3";
+import * as karaokeTimeImg from "../static/img/karaoke-time.png";
+import * as karaokeTimeSfx from "../static/sfx/karaoke-time.mp3";
 import * as tinycolor from "tinycolor2";
+import * as toyGunImg from "../static/img/toy-gun.png";
 
 // send actions to be performed by the server
 import { Action } from "../../interfaces/actions/Action";
@@ -121,13 +126,13 @@ function karaokeTime(username: string, message: string): Promise<void> {
       "--light-color-right": randomRight,
     });
 
-    const img = createImg("/assets/img/karaoke-time.png");
+    const img = createImg(karaokeTimeImg);
     const p = createText(`${username} ha sugerido cantar un tema`);
 
     div.appendChild(img);
     div.appendChild(p);
     img.onload = () => {
-      const audio = createAudio("/assets/sfx/karaoke-time.mp3");
+      const audio = createAudio(karaokeTimeSfx);
 
       audio.onended = function () {
         div.remove();
@@ -149,7 +154,7 @@ function russianRoulette(msg: RedemptionMessage): Promise<void> {
     div.classList.add("alert");
     div.style.margin = ".5rem";
 
-    const img = createImg("/assets/img/toy-gun.png");
+    const img = createImg(toyGunImg);
 
     const p = createText();
 
@@ -163,9 +168,8 @@ function russianRoulette(msg: RedemptionMessage): Promise<void> {
     div.appendChild(p);
 
     img.onload = () => {
-      const audio = createAudio(
-        `/assets/sfx/toy-gun/${gotShot ? "shot" : "stuck"}.mp3`
-      );
+      const audioSfx = gotShot ? gunShotSfx : gunStuckSfx;
+      const audio = createAudio(audioSfx);
 
       document.body.appendChild(div);
 

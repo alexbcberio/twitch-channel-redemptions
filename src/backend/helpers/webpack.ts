@@ -1,4 +1,4 @@
-import * as CopyPlugin from "copy-webpack-plugin";
+// import * as CopyPlugin from "copy-webpack-plugin";
 import * as CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 import * as HtmlWebpackPlugin from "html-webpack-plugin";
 import * as MiniCssExtractPlugin from "mini-css-extract-plugin";
@@ -15,8 +15,8 @@ const context = resolve(__dirname, "../../www");
 
 const regExp: Record<string, RegExp> = {
   images: /\.(a?png|gif|jpe?g|svg|webp)$/i,
-  videos: /\.(mp4|webm)$/i,
   fonts: /\.(otf|ttf|woff2?)$/i,
+  multimedia: /\.(mp3|webm|mp4)$/i,
 };
 
 // TODO: declare types (d.ts) to import files from TypeScript code
@@ -86,7 +86,7 @@ const webpackConfig: Configuration = {
         type: "asset/resource",
       },
       {
-        test: regExp.videos,
+        test: regExp.multimedia,
         type: "asset/resource",
       },
       {
@@ -105,14 +105,14 @@ const webpackConfig: Configuration = {
       template: "!!html-loader!src/www/index.html",
       inject: "body",
     }),
-    new CopyPlugin({
-      patterns: [
-        {
-          from: "static",
-          to: "assets",
-        },
-      ],
-    }),
+    // new CopyPlugin({
+    //   patterns: [
+    //     {
+    //       from: "static",
+    //       to: "assets",
+    //     },
+    //   ],
+    // }),
     new MiniCssExtractPlugin({
       filename: "assets/css/[name].css",
       chunkFilename: "assets/css/[id].css",
