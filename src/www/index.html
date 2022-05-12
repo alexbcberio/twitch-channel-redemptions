@@ -65,11 +65,15 @@
         }
       }
 
-      #playing img {
+      #playing .coverArt {
         display: block;
         width: var(--imgSize);
         height: var(--imgSize);
-        margin-right: calc(var(--imgSize) / 5)
+        margin-right: calc(var(--imgSize) / 5);
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-image: var(--coverArt);
       }
 
 
@@ -87,7 +91,7 @@
   <body>
     <div id="playing" style="display: none !important">
       <div>
-        <img class="coverArt" src="https://picsum.photos/id/248/300/300.jpg" />
+        <div class="coverArt"></div>
         <div class="trackData">
           <h1 class="trackName">Track Name</h1>
           <h2 class="trackArtist">Track Artist</h2>

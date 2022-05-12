@@ -13,15 +13,15 @@ export function updateSong(song: any) {
 
   playing.style.display = "";
 
-  const img = playing.querySelector<HTMLImageElement>(".coverArt");
+  const trackCoverArt = playing.querySelector<HTMLDivElement>(".coverArt");
   const trackName = playing.querySelector<HTMLElement>(".trackName");
   const trackArtist = playing.querySelector<HTMLElement>(".trackArtist");
 
-  if (!img || !trackName || !trackArtist) {
+  if (!trackCoverArt || !trackName || !trackArtist) {
     return;
   }
 
-  img.src = coverArt;
+  trackCoverArt.style.setProperty("--coverArt", `url("${coverArt}")`);
   trackName.innerText = title;
   trackArtist.innerText = artist;
 }
