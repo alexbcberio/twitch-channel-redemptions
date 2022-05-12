@@ -1,18 +1,10 @@
-import {
-  changeVsCodeColorTheme,
-  changeWindowsColorTheme,
-  existsVsCodeSettings,
-  isWindows,
-} from "./helpers";
+import { changeWindowsColorTheme, isWindows } from "./helpers";
 import { isProduction, msText } from "../../../helpers/util";
 
 import { ColorTheme } from "./types";
 import { LOG_PREFIX } from "../..";
 import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
 import { messages } from "../../../../localization";
-
-const vsCodeLightTheme = "Min Light";
-const vsCodeDarkTheme = "Min Dark";
 
 const minEventDuration = 10;
 
@@ -38,10 +30,6 @@ async function lightTheme(msg: RedemptionMessage): Promise<RedemptionMessage> {
   const colorTheme: ColorTheme = "light";
 
   if (isProduction) {
-    if (await existsVsCodeSettings()) {
-      await changeVsCodeColorTheme(colorTheme);
-    }
-
     await changeWindowsColorTheme(colorTheme);
   } else {
     console.log(
@@ -74,13 +62,10 @@ async function lightTheme(msg: RedemptionMessage): Promise<RedemptionMessage> {
 
     restoreTimeout = null;
 
-    await Promise.all([
-      changeVsCodeColorTheme(colorTheme),
-      changeWindowsColorTheme(colorTheme),
-    ]);
+    await changeWindowsColorTheme(colorTheme);
   }, timeoutTime);
 
   return msg;
 }
 
-export { lightTheme, vsCodeDarkTheme, vsCodeLightTheme };
+export { lightTheme };

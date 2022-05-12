@@ -1,69 +1,12 @@
 import * as regedit from "regedit";
 
 import { ColorTheme, RegeditListResult, RegisterColorTheme } from "./types";
-import { readFile, stat, writeFile } from "fs/promises";
-import { vsCodeDarkTheme, vsCodeLightTheme } from ".";
 
 import { platform } from "os";
-import { resolve } from "path";
 
 const isWindows = platform() === "win32";
 const registerColorThemePath =
   "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
-
-function vsCodeSettingsPath(): string {
-  if (!isWindows) {
-    throw new Error("This function only supports win32 platform");
-  }
-
-  const vsCodeSettings = resolve(
-    // @ts-expect-error Type string | undefined is not assignable
-    process.env.APPDATA,
-    "./Code/User/settings.json"
-  );
-
-  return vsCodeSettings;
-}
-
-async function existsVsCodeSettings(): Promise<boolean> {
-  try {
-    await stat(vsCodeSettingsPath());
-  } catch (e) {
-    return false;
-  }
-
-  return true;
-}
-
-async function changeVsCodeColorTheme(colorTheme: ColorTheme): Promise<void> {
-  let theme: string;
-
-  switch (colorTheme) {
-    case "light":
-      theme = vsCodeLightTheme;
-      break;
-    case "dark":
-    default:
-      theme = vsCodeDarkTheme;
-  }
-
-  if (!theme) {
-    return;
-  }
-
-  const filePath = vsCodeSettingsPath();
-  const settings = JSON.parse((await readFile(filePath)).toString());
-
-  const colorThemeSettingKey = "workbench.colorTheme";
-
-  if (settings[colorThemeSettingKey] === theme) {
-    return;
-  }
-
-  settings[colorThemeSettingKey] = theme;
-
-  await writeFile(filePath, JSON.stringify(settings));
-}
 
 function regeditList(keys: string | Array<string>): Promise<RegeditListResult> {
   const listKeys = Array.isArray(keys) ? keys : [keys];
@@ -143,9 +86,4 @@ async function changeWindowsColorTheme(colorTheme: ColorTheme): Promise<void> {
   await changeRegisterColorTheme(registerValue);
 }
 
-export {
-  isWindows,
-  existsVsCodeSettings,
-  changeVsCodeColorTheme,
-  changeWindowsColorTheme,
-};
+export { isWindows, changeWindowsColorTheme };
