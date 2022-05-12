@@ -1,10 +1,10 @@
 import fastify, { FastifyReply, FastifyRequest } from "fastify";
-import fastifyWebsocket, { SocketStream } from "fastify-websocket";
+import fastifyWebsocket, { SocketStream } from "@fastify/websocket";
 import { save, scheduledActions } from "../helpers/miniDb";
 
 import { Action } from "../../interfaces/actions/Action";
 import { createReadStream } from "fs";
-import fastifyStatic from "fastify-static";
+import fastifyStatic from "@fastify/static";
 import { handleClientAction } from "../chatClient";
 import { isDevelopment } from "../helpers/util";
 import { join } from "path";

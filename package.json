@@ -10,6 +10,8 @@
     "build:frontend": "cross-env NODE_ENV=production ts-node ./runWebpack.ts"
   },
   "dependencies": {
+    "@fastify/static": "^5.0.2",
+    "@fastify/websocket": "^5.0.0",
     "@twurple/api": "^5.0.13",
     "@twurple/auth": "^5.0.13",
     "@twurple/chat": "^5.0.13",
@@ -19,8 +21,6 @@
     "cross-env": "^7.0.3",
     "dotenv": "^8.2.0",
     "fastify": "^3.25.3",
-    "fastify-static": "^4.5.0",
-    "fastify-websocket": "^4.0.0",
     "regedit": "https://github.com/ironSource/node-regedit.git",
     "tinycolor2": "^1.4.2"
   },
