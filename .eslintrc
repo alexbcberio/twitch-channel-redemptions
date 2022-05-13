@@ -32,7 +32,7 @@
     "max-classes-per-file": ["error", 1],
     "no-alert": ["error"],
     // TODO: log using pino and enable this rule later on
-    // "no-console": ["error"],
+    "no-console": ["error"],
     "no-constructor-return": ["error"],
     "no-else-return": ["error"],
     "no-empty-function": ["error"],

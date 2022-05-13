@@ -7,7 +7,9 @@
     "start": "cross-env NODE_ENV=production node -r dotenv/config dist",
     "start:dev": "cross-env NODE_ENV=development DEBUG=twitch-channel-redemptions* nodemon -r dotenv/config src/index.ts",
     "build": "rimraf dist && tsc && yarn build:frontend",
-    "build:frontend": "cross-env NODE_ENV=production ts-node ./runWebpack.ts"
+    "build:frontend": "cross-env NODE_ENV=production ts-node ./runWebpack.ts",
+    "lint": "cross-env TWITCH_CHANNEL_NAME=alexbcberio eslint src/**/*",
+    "lint-fix": "yarn lint --fix"
   },
   "dependencies": {
     "@fastify/static": "^5.0.2",
