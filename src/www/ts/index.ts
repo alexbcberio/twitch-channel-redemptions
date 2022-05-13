@@ -80,28 +80,6 @@ async function checkEvent(this: WebSocket, e: MessageEvent) {
   }
 }
 
-// TODO: Check git history and give it some use
-// function sendWsActions(actions: Array<Action>) {
-//   if (!Array.isArray(actions)) {
-//     actions = [actions];
-//   }
-
-//   if (env === "dev") {
-//     console.log("Dev mode, actions not sent: ", actions);
-//     return;
-//   }
-
-//   if (ws.readyState === WebSocket.OPEN) {
-//     if (actions.length > 0) {
-//       ws.send(
-//         JSON.stringify({
-//           actions,
-//         })
-//       );
-//     }
-//   }
-// }
-
 function init() {
   ws = new WebSocket(
     `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}`
