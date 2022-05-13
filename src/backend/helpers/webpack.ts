@@ -140,10 +140,10 @@ function runWebpack(): Promise<void> {
     log("Running");
     webpack(webpackConfig, (err, stats) => {
       if (err) {
-        error("[%s] %O", namespace, err);
+        error("[%s] %s", namespace, err);
         rej(err);
       } else if (stats?.hasErrors() || stats?.hasWarnings()) {
-        error("[%s] %O", namespace, stats);
+        error("[%s] %s", namespace, stats);
       } else {
         log("Compiled ok");
       }
