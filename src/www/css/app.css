@@ -113,23 +113,7 @@ body {
   border: 1px solid var(--card-border-color);
   border-radius: 0.5rem;
   background-color: var(--card-background-color);
-}
-
-.card.open {
-  animation: cardAnimation 0.75s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-}
-
-.card.close {
-  animation: cardAnimation 0.75s cubic-bezier(0.18, 0.89, 0.32, 1.28) reverse;
-}
-
-@keyframes cardAnimation {
-  from {
-    top: -6.25rem;
-  }
-  to {
-    top: 0.5rem;
-  }
+  animation-timing-function: cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 
 .card-light {
