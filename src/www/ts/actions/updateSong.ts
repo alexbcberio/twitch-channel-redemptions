@@ -21,13 +21,15 @@ async function preloadImage(url: string): Promise<string> {
   });
 }
 
-// TODO: show player with animation
 function showPlayer(player: HTMLElement) {
   player.style.display = "";
+
+  animate(player, "fadeInUp");
 }
 
-// TODO: hide player with animation
-function hidePlayer(player: HTMLElement) {
+async function hidePlayer(player: HTMLElement) {
+  await animate(player, "fadeOutDown");
+
   player.style.display = "none";
 
   previousData = null;
