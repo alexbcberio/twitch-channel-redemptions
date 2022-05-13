@@ -2,11 +2,14 @@ import { changeWindowsColorTheme, isWindows } from "./helpers";
 import { isProduction, msText } from "../../../helpers/util";
 
 import { ColorTheme } from "./types";
-import { LOG_PREFIX } from "../..";
 import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
+import { extendLogger } from "../../../helpers/log";
 import { messages } from "../../../../localization";
 
 const minEventDuration = 10;
+
+const namespace = "PubSub:LightTheme";
+const log = extendLogger(namespace);
 
 const lightThemeMessages = messages.pubSubClient.actions.lightTheme;
 
@@ -32,9 +35,7 @@ async function lightTheme(msg: RedemptionMessage): Promise<RedemptionMessage> {
   if (isProduction) {
     await changeWindowsColorTheme(colorTheme);
   } else {
-    console.log(
-      `${LOG_PREFIX}Light Theme not changed to ${colorTheme} (not production)`
-    );
+    log("Light Theme not changed to %s (not production)", colorTheme);
   }
 
   const eventDuration = calculateEventDurationMs(msg.rewardCost);

@@ -4,18 +4,21 @@ import {
   HelixCreateCustomRewardData,
   UserIdResolvable,
 } from "@twurple/api";
+import { error, extendLogger } from "./log";
 import { getTokenData, saveTokenData } from "./tokenData";
 
 import { ClientCredentials } from "../../interfaces/ClientCredentials";
 
-const LOG_PREFIX = "[Twitch] ";
+const namespace = "Twitch";
+const log = extendLogger(namespace);
 
 let refreshAuthProvider: RefreshingAuthProvider;
 
 function getClientCredentials(): ClientCredentials {
   if (!process.env.TWITCH_CLIENT_ID || !process.env.TWITCH_CLIENT_SECRET) {
-    console.error(
-      `${LOG_PREFIX}Missing environment parameters TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET`
+    error(
+      "[%s] Missing environment parameters TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET",
+      namespace
     );
 
     const exitCode = 1;
@@ -30,7 +33,7 @@ function getClientCredentials(): ClientCredentials {
 }
 
 async function onRefresh(refreshData: AccessToken): Promise<void> {
-  console.log(`${LOG_PREFIX}Tokens refreshed`);
+  log("Tokens refreshed");
 
   await saveTokenData(refreshData);
 }

@@ -1,8 +1,12 @@
-import { LOG_PREFIX } from "..";
+import { extendLogger, warning } from "../../helpers/log";
+
 import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
 import { getUsernameFromId } from "../../helpers/twitch";
 import { messages } from "../../../localization";
 import { timeout } from "../../chatClient/clientActions";
+
+const namespace = "PubSub:HighlightMessage";
+const log = extendLogger(namespace);
 
 const highlightMessageMessages = messages.pubSubClient.actions.highlightMessage;
 
@@ -17,9 +21,10 @@ async function highlightMessage(
     /(https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
   if (urlRegex.test(msg.message)) {
-    console.log(`${LOG_PREFIX}Message contains a url`);
+    log("Message contains a url");
     const channel = await getUsernameFromId(parseInt(msg.channelId));
 
+    // this should never happen
     if (!channel) {
       throw new Error("No channel found");
     }
@@ -30,7 +35,12 @@ async function highlightMessage(
 
       await timeout(channel, msg.userDisplayName, timeoutSeconds, reason);
     } catch (e) {
-      // user probably cannot be timed out
+      warning(
+        "[%s] Username %s cannot be timed out in %s channel",
+        namespace,
+        msg.userDisplayName,
+        channel
+      );
     }
 
     throw new Error("The message cannot contain a url");

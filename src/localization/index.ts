@@ -1,14 +1,15 @@
 import { en } from "./en";
 import { es } from "./es";
+import { info } from "../backend/helpers/log";
 
 type Messages = typeof es;
 
 const fallbackLanguageCode = "en";
 
-const LOG_PREFIX = "[Localization] ";
+const namespace = "Localization";
 
 function reportLanguage(code: string): void {
-  console.log(`${LOG_PREFIX}Using "${code}" language`);
+  info('[%s] Using "%s" language', namespace, code);
 }
 
 function messagesOfLanguage(language: string): Messages {
@@ -20,8 +21,11 @@ function messagesOfLanguage(language: string): Messages {
       reportLanguage(language);
       return es;
     default:
-      console.log(
-        `${LOG_PREFIX}"${language}" is not supported, falling back to "${fallbackLanguageCode}"`
+      info(
+        '[%s] "%s" is not supported, falling back to "%s"',
+        namespace,
+        language,
+        fallbackLanguageCode
       );
 
       return messagesOfLanguage(fallbackLanguageCode);

@@ -1,18 +1,17 @@
 import { connect } from "./chatClient";
+import { error } from "./helpers/log";
 import { isProduction } from "./helpers/util";
 import { listen } from "./helpers/webServer";
 import { registerUserListener } from "./pubSubClient";
 import { runWebpack } from "./helpers/webpack";
 
-const LOG_PREFIX = "[APP] ";
+const namespace = "App";
 
 const channel = process.env.TWITCH_CHANNEL_NAME;
 
 export async function bootstrap() {
   if (!channel) {
-    console.error(
-      `${LOG_PREFIX}Missing environment parameter TWITCH_CHANNEL_NAME`
-    );
+    error("[%s] Missing environment parameter TWITCH_CHANNEL_NAME", namespace);
 
     const errorCode = 1;
 

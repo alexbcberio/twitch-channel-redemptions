@@ -1,9 +1,12 @@
+import { extendLogger, warning } from "./log";
+
 import { Action } from "../../interfaces/actions/Action";
 import { promises as fs } from "fs";
 import { handleClientAction } from "../chatClient";
 import { resolve } from "path";
 
-const LOG_PREFIX = "[Scheduled] ";
+const namespace = "Scheduled";
+const log = extendLogger(namespace);
 
 const FIRST_CHECK_TIMEOUT = 5e3;
 const SAVE_TIMEOUT = 5e3;
@@ -27,7 +30,7 @@ function save(): void {
   if (saveScheduledActionsTimeout) {
     clearTimeout(saveScheduledActionsTimeout);
     saveScheduledActionsTimeout = null;
-    console.log(`${LOG_PREFIX}Removed save timeout.`);
+    log("Removed save timeout.");
   }
 
   saveScheduledActionsTimeout = setTimeout(async () => {
@@ -36,7 +39,7 @@ function save(): void {
       fs.writeFile(VIP_USERS_FILE, JSON.stringify(vipUsers)),
     ]);
 
-    console.log(`${LOG_PREFIX}Saved actions.`);
+    log("Saved actions.");
     saveScheduledActionsTimeout = null;
   }, SAVE_TIMEOUT);
 }
@@ -67,7 +70,7 @@ async function checkScheduledActions(): Promise<void> {
       await handleClientAction(action);
     }
 
-    console.log(`${LOG_PREFIX}Executed: ${JSON.stringify(action)}`);
+    log("Executed: %O", action);
   }
 
   if (hasToSave) {
@@ -88,7 +91,7 @@ async function start(): Promise<void> {
   } catch (e) {
     // probably file does not exist
     if (e instanceof Error) {
-      console.log(`${LOG_PREFIX}${e.message}`);
+      warning("[%s] %s", namespace, e.message);
     }
   }
 
@@ -120,7 +123,7 @@ async function start(): Promise<void> {
   } catch (e) {
     // probably file does not exist
     if (e instanceof Error) {
-      console.log(`${LOG_PREFIX}${e.message}`);
+      warning("[%s] %s", namespace, e.message);
     }
   }
 }

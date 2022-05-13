@@ -4,6 +4,7 @@ import {
   completeRewards,
   getAuthProvider,
 } from "../helpers/twitch";
+import { error, extendLogger, info } from "../helpers/log";
 
 import { RedemptionIds } from "../../enums/Redemptions";
 import { RedemptionMessage } from "../../interfaces/RedemptionMessage";
@@ -19,13 +20,14 @@ import { russianRoulette } from "./actions/russianRoulette";
 import { stealVip } from "./actions/stealVip";
 import { timeoutFriend } from "./actions/timeoutFriend";
 
-const LOG_PREFIX = "[PubSub] ";
+const namespace = "PubSub";
+const log = extendLogger(namespace);
 
 type RedemptionHandler = (msg: RedemptionMessage) => Promise<RedemptionMessage>;
 
 function getRedemptionHandlerFromRewardId(rewardId: string): RedemptionHandler {
   const noop = (message: RedemptionMessage): Promise<RedemptionMessage> => {
-    console.log(`${LOG_PREFIX}Unhandled redemption ${rewardId}`);
+    log("Unhandled redemption %s", rewardId);
     return Promise.resolve(message);
   };
 
@@ -67,17 +69,17 @@ async function cancelReward(message: PubSubRedemptionMessage): Promise<void> {
   }
 
   if (keepInQueue(message.rewardId)) {
-    console.log(`${LOG_PREFIX}Reward kept in queue due to config`);
+    log("Reward kept in queue due to config");
 
     return;
   }
 
   try {
     await cancelRewards(message.channelId, message.rewardId, message.id);
-    console.log(`${LOG_PREFIX}Reward removed from queue (canceled)`);
+    log("Reward removed from queue (canceled)");
   } catch (e) {
     if (e instanceof Error) {
-      console.log(`${LOG_PREFIX}${e.message}`);
+      error("[%s] %s", namespace, e.message);
     }
   }
 }
@@ -88,17 +90,17 @@ async function completeReward(message: PubSubRedemptionMessage): Promise<void> {
   }
 
   if (keepInQueue(message.rewardId)) {
-    console.log(`${LOG_PREFIX}Reward kept in queue due to config`);
+    log("Reward kept in queue due to config");
 
     return;
   }
 
   try {
     await completeRewards(message.channelId, message.rewardId, message.id);
-    console.log(`${LOG_PREFIX}Reward removed from queue (completed)`);
+    log("Reward removed from queue (completed)");
   } catch (e) {
     if (e instanceof Error) {
-      console.log(`${LOG_PREFIX}${e.message}`);
+      error("[%s] %s", namespace, e.message);
     }
   }
 }
@@ -113,8 +115,11 @@ function rewardNameFromRewardId(rewardId: string): string {
 }
 
 async function onRedemption(message: PubSubRedemptionMessage) {
-  console.log(
-    `${LOG_PREFIX}Reward: "${message.rewardTitle}" (${message.rewardId}) redeemed by ${message.userDisplayName}`
+  log(
+    'Reward: "%s" (%s) redeemed by %s',
+    message.rewardTitle,
+    message.rewardId,
+    message.userDisplayName
   );
 
   const raw = message[rawDataSymbol];
@@ -145,7 +150,7 @@ async function onRedemption(message: PubSubRedemptionMessage) {
     };
   } catch (e) {
     if (e instanceof Error) {
-      console.error(`${LOG_PREFIX}${e.message}`);
+      error("[%s] %s", namespace, e.message);
     }
 
     await cancelReward(message);
@@ -171,7 +176,7 @@ async function registerUserListener(user: UserIdResolvable) {
 
   await pubSubClient.onRedemption(userId, onRedemption);
 
-  console.log(`${LOG_PREFIX}Connected & registered`);
+  info("[%s] Connected & registered", namespace);
 }
 
-export { registerUserListener, LOG_PREFIX };
+export { registerUserListener };

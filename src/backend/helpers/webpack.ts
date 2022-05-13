@@ -4,12 +4,14 @@ import * as HtmlWebpackPlugin from "html-webpack-plugin";
 import * as MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 import { Configuration, ProgressPlugin, webpack } from "webpack";
+import { error, extendLogger, warning } from "./log";
 import { isDevelopment, isProduction } from "./util";
 import { parse, resolve } from "path";
 
 import { CleanWebpackPlugin } from "clean-webpack-plugin";
 
-const LOG_PREFIX = "[Webpack] ";
+const namespace = "Webpack";
+const log = extendLogger(namespace);
 
 const context = resolve(__dirname, "../../www");
 
@@ -56,7 +58,12 @@ const webpackConfig: Configuration = {
       if (!contentType) {
         contentType = "miscellaneous";
 
-        console.log(`Unknown extension ${ext}, falling back to ${contentType}`);
+        warning(
+          "[%s] Unknown extension %s, falling back to %s",
+          namespace,
+          ext,
+          contentType
+        );
       }
 
       return `assets/${contentType}/[name][ext]`;
@@ -130,15 +137,15 @@ const webpackConfig: Configuration = {
 
 function runWebpack(): Promise<void> {
   return new Promise((res, rej) => {
-    console.log(`${LOG_PREFIX}Running`);
+    log("Running");
     webpack(webpackConfig, (err, stats) => {
       if (err) {
-        console.error(err.toString());
+        error("[%s] %O", namespace, err);
         rej(err);
       } else if (stats?.hasErrors() || stats?.hasWarnings()) {
-        console.error(stats.toString());
+        error("[%s] %O", namespace, stats);
       } else {
-        console.log(`${LOG_PREFIX}Compiled ok`);
+        log("Compiled ok");
       }
 
       res();

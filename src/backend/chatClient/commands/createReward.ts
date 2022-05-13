@@ -1,10 +1,11 @@
 import { sayError, saySuccess } from "../clientActions";
 
-import { LOG_PREFIX } from "..";
 import { TwitchPrivateMessage } from "@twurple/chat/lib/commands/TwitchPrivateMessage";
 import { createReward as createChannelPointsReward } from "../../helpers/twitch";
+import { error } from "../../helpers/log";
 import { messages } from "../../../localization";
 
+const namespace = "ChatClient:CreateReward";
 const createRewardMessages = messages.chatClient.commands.createReward;
 
 async function createReward(
@@ -34,7 +35,7 @@ async function createReward(
     saySuccess(channel, createRewardMessages.rewardCreated(title, cost));
   } catch (e) {
     if (e instanceof Error) {
-      console.log(`${LOG_PREFIX}${e.message}`);
+      error("[%s] %s", namespace, e.message);
     }
   }
 }

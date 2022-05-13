@@ -1,4 +1,5 @@
 import { addVip, removeVip, say, timeout } from "./clientActions";
+import { error, extendLogger, info, warning } from "../helpers/log";
 import { getAuthProvider, getUsernameFromId } from "../helpers/twitch";
 
 import { Action } from "../../interfaces/actions/Action";
@@ -13,11 +14,13 @@ import { start } from "../helpers/miniDb";
 
 let chatClient: ChatClient;
 
-const LOG_PREFIX = "[ChatClient] ";
+const namespace = "ChatClient";
+const log = extendLogger(namespace);
+
 const chatClientMessages = messages.chatClient;
 
 function onConnect(): Promise<void> {
-  console.log(`${LOG_PREFIX}Connected`);
+  info("[%s] Connected", namespace);
 
   start();
 
@@ -49,8 +52,11 @@ async function onMessage(
         await createReward(channel, user, args.join(" "), msg);
         break;
       default:
-        console.log(
-          `${LOG_PREFIX}Command ${commandPrefix}${commandName} not handled`
+        warning(
+          "[%s] Command %s%s not handled",
+          namespace,
+          commandPrefix,
+          commandName
         );
     }
   }
@@ -73,15 +79,15 @@ async function connect(channels: Array<string>): Promise<void> {
 
   chatClient.onDisconnect((manually, reason) => {
     if (manually) {
-      console.log(`${LOG_PREFIX}Disconnected manually`);
+      log("Disconnected manually");
       return;
     }
 
-    console.log(`${LOG_PREFIX}Disconnected ${reason}`);
+    log("Disconnected %s", reason);
   });
 
   chatClient.onNoPermission((channel, message) => {
-    console.log(`${LOG_PREFIX}No permission on ${channel}: ${message}`);
+    error("[%s] No permission on %s:%s", namespace, channel, message);
   });
 
   chatClient.onMessage(onMessage);
@@ -96,7 +102,7 @@ async function handleClientAction(action: Action): Promise<void> {
   ]);
 
   if (!channel || !username) {
-    console.log(`${[LOG_PREFIX]}ChannelId or userId could not be solved`);
+    warning("[%s] ChannelId or userId could not be solved", namespace);
     return;
   }
 
@@ -108,7 +114,12 @@ async function handleClientAction(action: Action): Promise<void> {
       try {
         await timeout(channel, username, action.data.time, action.data.reason);
       } catch (e) {
-        // user cannot be timed out
+        warning(
+          "[%s] Username %s cannot be timed out in %s channel",
+          namespace,
+          username,
+          channel
+        );
       }
       break;
     case ActionType.Broadcast:
@@ -125,8 +136,8 @@ async function handleClientAction(action: Action): Promise<void> {
       );
       break;
     default:
-      console.log(`${[LOG_PREFIX]}Couldn't handle action:`, action);
+      warning("[%s] Couldn't handle action: %O", namespace, action);
   }
 }
 
-export { chatClient, connect, handleClientAction, say, LOG_PREFIX };
+export { chatClient, connect, handleClientAction, say };

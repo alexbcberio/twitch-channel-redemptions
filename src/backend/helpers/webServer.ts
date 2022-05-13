@@ -1,3 +1,4 @@
+import { extendLogger, info } from "./log";
 import fastify, { FastifyReply, FastifyRequest } from "fastify";
 import fastifyWebsocket, { SocketStream } from "@fastify/websocket";
 import { save, scheduledActions } from "../helpers/miniDb";
@@ -9,8 +10,10 @@ import { handleClientAction } from "../chatClient";
 import { isDevelopment } from "../helpers/util";
 import { join } from "path";
 
-const LOG_PREFIX_HTTP = "[HTTP] ";
-const LOG_PREFIX_WS = "[WS] ";
+const namespaceHttp = "HTTP";
+// const logHttp = extendLogger(namespaceHttp);
+const namespaceWs = "WS";
+const logWs = extendLogger(namespaceWs);
 
 const staticPath = join(process.cwd(), "dist/www");
 
@@ -53,21 +56,18 @@ async function onMessage(this: WebSocket, rawMsg: Buffer) {
     }
   }
 
-  console.log(
-    `${LOG_PREFIX_WS}Received message with ${data.actions.length} actions:`,
-    data
-  );
+  logWs("Received message with %d actions: %O", data.actions.length, data);
 }
 
 function onClose(this: WebSocket) {
   sockets.delete(this);
-  console.log(`${LOG_PREFIX_WS}Connection closed`);
+  logWs("Connection closed");
 }
 
 function wsHandler(con: SocketStream, req: FastifyRequest) {
   const { socket } = con;
 
-  console.log(`${LOG_PREFIX_WS}${req.ip} New connection established`);
+  logWs("%s New connection established", req.ip);
 
   sockets.add(socket);
 
@@ -111,7 +111,7 @@ async function listen(): Promise<void> {
         return;
       }
 
-      console.log(`${LOG_PREFIX_HTTP}Listening on port ${port}`);
+      info("[%s] Listening on port %d", namespaceHttp, port);
       res();
     });
   });

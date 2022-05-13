@@ -1,9 +1,13 @@
+import { error, extendLogger } from "./log";
+
 import { AccessToken } from "@twurple/auth";
 import { promises as fs } from "fs";
 import { resolve } from "path";
 
 const TOKENS_FILE = "tokens.json";
-const LOG_PREFIX = "[TokenData] ";
+
+const namespace = "TokenData";
+const log = extendLogger(namespace);
 
 function getTokenDataFilePath(): string {
   return resolve(process.cwd(), TOKENS_FILE);
@@ -11,8 +15,10 @@ function getTokenDataFilePath(): string {
 
 function checkTokenData(tokenData: AccessToken): void {
   if (!tokenData.accessToken || !tokenData.refreshToken) {
-    console.error(
-      `${LOG_PREFIX}Missing refreshToken or accessToken in ${TOKENS_FILE}.`
+    error(
+      "[%s] Missing refreshToken or accessToken in %s.",
+      namespace,
+      TOKENS_FILE
     );
 
     const exitCode = 1;
@@ -28,8 +34,11 @@ async function getTokenData(): Promise<AccessToken> {
   try {
     buffer = await fs.readFile(tokenDataFilePath);
   } catch (e) {
-    console.error(
-      `${LOG_PREFIX}${TOKENS_FILE} not found on ${tokenDataFilePath}.`
+    error(
+      "[%s] %s not found on %s.",
+      namespace,
+      TOKENS_FILE,
+      tokenDataFilePath
     );
 
     const exitCode = 1;
@@ -49,7 +58,7 @@ async function saveTokenData(tokenData: AccessToken): Promise<void> {
   const jsonTokenData = JSON.stringify(tokenData);
 
   await fs.writeFile(tokenDataFilePath, jsonTokenData);
-  console.log(`${LOG_PREFIX}Token data saved`);
+  log("Token data saved");
 }
 
 export { getTokenData, saveTokenData };
