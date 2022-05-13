@@ -1,4 +1,5 @@
 import { RedemptionMessage } from "../../interfaces/RedemptionMessage";
+import { Song } from "../../interfaces/Song";
 import { createCard } from "./actions/createCard";
 import { karaokeTime } from "./actions/karaokeTime";
 import { russianRoulette } from "./actions/russianRoulette";
@@ -33,7 +34,8 @@ async function checkEvent(this: WebSocket, e: MessageEvent) {
   const message = JSON.parse(e.data);
 
   if (message.song) {
-    updateSong(message.song);
+    const song: Song = message;
+    updateSong(song);
     return;
   }
 
