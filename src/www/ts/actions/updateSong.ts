@@ -1,4 +1,7 @@
+import "animate.css";
+
 import { Song } from "../../../interfaces/Song";
+import { animate } from "../helpers/animate.css";
 
 const hideTimeoutSeconds = 5e3;
 
@@ -57,16 +60,12 @@ async function setData(
     return;
   }
 
-  previousCoverArt.onanimationend = () => {
-    previousCoverArt.style.setProperty("--coverArt", coverArtPropertyValue);
-    previousCoverArt.classList.remove("previous");
-    newCoverArt.classList.remove("next");
-  };
+  await Promise.all([
+    animate(previousCoverArt, "slideOutLeft"),
+    animate(newCoverArt, "slideInRight"),
+  ]);
 
-  previousCoverArt.classList.remove("previous");
-  newCoverArt.classList.remove("next");
-  previousCoverArt.classList.add("previous");
-  newCoverArt.classList.add("next");
+  previousCoverArt.style.setProperty("--coverArt", coverArtPropertyValue);
 }
 
 export async function updateSong(data: Song) {
