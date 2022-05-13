@@ -1,8 +1,8 @@
 {
   "name": "twitch-channel-redemptions",
-  "version": "1.0.0",
+  "version": "0.4.0",
   "main": "dist/index.js",
-  "license": "MIT",
+  "license": "CC0 1.0 Universal",
   "scripts": {
     "start": "cross-env NODE_ENV=production node -r dotenv/config dist",
     "start:dev": "cross-env NODE_ENV=development DEBUG=twitch-channel-redemptions* nodemon -r dotenv/config src/index.ts",
