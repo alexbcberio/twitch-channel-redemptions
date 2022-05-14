@@ -28,7 +28,22 @@ success.enabled = true;
 success.color = Color.Green;
 
 function extendLogger(name: string): Debugger {
-  return main.extend(name);
+  const extended = main.extend(name);
+
+  const blacklistedColors = Object.values<string>(Color).map((v) =>
+    parseInt(v)
+  );
+
+  let currentColor = parseInt(extended.color);
+  while (blacklistedColors.includes(currentColor)) {
+    currentColor++;
+  }
+
+  if (currentColor !== parseInt(extended.color)) {
+    extended.color = currentColor.toString();
+  }
+
+  return extended;
 }
 
 export { main, error, warning, info, success, extendLogger };
