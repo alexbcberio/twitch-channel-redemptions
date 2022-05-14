@@ -7,7 +7,7 @@ import { ActionType } from "../../enums/ActionType";
 import { ChatClient } from "@twurple/chat";
 import { ChatCommands } from "../../enums/ChatCommands";
 import { TwitchPrivateMessage } from "@twurple/chat/lib/commands/TwitchPrivateMessage";
-import { broadcast } from "../helpers/webServer";
+import { broadcast } from "../webserver";
 import { createReward } from "./commands/createReward";
 import { messages } from "../../localization";
 import { start } from "../helpers/miniDb";

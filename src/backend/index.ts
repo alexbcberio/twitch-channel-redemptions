@@ -1,7 +1,7 @@
 import { connect } from "./chatClient";
 import { error } from "./helpers/log";
 import { isProduction } from "./helpers/util";
-import { listen } from "./helpers/webServer";
+import { listen } from "./webserver";
 import { registerUserListener } from "./pubSubClient";
 import { runWebpack } from "./helpers/webpack";
 

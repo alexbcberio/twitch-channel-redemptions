@@ -9,7 +9,7 @@ import { error, extendLogger, info } from "../helpers/log";
 import { RedemptionIds } from "../../enums/Redemptions";
 import { RedemptionMessage } from "../../interfaces/RedemptionMessage";
 import { UserIdResolvable } from "@twurple/api";
-import { broadcast } from "../helpers/webServer";
+import { broadcast } from "../webserver";
 import { getVip } from "./actions/getVip";
 import { hidrate } from "./actions/hidrate";
 import { highlightMessage } from "./actions/highlightMessage";
