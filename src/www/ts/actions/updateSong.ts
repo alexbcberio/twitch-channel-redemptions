@@ -50,7 +50,15 @@ async function setData(
     return;
   }
 
-  const coverArtValue = skipAnimation ? coverArt : await preloadImage(coverArt);
+  let coverArtValue: string;
+
+  try {
+    coverArtValue = skipAnimation ? coverArt : await preloadImage(coverArt);
+  } catch (e) {
+    // exception due to CORS, use url instead of preloading the image
+    coverArtValue = coverArt;
+  }
+
   const coverArtPropertyValue = `url(${coverArtValue})`;
 
   newCoverArt.style.setProperty("--coverArt", coverArtPropertyValue);
