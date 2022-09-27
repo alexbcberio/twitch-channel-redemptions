@@ -1,30 +1,30 @@
 import { connect } from "./chatClient";
 import { error } from "./helpers/log";
-import { isProduction } from "./helpers/util";
-import { listen } from "./webserver";
+import { isDevelopment } from "./helpers/util";
 import { registerUserListener } from "./pubSubClient";
 import { runWebpack } from "./helpers/webpack";
+import { start } from "./webserver";
 
 const namespace = "App";
 
-const channel = process.env.TWITCH_CHANNEL_NAME;
+let runningWebpack = false;
 
 export async function bootstrap() {
-  if (!channel) {
+  if (isDevelopment && runningWebpack === false) {
+    runningWebpack = true;
+    await runWebpack();
+  }
+
+  const channel = process.env.TWITCH_CHANNEL_NAME;
+
+  if (typeof channel !== "string") {
     error("[%s] Missing environment parameter TWITCH_CHANNEL_NAME", namespace);
-
-    const errorCode = 1;
-
-    process.exit(errorCode);
+    return;
   }
 
   await Promise.all([
     registerUserListener(channel),
     connect([channel]),
-    listen(),
+    start(),
   ]);
-
-  if (!isProduction) {
-    await runWebpack();
-  }
 }
