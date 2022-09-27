@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Installation finished</title>
+    <!-- TODO: poll server availability request "HEAD /" -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(checkServerAvailability, 5e3);
+      });
+
+      async function isAvailable() {
+        try {
+          const res = await fetch("/");
+          return res.ok;
+        } catch(e) {
+          return false;
+        }
+      }
+
+      async function checkServerAvailability() {
+        if (!(await isAvailable())) {
+          setTimeout(checkServerAvailability, 500);
+          return;
+        }
+
+        location.href = "/";
+        // alert("redirect!");
+      }
+    </script>
+    <style>
+      body {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Installation finished</h1>
+
+    <p>
+      The server is restarting to apply the changes, this might take some time.
+    </p>
+    <p>You will be automatically redirected once is ready.</p>
+  </body>
+</html>

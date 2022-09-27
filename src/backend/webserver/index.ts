@@ -1,3 +1,5 @@
 import { broadcast, start } from "./production";
 
-export { start, broadcast };
+import { install } from "./install";
+
+export { start, install, broadcast };

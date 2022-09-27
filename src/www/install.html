@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Installation page</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        --purple: hsl(258, 94%, 66%);
+        --white: hsl(240, 100%, 97%);
+        --black: hsl(0, 0%, 0%);
+
+        --border-width: 1px;
+        --border-radius: .25rem;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+        position: relative;
+      }
+
+      button {
+        appearance: none;
+        background: transparent;
+        cursor: pointer;
+        border: 0;
+      }
+
+      #main {
+        display: flex;
+        flex-wrap: nowrap;
+        flex-direction: row;
+        max-width: 800px;
+        margin: auto;
+      }
+
+      [id="main"] > section {
+        display: none;
+        animation: .5s ease-out forwards;
+        flex-shrink: 0;
+      }
+
+      section.active {
+        display: flex;
+      }
+
+      .active + .active {
+        margin-left: 1rem;
+      }
+
+      section {
+        --margin: 1rem;
+        display: flex;
+        flex-direction: column;
+        width: calc(100% - 2 * var(--margin));
+        height: 60vh;
+        padding: 1rem;
+        margin:  var(--margin);
+        border: var(--border-width) solid var(--black);
+        border-radius: var(--border-radius);
+      }
+
+      section .title {
+        margin: 0;
+        font-size: 1.5rem;
+        text-align: center;
+      }
+
+      section .content {
+        flex-grow: 1;
+        margin: 1rem 0;
+        overflow: auto;
+      }
+
+      section .pagination {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      section .content input:not([type="checkbox"]) {
+        display: block;
+        width: 100%;
+      }
+
+      section .content input:focus,
+      section .content button:focus {
+        outline-color: var(--purple);
+      }
+
+      section .content input:disabled {
+        opacity: .5;
+      }
+
+      section .content input:not([type="checkbox"]),
+      section .pagination button {
+        padding: .5rem .75rem;
+        border: var(--border-width) solid var(--purple);
+        border-radius: .25rem;
+      }
+
+      :where(section .pagination, .copy-clipboard) button:focus {
+        background: var(--purple);
+        color: var(--white);
+      }
+
+      section label {
+        display: block;
+      }
+
+      section label + input {
+        margin-bottom: .5rem;
+      }
+
+      .copy-clipboard {
+        position: relative
+      }
+
+      .copy-clipboard button {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        border-left: 1px solid var(--purple);
+      }
+
+      #scopes {
+        display: flex;
+        flex-wrap: wrap;
+        row-gap: .25rem;
+        column-gap: .5rem;
+      }
+
+      #scopes input[type="checkbox"] {
+        display: none;
+      }
+
+      #scopes input + span {
+        display: inline-block;
+        padding: .25rem;
+        border: var(--border-width) solid var(--purple);
+        color: var(--black);
+        cursor: pointer;
+        border-radius: var(--border-radius);
+      }
+
+      #scopes input:checked + span {
+        color: var(--white);
+        background-color: var(--purple);
+      }
+
+      .form-error {
+        border: var(--border-width) solid hsl(4deg 90% 58%);
+        border-radius: var(--border-radius);
+        padding: .5rem;
+        background-color: hsl(354deg 100% 90%);
+        margin: 0;
+        margin-bottom: 1rem;
+      }
+
+      /*
+      Animations by animate.css
+      <https://github.com/animate-css/animate.css>
+      */
+
+      @keyframes slideInRight {
+        from {
+          transform: translate3d(0, 0, 0);
+          visibility: visible;
+        }
+
+        to {
+          transform: translate3d(-100%, 0, 0);
+        }
+      }
+
+      @keyframes slideOutLeft {
+        from {
+          transform: translate3d(0, 0, 0);
+        }
+
+        to {
+          visibility: hidden;
+          transform: translate3d(-100%, 0, 0);
+        }
+      }
+
+      @keyframes slideInLeft {
+        from {
+          transform: translate3d(-100%, 0, 0);
+          visibility: visible;
+        }
+
+        to {
+          transform: translate3d(0, 0, 0);
+        }
+      }
+
+      @keyframes slideOutRight {
+        from {
+          transform: translate3d(-100%, 0, 0);
+        }
+
+        to {
+          visibility: hidden;
+          transform: translate3d(0, 0, 0);
+        }
+      }
+    </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", init);
+
+      function init() {
+        addEventListeners();
+        document.querySelector("#authorizationUrl").value = getAuthorizationUrl();
+        createScopesInputs();
+      }
+
+      function addEventListeners() {
+        const buttons = document.querySelectorAll(".previous-step, .next-step");
+
+        for (let i = 0; i < buttons.length; i++) {
+          const element = buttons[i];
+          element.addEventListener("click", buttonClick);
+        }
+
+        const submitFormButtons = document.querySelectorAll(".submit-form");
+
+        for (let i = 0; i < submitFormButtons.length; i++) {
+          const submitFormButton = submitFormButtons[i];
+
+          submitFormButton.addEventListener("click", submitForm);
+        }
+
+        document.querySelector(".redirect-twitch-auth")
+          .addEventListener("click", redirectTwitchAuth);
+
+        document.querySelector(".copy-clipboard button")
+        .addEventListener("click", copyInputToClipboard);
+      }
+
+      function getAuthorizationUrl() {
+        const origin = location.origin.replace("127.0.0.1", "localhost");
+
+        return authorizationUrl = `${origin}/authenticate`;
+      }
+
+      function copyInputToClipboard(e) {
+        const {target} = e;
+
+        const input = target.previousElementSibling;
+
+        if (input.nodeName.toLowerCase() !== "input") {
+          return;
+        }
+
+        input.select();
+
+        if (document.execCommand("copy") === false) {
+          return;
+        }
+
+        const previousValue = target.innerText;
+        target.innerText = target.innerText.replace(/copy/i, "Copied")
+
+        setTimeout(() => {
+          target.innerText = previousValue;
+        }, 2e3);
+      }
+
+      function createScopesInputs() {
+        const scopes = [
+          "analytics:read:extensions",
+          "analytics:read:games",
+          "bits:read",
+          "channel:edit:commercial",
+          "channel:manage:broadcast",
+          "channel:read:charity",
+          "channel:manage:extensions",
+          "channel:manage:moderators",
+          "channel:manage:polls",
+          "channel:manage:predictions",
+          "channel:manage:raids",
+          "channel:manage:redemptions",
+          "channel:manage:schedule",
+          "channel:manage:videos",
+          "channel:read:editors",
+          "channel:read:goals",
+          "channel:read:hype_train",
+          "channel:read:polls",
+          "channel:read:predictions",
+          "channel:read:redemptions",
+          "channel:read:stream_key",
+          "channel:read:subscriptions",
+          "channel:read:vips",
+          "channel:manage:vips",
+          "clips:edit",
+          "moderation:read",
+          "moderator:manage:announcements",
+          "moderator:manage:automod",
+          "moderator:read:automod_settings",
+          "moderator:manage:automod_settings",
+          "moderator:manage:banned_users",
+          "moderator:read:blocked_terms",
+          "moderator:manage:blocked_terms",
+          "moderator:manage:chat_messages",
+          "moderator:read:chat_settings",
+          "moderator:manage:chat_settings",
+          "user:edit",
+          "user:edit:follows",
+          "user:manage:blocked_users",
+          "user:read:blocked_users",
+          "user:read:broadcast",
+          "user:manage:chat_color",
+          "user:read:email",
+          "user:read:follows",
+          "user:read:subscriptions",
+          "user:manage:whispers",
+          "channel:moderate",
+          "chat:edit",
+          "chat:read",
+          "whispers:read",
+          "whispers:edit"
+        ];
+
+        const defaultScopes = [
+        "channel:manage:redemptions",
+        "channel:moderate",
+        "channel:read:redemptions",
+        "channel:manage:vips",
+        "chat:edit",
+        "chat:read"
+        ];
+
+        const scopeContainer = document.querySelector("#scopes");
+
+        for (let i = 0; i < scopes.length; i++) {
+          const scope = scopes[i];
+
+          const labelElement = document.createElement("label");
+
+          const scopeInput = document.createElement("input");
+          scopeInput.type = "checkbox";
+          scopeInput.name = "scope";
+          scopeInput.value = scope;
+
+          if (defaultScopes.includes(scope)) {
+            scopeInput.setAttribute("checked", true);
+          }
+
+          labelElement.appendChild(scopeInput);
+
+          const spanElement = document.createElement("span");
+          spanElement.innerText = scope;
+          labelElement.appendChild(spanElement);
+
+          scopeContainer.appendChild(labelElement);
+        }
+      }
+
+      function buttonClick(e) {
+        const { target } = e;
+
+        if (target.classList.contains("previous-step")) {
+          previousStep();
+        } else if (target.classList.contains("next-step")) {
+          nextStep();
+        }
+      }
+
+      function previousStep() {
+        const activeStep = document.querySelector(".active");
+        const previousStep = activeStep.previousElementSibling;
+
+        if (previousStep === null) {
+          return;
+        }
+
+        activeStep.style.animationName = "slideOutRight";
+        previousStep.classList.add("active");
+        previousStep.style.animationName = "slideInLeft";
+        previousStep.parentElement.style.overflowX = "hidden";
+
+        previousStep.onanimationend = () => {
+          previousStep.onanimationend = null;
+
+          activeStep.style.animationName = null;
+          activeStep.classList.remove("active");
+          previousStep.style.animationName = null;
+          previousStep.parentElement.style.overflowX = null;
+        }
+      }
+
+      function nextStep() {
+        const activeStep = document.querySelector(".active");
+        const nextStep = activeStep.nextElementSibling;
+
+        if (nextStep === null) {
+          return;
+        }
+
+        activeStep.style.animationName = "slideOutLeft";
+        nextStep.classList.add("active");
+        nextStep.style.animationName = "slideInRight";
+        nextStep.parentElement.style.overflowX = "hidden";
+
+        nextStep.onanimationend = () => {
+          nextStep.onanimationend = null;
+
+          activeStep.style.animationName = null;
+          activeStep.classList.remove("active");
+          nextStep.style.animationName = null;
+          nextStep.parentElement.style.overflowX = null;
+        }
+      }
+
+      async function submitForm(e) {
+        const form = document.querySelector(".active form");
+        const formData = new FormData(form);
+
+        const inputs = form.querySelectorAll("input");
+
+        for (let i = 0; i < inputs.length; i++) {
+          inputs[i].setAttribute("disabled", true);
+        }
+
+        const body = {};
+
+        for (const key of formData.keys()) {
+          const entryValues = formData.getAll(key);
+
+          body[key] = entryValues.length === 1
+            ? entryValues[0]
+            :entryValues;
+        }
+
+        const error = document.querySelector(".active p.form-error");
+        if (error) {
+          error.remove();
+        }
+
+        const response = await fetch(form.getAttribute("action"), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
+
+        for (let i = 0; i < inputs.length; i++) {
+          inputs[i].removeAttribute("disabled");
+        }
+
+        if (response.ok) {
+          nextStep();
+        } else {
+          const error = document.createElement("p");
+          error.classList.add("form-error");
+          error.innerText = await response.text();
+
+          form.insertAdjacentElement("beforebegin", error);
+        }
+      }
+
+      function redirectTwitchAuth() {
+        const clientId = document.querySelector("#clientId").value;
+        const selectedScopes = document.querySelectorAll("[name='scope']:checked");
+
+        const scopes = [];
+
+        for (let i = 0; i < selectedScopes.length; i++) {
+          scopes.push(selectedScopes[i].value);
+
+        }
+
+        location.href = "https://id.twitch.tv/oauth2/authorize" +
+          `?client_id=${clientId}` +
+          `&redirect_uri=${encodeURIComponent(getAuthorizationUrl())}` +
+          "&response_type=code" +
+          `&scope=${encodeURIComponent(scopes.join(" "))}`;
+      }
+    </script>
+  </head>
+  <body>
+    <div id="main">
+      <section class="active">
+        <h1 class="title">Installation <abbr title="wizard">🧙‍♂️</abbr></h1>
+
+        <div class="content">
+          <p>
+            We have to setup some things before starting the service for the
+            first time. This will take less than 5 minutes.
+          </p>
+          <p>
+            Feel free to contact with the developer if you find any issues or
+            require any assistance. &lt;3
+          </p>
+        </div>
+
+        <div class="pagination">
+          <button class="previous-step" disabled>Previous</button>
+          <button class="next-step">Next</button>
+        </div>
+      </section>
+
+      <section>
+        <h1 class="title">Register the Application</h1>
+
+        <div class="content">
+          <ol>
+            <li>
+              Create a new application on Twitch developers,
+              <a
+                href="https://dev.twitch.tv/console/apps/create"
+                target="_blank"
+                >here</a
+              >
+            </li>
+            <li>
+              Set up this url on "OAuth Redirect URLs"
+              <div class="copy-clipboard">
+                <input type="url" id="authorizationUrl" readonly />
+                <button>Copy to clipboard</button>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <div class="pagination">
+          <button class="previous-step">Previous</button>
+          <button class="next-step">Next</button>
+        </div>
+      </section>
+
+      <section>
+        <h1 class="title">Setup Application data</h1>
+
+        <div class="content">
+          <p>
+            Fill the <code>client id</code> and generate a
+            <code>client secret</code> from the created Twitch application.
+          </p>
+
+          <form action="/setup-env">
+            <label for="clientId">Twitch Application Client ID:</label>
+            <input type="text" name="clientId" id="clientId" />
+
+            <label for="clientSecret">Twitch app client secret:</label>
+            <input type="password" name="clientSecret" id="clientSecret" />
+          </form>
+        </div>
+
+        <div class="pagination">
+          <button class="previous-step">Previous</button>
+          <button class="submit-form">Next</button>
+        </div>
+      </section>
+
+      <section>
+        <h1 class="title">Creating the OAuth user token</h1>
+
+        <div class="content">
+          <form action="/create-user-oauth-token">
+            <p>
+              Select the scopes you want to request permissions for, some
+              defaults have been preselected. Check
+              <a
+                href="https://dev.twitch.tv/docs/authentication/scopes#twitch-api-scopes"
+                target="_blank"
+              >
+                Twitch documentation page
+              </a>
+              for more details.
+            </p>
+            <div id="scopes"></div>
+          </form>
+        </div>
+
+        <div class="pagination">
+          <button class="previous-step">Previous</button>
+          <button class="redirect-twitch-auth">Finish</button>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

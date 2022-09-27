@@ -1,4 +1,4 @@
-// import * as CopyPlugin from "copy-webpack-plugin";
+import * as CopyPlugin from "copy-webpack-plugin";
 import * as CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 import * as HtmlWebpackPlugin from "html-webpack-plugin";
 import * as MiniCssExtractPlugin from "mini-css-extract-plugin";
@@ -112,14 +112,17 @@ const webpackConfig: Configuration = {
       template: "!!html-loader!src/www/index.html",
       inject: "body",
     }),
-    // new CopyPlugin({
-    //   patterns: [
-    //     {
-    //       from: "static",
-    //       to: "assets",
-    //     },
-    //   ],
-    // }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "*.html",
+          to: ".",
+          globOptions: {
+            ignore: ["index.html"],
+          },
+        },
+      ],
+    }),
     new MiniCssExtractPlugin({
       filename: "assets/css/[name].css",
       chunkFilename: "assets/css/[id].css",
