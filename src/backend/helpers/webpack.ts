@@ -118,7 +118,7 @@ const webpackConfig: Configuration = {
           from: "*.html",
           to: ".",
           globOptions: {
-            ignore: ["index.html"],
+            ignore: ["**/www/index.html"],
           },
         },
       ],
