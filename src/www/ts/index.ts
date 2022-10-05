@@ -10,16 +10,25 @@ let ws: WebSocket;
 let env: "dev" | "prod";
 
 function reconnect() {
+  const reconnectTimeout = 5e3;
+
+  console.log(`Reconnecting in ${reconnectTimeout}ms`);
+
   if (env === "dev") {
-    location.reload();
+    setTimeout(async () => {
+      try {
+        await fetch(location.href);
+
+        location.reload();
+      } catch (e) {
+        setTimeout(reconnect);
+      }
+    }, reconnectTimeout);
+    return;
   }
 
-  const reconnectSeconds = 5;
-  const msPerSecond = 1e3;
-
-  console.log(`Reconnecting in ${reconnectSeconds} seconds...`);
   // eslint-disable-next-line no-use-before-define
-  setTimeout(init, reconnectSeconds * msPerSecond);
+  setTimeout(init, reconnectTimeout);
 }
 
 const events: Array<RedemptionMessage> = [];
