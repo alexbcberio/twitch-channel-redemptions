@@ -1,5 +1,3 @@
-import "animate.css";
-
 import * as tinycolor from "tinycolor2";
 
 import { animate } from "../helpers/animate.css";

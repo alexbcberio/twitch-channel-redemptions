@@ -1,3 +1,5 @@
+import "animate.css";
+
 function className(animationName: string) {
   return `animate__${animationName}`;
 }

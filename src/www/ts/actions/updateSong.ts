@@ -1,5 +1,3 @@
-import "animate.css";
-
 import { Song } from "../../../interfaces/Song";
 import { animate } from "../helpers/animate.css";
 
