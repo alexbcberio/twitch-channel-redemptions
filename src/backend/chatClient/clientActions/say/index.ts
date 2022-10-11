@@ -1,8 +1,12 @@
+import { TwitchPrivateMessage } from "@twurple/chat/lib/commands/TwitchPrivateMessage";
 import { chatClient } from "../..";
 
-async function say(channel: string, message: string): Promise<void> {
+async function say(
+  channel: string,
+  message: string,
+  replyTo?: string | TwitchPrivateMessage
+): Promise<void> {
   const maxMessageLength = 500;
-  // message = `MrDestructoid ${message}`;
 
   if (message.length > maxMessageLength) {
     const startIndex = 0;
@@ -14,7 +18,13 @@ async function say(channel: string, message: string): Promise<void> {
     )}${suffix}`;
   }
 
-  await chatClient.say(channel, message);
+  if (typeof replyTo === "undefined") {
+    await chatClient.say(channel, message);
+  } else {
+    await chatClient.say(channel, message, {
+      replyTo,
+    });
+  }
 }
 
 async function sayError(channel: string, message: string): Promise<void> {
