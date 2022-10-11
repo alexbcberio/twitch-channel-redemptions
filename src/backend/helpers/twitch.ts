@@ -76,6 +76,17 @@ async function getUsernameFromId(userId: number): Promise<string | null> {
   return user.displayName;
 }
 
+async function getUserIdFromUsername(username: string): Promise<string | null> {
+  const apiClient = await getApiClient();
+  const user = await apiClient.users.getUserByName(username);
+
+  if (!user) {
+    return null;
+  }
+
+  return user.id;
+}
+
 async function createReward(
   userId: UserIdResolvable,
   data: HelixCreateCustomRewardData
@@ -127,6 +138,7 @@ export {
   getAuthProvider,
   getApiClient,
   getUsernameFromId,
+  getUserIdFromUsername,
   completeRewards,
   cancelRewards,
   createReward,
