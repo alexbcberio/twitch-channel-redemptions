@@ -1,8 +1,8 @@
-import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
-import { getUsernameFromId } from "../../helpers/twitch";
-import { messages } from "../../../localization";
-import { msText } from "../../helpers/util";
-import { timeout } from "../../chatClient/clientActions";
+import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
+import { getUsernameFromId } from "../../../helpers/twitch";
+import { messages } from "../../../../localization";
+import { msText } from "../../../helpers/util";
+import { timeout } from "../../../chatClient/clientActions";
 
 const timeoutFriendMessages = messages.pubSubClient.actions.timeoutFriend;
 

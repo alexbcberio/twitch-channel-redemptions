@@ -1,9 +1,14 @@
-import { addVip, hasVip, removeVip, say } from "../../chatClient/clientActions";
-import { save, vipUsers } from "../../helpers/miniDb";
+import {
+  addVip,
+  hasVip,
+  removeVip,
+  say,
+} from "../../../chatClient/clientActions";
+import { save, vipUsers } from "../../../helpers/miniDb";
 
-import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
-import { getUsernameFromId } from "../../helpers/twitch";
-import { messages } from "../../../localization";
+import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
+import { getUsernameFromId } from "../../../helpers/twitch";
+import { messages } from "../../../../localization";
 
 const stealVipMessages = messages.pubSubClient.actions.stealVip;
 

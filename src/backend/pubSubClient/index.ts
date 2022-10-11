@@ -5,20 +5,22 @@ import {
   getAuthProvider,
 } from "../helpers/twitch";
 import { error, extendLogger, info } from "../helpers/log";
+import {
+  getVip,
+  hidrate,
+  highlightMessage,
+  lightTheme,
+  russianRoulette,
+  stealVip,
+  timeoutFriend,
+} from "./actions";
 
 import { RedemptionIds } from "../../enums/Redemptions";
 import { RedemptionMessage } from "../../interfaces/RedemptionMessage";
 import { UserIdResolvable } from "@twurple/api";
 import { broadcast } from "../webserver";
-import { getVip } from "./actions/getVip";
-import { hidrate } from "./actions/hidrate";
-import { highlightMessage } from "./actions/highlightMessage";
 import { isProduction } from "../helpers/util";
-import { lightTheme } from "./actions/lightTheme";
 import { rawDataSymbol } from "@twurple/common";
-import { russianRoulette } from "./actions/russianRoulette";
-import { stealVip } from "./actions/stealVip";
-import { timeoutFriend } from "./actions/timeoutFriend";
 
 const namespace = "PubSub";
 const log = extendLogger(namespace);
