@@ -13,7 +13,7 @@ function isChatMessage(action: Event): action is ChatMessageEvent {
 }
 
 function handleChatMessageAction(action: ChatMessageEvent) {
-  if (MessageEvent === undefined) {
+  if (messagesElement === undefined) {
     try {
       initMessagesElement();
     } catch (e) {
