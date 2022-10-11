@@ -1,7 +1,12 @@
 import { addVip, removeVip, say, timeout } from "./clientActions";
 import { extendLogger, warning } from "../helpers/log";
 import { getAuthProvider, getUsernameFromId } from "../helpers/twitch";
-import { onConnect, onDisconnect, onNoPermission } from "./events";
+import {
+  onConnect,
+  onDisconnect,
+  onMessageRemove,
+  onNoPermission,
+} from "./events";
 
 import { Action } from "../../interfaces/actions/Action";
 import { ActionType } from "../../enums/ActionType";
@@ -35,6 +40,7 @@ async function connect(channels: Array<string>): Promise<void> {
   chatClient.onNoPermission(onNoPermission);
 
   chatClient.onMessage(onMessage);
+  chatClient.onMessageRemove(onMessageRemove);
 
   await chatClient.connect();
 }
