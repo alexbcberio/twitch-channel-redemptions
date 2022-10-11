@@ -1,6 +1,7 @@
 :root {
   --black: hsl(0, 0%, 0%);
   --white: hsl(0, 0%, 100%);
+  --messages-background: hsla(0, 0%, 0%, 0.5);
 
   --messages-padding: 1rem;
   --message-user-color: var(--white);
@@ -8,7 +9,7 @@
 
 body {
   margin: 0;
-  background-color: var(--black);
+  background-color: var(--white);
   color: var(--white);
 }
 
@@ -20,6 +21,7 @@ body {
   flex-direction: column;
   justify-content: flex-end;
   overflow: hidden;
+  background-color: var(--messages-background);
   font-family: "Noto Sans Mono";
 }
 
