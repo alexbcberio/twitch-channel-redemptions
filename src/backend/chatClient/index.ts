@@ -2,6 +2,7 @@ import { addVip, removeVip, say, timeout } from "./clientActions";
 import { extendLogger, warning } from "../helpers/log";
 import { getAuthProvider, getUsernameFromId } from "../helpers/twitch";
 import {
+  onBan,
   onConnect,
   onDisconnect,
   onMessageRemove,
@@ -43,6 +44,7 @@ async function connect(channels: Array<string>): Promise<void> {
   chatClient.onMessage(onMessage);
   chatClient.onMessageRemove(onMessageRemove);
   chatClient.onTimeout(onTimeout);
+  chatClient.onBan(onBan);
 
   await chatClient.connect();
 }
