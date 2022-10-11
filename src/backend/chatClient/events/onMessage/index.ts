@@ -1,5 +1,8 @@
 import { ChatCommands } from "../../../../enums/ChatCommands";
+import { ChatMessageEvent } from "../../../../interfaces/events/ChatMessageEvent";
+import { EventType } from "../../../../enums/EventType";
 import { TwitchPrivateMessage } from "@twurple/chat/lib/commands/TwitchPrivateMessage";
+import { broadcast } from "../../../webserver";
 import { createReward } from "../../commands/createReward";
 import { messages } from "../../../../localization";
 import { namespace } from "../..";
@@ -42,11 +45,46 @@ async function handleChatCommand(
   }
 }
 
+function broadcastMessage(
+  _channel: string,
+  user: string,
+  message: string,
+  msg: TwitchPrivateMessage
+) {
+  if (!msg.channelId) {
+    return;
+  }
+
+  const { userInfo } = msg;
+  const fallbackUserColor = "#fff";
+
+  const broadcastMessage: ChatMessageEvent = {
+    type: EventType.ChatMessage,
+    channelId: msg.channelId,
+    userId: userInfo.userId,
+    data: {
+      user: {
+        name: user,
+        color: userInfo.color ?? fallbackUserColor,
+        isMod: userInfo.isBroadcaster || userInfo.isMod,
+      },
+      message: {
+        id: msg.id,
+        text: message,
+      },
+    },
+  };
+
+  broadcast(JSON.stringify(broadcastMessage));
+}
+
 export async function onMessage(
   channel: string,
   user: string,
   message: string,
   msg: TwitchPrivateMessage
 ): Promise<void> {
+  broadcastMessage(channel, user, message, msg);
+
   await handleChatCommand(channel, user, message, msg);
 }
