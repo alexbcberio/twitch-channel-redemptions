@@ -6,6 +6,7 @@ import {
   onDisconnect,
   onMessageRemove,
   onNoPermission,
+  onTimeout,
 } from "./events";
 
 import { Action } from "../../interfaces/actions/Action";
@@ -41,6 +42,7 @@ async function connect(channels: Array<string>): Promise<void> {
 
   chatClient.onMessage(onMessage);
   chatClient.onMessageRemove(onMessageRemove);
+  chatClient.onTimeout(onTimeout);
 
   await chatClient.connect();
 }
