@@ -27,6 +27,15 @@ async function start(): Promise<void> {
     },
   });
 
+  server.route({
+    method: "GET",
+    url: "/chat",
+    wsHandler,
+    handler(_req, reply) {
+      reply.type("text/html").send(staticFileStream("chat-overlay.html"));
+    },
+  });
+
   startServer(server);
 }
 

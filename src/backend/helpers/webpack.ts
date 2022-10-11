@@ -33,6 +33,7 @@ const webpackConfig: Configuration = {
   },
   entry: {
     app: ["./ts/index.ts", "./css/app.css"],
+    "chat-overlay": ["./ts/chat-overlay.ts", "./css/chat-overlay.css"],
   },
   output: {
     path: resolve(process.cwd(), "dist/www"),

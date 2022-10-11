@@ -1,0 +1,43 @@
+:root {
+  --black: hsl(0, 0%, 0%);
+  --white: hsl(0, 0%, 100%);
+
+  --messages-padding: 1rem;
+  --message-user-color: var(--white);
+}
+
+body {
+  margin: 0;
+  background-color: var(--black);
+  color: var(--white);
+}
+
+#messages {
+  width: calc(100% - 2 * var(--messages-padding));
+  height: calc(100vh - 2 * var(--messages-padding));
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  font-family: "Noto Sans Mono";
+}
+
+.message {
+  margin: 0;
+  margin-top: 0.75em;
+}
+
+.message .user {
+  color: var(--message-color);
+  margin-right: 0.25em;
+}
+
+.message .user::after {
+  content: ":~$";
+  color: var(--white);
+}
+
+.message .user.mod-user::after {
+  content: ":~#";
+}

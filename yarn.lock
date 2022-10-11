@@ -160,6 +160,11 @@
     fastify-plugin "^3.0.0"
     ws "^8.0.0"
 
+"@fontsource/noto-sans-mono@^4.5.11":
+  version "4.5.11"
+  resolved "https://registry.yarnpkg.com/@fontsource/noto-sans-mono/-/noto-sans-mono-4.5.11.tgz#e213d695b3ef8fb2060ca3d86738b969f1ea0599"
+  integrity sha512-AhORX8FAWObQvhx+jm52ainEYlgdImrIDnecxhk6P3zRtXNg6lHMjE5QPdxupjG2iLNWSaM66JYTOF38qzLD5A==
+
 "@humanwhocodes/config-array@^0.9.2":
   version "0.9.5"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.9.5.tgz#2cbaf9a89460da24b5ca6531b8bbfc23e1df50c7"
