@@ -53,43 +53,45 @@ async function checkEvent(this: WebSocket, e: MessageEvent) {
 
   events.push(message);
 
-  // eslint-disable-next-line no-magic-numbers
-  if (events.length === 1) {
-    do {
-      // eslint-disable-next-line no-magic-numbers
-      const data = events[0];
-
-      if (!data.message) {
-        data.message = "";
-      }
-
-      if (data.channelId) {
-        switch (data.rewardId) {
-          case "KaraokeTime":
-            await karaokeTime(data.userDisplayName, data.message);
-            break;
-          case "RussianRoulette":
-            await russianRoulette(data);
-            break;
-          default:
-            await createCard(
-              data.rewardName,
-              data.message,
-              data.backgroundColor,
-              data.rewardImage
-            );
-        }
-      }
-
-      events.shift();
-      await sleep(500);
-      // eslint-disable-next-line no-magic-numbers
-    } while (events.length > 0);
-  }
-
   if (env === "dev") {
     console.log(e.data);
   }
+
+  // eslint-disable-next-line no-magic-numbers
+  if (events.length > 1) {
+    return;
+  }
+
+  do {
+    // eslint-disable-next-line no-magic-numbers
+    const data = events[0];
+
+    if (!data.message) {
+      data.message = "";
+    }
+
+    if (data.channelId) {
+      switch (data.rewardId) {
+        case "KaraokeTime":
+          await karaokeTime(data.userDisplayName, data.message);
+          break;
+        case "RussianRoulette":
+          await russianRoulette(data);
+          break;
+        default:
+          await createCard(
+            data.rewardName,
+            data.message,
+            data.backgroundColor,
+            data.rewardImage
+          );
+      }
+    }
+
+    events.shift();
+    await sleep(500);
+    // eslint-disable-next-line no-magic-numbers
+  } while (events.length > 0);
 }
 
 function init() {
