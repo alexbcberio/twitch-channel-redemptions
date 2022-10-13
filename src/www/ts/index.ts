@@ -3,8 +3,8 @@ import { Song } from "../../interfaces/Song";
 import { createCard } from "./actions/createCard";
 import { karaokeTime } from "./actions/karaokeTime";
 import { russianRoulette } from "./actions/russianRoulette";
+import { sleep } from "./helpers/sleep";
 import { updateSong } from "./actions/updateSong";
-import { waitTime } from "./helpers/waitTime";
 
 let ws: WebSocket;
 let env: "dev" | "prod";
@@ -79,7 +79,7 @@ async function checkEvent(this: WebSocket, e: MessageEvent) {
       }
 
       events.shift();
-      await waitTime();
+      await sleep(500);
       // eslint-disable-next-line no-magic-numbers
     } while (events.length > 0);
   }
