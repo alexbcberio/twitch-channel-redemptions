@@ -3,7 +3,7 @@
   --white: hsl(0, 0%, 100%);
   --messages-background: hsla(0, 0%, 0%, 0.85);
 
-  --messages-padding: 1rem;
+  --messages-margin: 1rem;
   --message-user-color: var(--white);
 }
 
@@ -16,20 +16,29 @@ body {
   color: var(--white);
 }
 
+#messages-container {
+  width: 100%;
+  background-color: var(--messages-background);
+}
+
 #messages {
-  width: calc(100% - 2 * var(--messages-padding));
-  max-height: calc(100vh - 2 * var(--messages-padding));
-  padding: 1rem;
+  max-height: calc(100vh - 2 * var(--messages-margin));
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   overflow: hidden;
-  background-color: var(--messages-background);
   font-family: "Noto Sans Mono";
+}
+
+#messages:not(:empty) {
+  margin: 1rem;
 }
 
 .message {
   margin: 0;
+}
+
+.message:not(:first-child) {
   margin-top: 0.75em;
 }
 
