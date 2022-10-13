@@ -1,5 +1,5 @@
-import { EventType } from "../../../../enums/EventType";
-import { UserTimeout } from "../../../../interfaces/events/UserTimeout";
+import { ChatEvent } from "../../../../enums/ChatEvent";
+import { UserTimeout } from "../../../../interfaces/events/chat/UserTimeout";
 import { broadcast } from "../../../webserver";
 import { getUserIdFromUsername } from "../../../helpers/twitch";
 
@@ -15,7 +15,7 @@ export async function onTimeout(
   }
 
   const msg: UserTimeout = {
-    type: EventType.UserTimeout,
+    type: ChatEvent.UserTimeout,
     channelId: channel,
     userId,
     data: {

@@ -1,8 +1,8 @@
-import { EventType } from "../../enums/EventType";
+import { ChatEvent } from "../../../enums/ChatEvent";
 import { UserEvent } from "./UserEvent";
 
 export interface ChatMessageEvent extends UserEvent {
-  type: EventType.ChatMessage;
+  type: ChatEvent.ChatMessage;
   data: {
     user: {
       name: string;

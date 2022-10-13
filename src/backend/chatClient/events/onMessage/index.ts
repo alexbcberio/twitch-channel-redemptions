@@ -1,6 +1,6 @@
 import { ChatCommands } from "../../../../enums/ChatCommands";
-import { ChatMessageEvent } from "../../../../interfaces/events/ChatMessageEvent";
-import { EventType } from "../../../../enums/EventType";
+import { ChatEvent } from "../../../../enums/ChatEvent";
+import { ChatMessageEvent } from "../../../../interfaces/events/chat/ChatMessageEvent";
 import { TwitchPrivateMessage } from "@twurple/chat/lib/commands/TwitchPrivateMessage";
 import { broadcast } from "../../../webserver";
 import { createReward } from "../../commands/createReward";
@@ -59,7 +59,7 @@ function broadcastMessage(
   const fallbackUserColor = "#fff";
 
   const broadcastMessage: ChatMessageEvent = {
-    type: EventType.ChatMessage,
+    type: ChatEvent.ChatMessage,
     channelId: msg.channelId,
     userId: userInfo.userId,
     data: {

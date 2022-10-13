@@ -1,10 +1,10 @@
-import { Event } from "../../../../../interfaces/events/Event";
-import { EventType } from "../../../../../enums/EventType";
-import { UserTimeout } from "../../../../../interfaces/events/UserTimeout";
+import { BaseChatEvent } from "../../../../../interfaces/events/chat/BaseChatEvent";
+import { ChatEvent } from "../../../../../enums/ChatEvent";
+import { UserTimeout } from "../../../../../interfaces/events/chat/UserTimeout";
 import { removeUserMessages } from "../common";
 
-function isUserTimeoutMessage(action: Event): action is UserTimeout {
-  return action.type === EventType.UserTimeout;
+function isUserTimeoutMessage(action: BaseChatEvent): action is UserTimeout {
+  return action.type === ChatEvent.UserTimeout;
 }
 
 function handleUserTimeoutMessageAction(action: UserTimeout) {

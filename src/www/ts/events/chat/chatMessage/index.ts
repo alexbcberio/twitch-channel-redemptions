@@ -1,6 +1,6 @@
-import { ChatMessageEvent } from "../../../../../interfaces/events/ChatMessageEvent";
-import { Event } from "../../../../../interfaces/events/Event";
-import { EventType } from "../../../../../enums/EventType";
+import { BaseChatEvent } from "../../../../../interfaces/events/chat/BaseChatEvent";
+import { ChatEvent } from "../../../../../enums/ChatEvent";
+import { ChatMessageEvent } from "../../../../../interfaces/events/chat/ChatMessageEvent";
 import { animate } from "../../../helpers/animate.css";
 import { removeMessage } from "../common";
 
@@ -8,8 +8,8 @@ const REMOVE_MESSAGE_AFTER_MS = 2 * 60e3;
 
 let messagesElement: HTMLElement;
 
-function isChatMessage(action: Event): action is ChatMessageEvent {
-  return action.type === EventType.ChatMessage;
+function isChatMessage(action: BaseChatEvent): action is ChatMessageEvent {
+  return action.type === ChatEvent.ChatMessage;
 }
 
 function handleChatMessageAction(action: ChatMessageEvent) {

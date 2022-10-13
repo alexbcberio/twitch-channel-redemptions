@@ -1,6 +1,6 @@
-import { ChatMessageRemoveEvent } from "../../../../interfaces/events/ChatMessageRemoveEvent";
+import { ChatEvent } from "../../../../enums/ChatEvent";
+import { ChatMessageRemoveEvent } from "../../../../interfaces/events/chat/ChatMessageRemoveEvent";
 import { ClearMsg } from "@twurple/chat";
-import { EventType } from "../../../../enums/EventType";
 import { broadcast } from "../../../webserver";
 
 function broadcastMessageRemove(
@@ -9,7 +9,7 @@ function broadcastMessageRemove(
   _msg: ClearMsg
 ) {
   const broadcastMessageRemove: ChatMessageRemoveEvent = {
-    type: EventType.ChatMessageRemove,
+    type: ChatEvent.ChatMessageRemove,
     channelId,
     data: {
       messageId,

@@ -1,7 +1,7 @@
-import { EventType } from "../../enums/EventType";
+import { ChatEvent } from "../../../enums/ChatEvent";
 import { UserEvent } from "./UserEvent";
 
 export interface UserBan extends UserEvent {
-  type: EventType.UserBan;
+  type: ChatEvent.UserBan;
   data: null;
 }

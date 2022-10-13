@@ -1,10 +1,10 @@
-import { Event } from "../../../../../interfaces/events/Event";
-import { EventType } from "../../../../../enums/EventType";
-import { UserBan } from "../../../../../interfaces/events/UserBan";
+import { BaseChatEvent } from "../../../../../interfaces/events/chat/BaseChatEvent";
+import { ChatEvent } from "../../../../../enums/ChatEvent";
+import { UserBan } from "../../../../../interfaces/events/chat/UserBan";
 import { removeUserMessages } from "../common";
 
-function isUserBanMessage(action: Event): action is UserBan {
-  return action.type === EventType.UserBan;
+function isUserBanMessage(action: BaseChatEvent): action is UserBan {
+  return action.type === ChatEvent.UserBan;
 }
 
 function handleUserBanMessageAction(action: UserBan) {

@@ -1,4 +1,4 @@
-export enum EventType {
+export enum ChatEvent {
   ChatMessage = "chatMessage",
   ChatMessageRemove = "chatMessageRemove",
   UserTimeout = "userTimeout",

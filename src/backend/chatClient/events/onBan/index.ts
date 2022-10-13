@@ -1,6 +1,6 @@
+import { ChatEvent } from "../../../../enums/ChatEvent";
 import { ClearChat } from "@twurple/chat/lib";
-import { EventType } from "../../../../enums/EventType";
-import { UserBan } from "../../../../interfaces/events/UserBan";
+import { UserBan } from "../../../../interfaces/events/chat/UserBan";
 import { broadcast } from "../../../webserver";
 import { getUserIdFromUsername } from "../../../helpers/twitch";
 
@@ -16,7 +16,7 @@ export async function onBan(
   }
 
   const msg: UserBan = {
-    type: EventType.UserBan,
+    type: ChatEvent.UserBan,
     channelId: channel,
     userId,
     data: null,

@@ -11,7 +11,7 @@ import {
   isUserTimeoutMessage,
 } from "./events/chat";
 
-import { Event } from "../../interfaces/events/Event";
+import { BaseChatEvent } from "../../interfaces/events/chat/BaseChatEvent";
 
 document.addEventListener("DOMContentLoaded", init);
 
@@ -72,7 +72,7 @@ function onMessage(messageEvent: MessageEvent<string>) {
     return;
   }
 
-  const action: Event = JSON.parse(messageEvent.data);
+  const action: BaseChatEvent = JSON.parse(messageEvent.data);
 
   if (isChatMessage(action)) {
     handleChatMessageAction(action);

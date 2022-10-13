@@ -1,10 +1,12 @@
-import { ChatMessageRemoveEvent } from "../../../../../interfaces/events/ChatMessageRemoveEvent";
-import { Event } from "../../../../../interfaces/events/Event";
-import { EventType } from "../../../../../enums/EventType";
+import { BaseChatEvent } from "../../../../../interfaces/events/chat/BaseChatEvent";
+import { ChatEvent } from "../../../../../enums/ChatEvent";
+import { ChatMessageRemoveEvent } from "../../../../../interfaces/events/chat/ChatMessageRemoveEvent";
 import { removeMessage } from "../common";
 
-function isChatRemoveMessage(action: Event): action is ChatMessageRemoveEvent {
-  return action.type === EventType.ChatMessageRemove;
+function isChatRemoveMessage(
+  action: BaseChatEvent
+): action is ChatMessageRemoveEvent {
+  return action.type === ChatEvent.ChatMessageRemove;
 }
 
 async function handleChatRemoveMessageAction(action: ChatMessageRemoveEvent) {

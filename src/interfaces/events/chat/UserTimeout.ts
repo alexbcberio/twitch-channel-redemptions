@@ -1,8 +1,8 @@
-import { EventType } from "../../enums/EventType";
+import { ChatEvent } from "../../../enums/ChatEvent";
 import { UserEvent } from "./UserEvent";
 
 export interface UserTimeout extends UserEvent {
-  type: EventType.UserTimeout;
+  type: ChatEvent.UserTimeout;
   data: {
     duration: number;
   };
