@@ -1,11 +1,11 @@
-import * as gunShotSfx from "../../static/sfx/toy-gun/shot.mp3";
-import * as gunStuckSfx from "../../static/sfx/toy-gun/stuck.mp3";
-import * as toyGunImg from "../../static/img/toy-gun.png";
+import * as gunShotSfx from "../../../static/sfx/toy-gun/shot.mp3";
+import * as gunStuckSfx from "../../../static/sfx/toy-gun/stuck.mp3";
+import * as toyGunImg from "../../../static/img/toy-gun.png";
 
-import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
-import { createAudio } from "../helpers/createAudio";
-import { createImg } from "../helpers/createImg";
-import { createText } from "../helpers/createText";
+import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
+import { createAudio } from "../../helpers/createAudio";
+import { createImg } from "../../helpers/createImg";
+import { createText } from "../../helpers/createText";
 
 export function russianRoulette(msg: RedemptionMessage): Promise<void> {
   const { userDisplayName, message } = msg;

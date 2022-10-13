@@ -1,10 +1,13 @@
+import {
+  createCard,
+  karaokeTime,
+  russianRoulette,
+  updateSong,
+} from "./events/redemption";
+
 import { RedemptionMessage } from "../../interfaces/RedemptionMessage";
 import { Song } from "../../interfaces/Song";
-import { createCard } from "./actions/createCard";
-import { karaokeTime } from "./actions/karaokeTime";
-import { russianRoulette } from "./actions/russianRoulette";
 import { sleep } from "./helpers/sleep";
-import { updateSong } from "./actions/updateSong";
 
 let ws: WebSocket;
 let env: "dev" | "prod";
