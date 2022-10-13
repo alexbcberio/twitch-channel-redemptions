@@ -2,10 +2,12 @@ import * as karaokeTimeImg from "../../../../static/img/karaoke-time.png";
 import * as karaokeTimeSfx from "../../../../static/sfx/karaoke-time.mp3";
 import * as tinycolor from "tinycolor2";
 
-import { createAudio } from "../../../helpers/createAudio";
-import { createImg } from "../../../helpers/createImg";
-import { createText } from "../../../helpers/createText";
-import { insertCssVariables } from "../../../helpers/insertCssVariables";
+import {
+  createAudio,
+  createImg,
+  createText,
+  insertCssVariables,
+} from "../common";
 
 function karaokeTime(username: string, message: string): Promise<void> {
   return new Promise((res) => {

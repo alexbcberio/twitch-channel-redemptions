@@ -1,9 +1,8 @@
 import * as tinycolor from "tinycolor2";
 
+import { createImg, createText, insertCssVariables } from "../common";
+
 import { animate } from "../../../helpers/animate.css";
-import { createImg } from "../../../helpers/createImg";
-import { createText } from "../../../helpers/createText";
-import { insertCssVariables } from "../../../helpers/insertCssVariables";
 
 export function createCard(
   title: string,
