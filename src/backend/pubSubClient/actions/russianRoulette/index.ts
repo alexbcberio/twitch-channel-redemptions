@@ -23,11 +23,11 @@ async function russianRoulette(
     throw new Error("No channel found");
   }
 
-  if (!gunsSafeShots[channelId]) {
+  const noShots = 0;
+
+  if (gunsSafeShots[channelId] === noShots) {
     gunsSafeShots[channelId] = maxSafeShots;
   }
-
-  const noShots = 0;
 
   const gotShot =
     gunsSafeShots[channelId] > noShots &&
