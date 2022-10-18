@@ -1,4 +1,5 @@
 import { PubSubClient, PubSubRedemptionMessage } from "@twurple/pubsub";
+import { access, readFile } from "fs/promises";
 import {
   cancelRewards,
   completeRewards,
@@ -15,10 +16,12 @@ import {
   timeoutFriend,
 } from "./actions";
 
-import { RedemptionIds } from "../../enums/Redemptions";
 import { RedemptionMessage } from "../../interfaces/RedemptionMessage";
+import { RedemptionType } from "../../enums/RedemptionType";
 import { UserIdResolvable } from "@twurple/api";
 import { broadcast } from "../webserver";
+import { constants } from "fs";
+import { cwd } from "process";
 import { isProduction } from "../helpers/util";
 import { rawDataSymbol } from "@twurple/common";
 
@@ -27,27 +30,55 @@ const log = extendLogger(namespace);
 
 type RedemptionHandler = (msg: RedemptionMessage) => Promise<RedemptionMessage>;
 
-function getRedemptionHandlerFromRewardId(rewardId: string): RedemptionHandler {
-  const noop = (message: RedemptionMessage): Promise<RedemptionMessage> => {
-    log("Unhandled redemption %s", rewardId);
-    return Promise.resolve(message);
-  };
+const configFilePath = `${cwd()}/config/redemptions.json`;
 
-  switch (rewardId) {
-    case RedemptionIds.GetVip:
+let redemptions: Record<string, RedemptionType> = {};
+
+async function loadRedemptions() {
+  try {
+    await access(configFilePath, constants.R_OK);
+  } catch (e) {
+    error(
+      '[%s] Cannot access configuration file "%s"',
+      namespace,
+      configFilePath
+    );
+    return;
+  }
+
+  const redemptionsConfig = await readFile(configFilePath);
+
+  try {
+    redemptions = JSON.parse(redemptionsConfig.toString());
+  } catch (e) {
+    error(
+      '[%s] Error parsing configuration file "%s"',
+      namespace,
+      configFilePath
+    );
+  }
+}
+
+function noop(message: RedemptionMessage): Promise<RedemptionMessage> {
+  log("Unhandled redemption %s", message.rewardId);
+  return Promise.resolve(message);
+}
+
+function getRedemptionHandlerFromRewardId(rewardId: string): RedemptionHandler {
+  switch (redemptions[rewardId]) {
+    case RedemptionType.GetVip:
       return getVip;
-    case RedemptionIds.Hidrate:
+    case RedemptionType.Hidrate:
       return hidrate;
-    case RedemptionIds.HighlightMessage:
+    case RedemptionType.HighlightMessage:
       return highlightMessage;
-    case RedemptionIds.LightTheme2m:
-    case RedemptionIds.LightTheme5m:
+    case RedemptionType.LightTheme:
       return lightTheme;
-    case RedemptionIds.RussianRoulette:
+    case RedemptionType.RussianRoulette:
       return russianRoulette;
-    case RedemptionIds.StealVip:
+    case RedemptionType.StealVip:
       return stealVip;
-    case RedemptionIds.TimeoutFriend:
+    case RedemptionType.TimeoutFriend:
       return timeoutFriend;
     default:
       return noop;
@@ -55,10 +86,7 @@ function getRedemptionHandlerFromRewardId(rewardId: string): RedemptionHandler {
 }
 
 function keepInQueue(rewardId: string): boolean {
-  const keepInQueueRewards = [RedemptionIds.KaraokeTime];
-
-  // @ts-expect-error String is not assignable to... but all keys are strings
-  if (keepInQueueRewards.includes(rewardId)) {
+  if (redemptions[rewardId] === RedemptionType.KaraokeTime) {
     return true;
   }
 
@@ -107,16 +135,17 @@ async function completeReward(message: PubSubRedemptionMessage): Promise<void> {
   }
 }
 
-function rewardNameFromRewardId(rewardId: string): string {
-  const rewardEnumValues = Object.values(RedemptionIds);
-  // @ts-expect-error String is not assignable to... but all keys are strings
-  const rewardIdValueIndex = rewardEnumValues.indexOf(rewardId);
-  const rewardName = Object.keys(RedemptionIds)[rewardIdValueIndex];
-
-  return rewardName;
+function rewardTypeFromRewardId(rewardId: string): RedemptionType {
+  return redemptions[rewardId];
 }
 
 async function onRedemption(message: PubSubRedemptionMessage) {
+  // eslint-disable-next-line no-magic-numbers
+  if (Object.keys(redemptions).length === 0) {
+    log("Loading redemptions");
+    await loadRedemptions();
+  }
+
   log(
     'Reward: "%s" (%s) redeemed by %s',
     message.rewardTitle,
@@ -130,6 +159,7 @@ async function onRedemption(message: PubSubRedemptionMessage) {
     id: message.id,
     channelId: message.channelId,
     rewardId: message.rewardId,
+    rewardType: rewardTypeFromRewardId(message.rewardId),
     rewardName: message.rewardTitle,
     rewardImage: message.rewardImage
       ? message.rewardImage.url_4x
@@ -146,10 +176,7 @@ async function onRedemption(message: PubSubRedemptionMessage) {
   const redemptionHandler = getRedemptionHandlerFromRewardId(msg.rewardId);
 
   try {
-    handledMessage = {
-      ...(await redemptionHandler(msg)),
-      rewardId: rewardNameFromRewardId(message.rewardId),
-    };
+    handledMessage = await redemptionHandler(msg);
   } catch (e) {
     if (e instanceof Error) {
       error("[%s] %s", namespace, e.message);

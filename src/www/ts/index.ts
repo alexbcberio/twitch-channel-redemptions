@@ -6,6 +6,7 @@ import {
 } from "./events/redemption";
 
 import { RedemptionMessage } from "../../interfaces/RedemptionMessage";
+import { RedemptionType } from "../../enums/RedemptionType";
 import { Song } from "../../interfaces/Song";
 import { sleep } from "./helpers/sleep";
 
@@ -49,6 +50,8 @@ async function checkEvent(this: WebSocket, e: MessageEvent) {
     const song: Song = message;
     updateSong(song);
     return;
+  } else if (!message.rewardId) {
+    return;
   }
 
   events.push(message);
@@ -71,11 +74,11 @@ async function checkEvent(this: WebSocket, e: MessageEvent) {
     }
 
     if (data.channelId) {
-      switch (data.rewardId) {
-        case "KaraokeTime":
+      switch (data.rewardType) {
+        case RedemptionType.KaraokeTime:
           await karaokeTime(data.userDisplayName, data.message);
           break;
-        case "RussianRoulette":
+        case RedemptionType.RussianRoulette:
           await russianRoulette(data);
           break;
         default:
