@@ -1,6 +1,5 @@
 import * as CopyPlugin from "copy-webpack-plugin";
 import * as CssMinimizerPlugin from "css-minimizer-webpack-plugin";
-import * as HtmlWebpackPlugin from "html-webpack-plugin";
 import * as MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 import { Configuration, ProgressPlugin, webpack } from "webpack";
@@ -109,18 +108,11 @@ const webpackConfig: Configuration = {
   plugins: [
     new ProgressPlugin(),
     new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin({
-      template: "!!html-loader!src/www/index.html",
-      inject: "body",
-    }),
     new CopyPlugin({
       patterns: [
         {
           from: "*.html",
           to: ".",
-          globOptions: {
-            ignore: ["**/www/index.html"],
-          },
         },
       ],
     }),
