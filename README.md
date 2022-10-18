@@ -80,13 +80,13 @@ There's a small utility chatbot do help performing some tasks such as this one, 
 !createReward <title> <cost>
 ```
 
-#### Linkink channel point reward with an action
+#### Linking channel point reward with an action
 
 We call actions to the different integrations that can be set up with channel point rewards. The available actions are stored in [`src/backend/pubSubClient/actions`](./src/backend/pubSubClient/actions)
 
-The actions are mapped to a reward in [`src/enums/Redemptions.ts`](./src/enums/Redemptions.ts), set the ID of the reward as the value.
+The actions are mapped to a reward in the configuration file `config/redemptions.json` where the ID of the reward is the key and the action is the value. You can get the available values from [`RedemptionType.ts`](./src/enums/RedemptionType.ts).
 
-To get the ID of a reward start the service start the tool in [development mode](#development) and send the redeem the redemption you want to set up. It will show a message on the console like this one.
+To get the ID of a reward start the service start the tool in [development mode](#development) and send the redemption you want to set up. It will show a message on the console like this one.
 
 ![Logs of unhandled channel point reward](./docs/img/unhandled-channel-point-reward-redemption.jpg)
 
@@ -96,7 +96,21 @@ Once the ID is correctly set up (remember to save the file) redeem again the rew
 
 ![Logs of handled channel point reward](./docs/img/handled-channel-point-reward-redemption.jpg)
 
-Repeat this same step for all any channel point reward you want to set up.
+Repeat this same step for all any channel point reward you want to set up. The configuration file will look similar to this, you can repeat a action multiple times.
+
+```json
+{
+  "ddcb6566-6b02-447c-a396-6b93ade3b480": "getVip",
+  "3dfb7ed4-b696-4dff-92d7-18f9bfa3dd4a": "hidrate",
+  "df93120a-9ebe-493c-91e1-42338400dc35": "highlightMessage",
+  "53c72f19-61ae-4a27-bbe0-c8100e2fce8e": "karaokeTime",
+  "f60151fc-7f62-48c6-b225-21007e0dd544": "lightTheme",
+  "a7c10cae-dbea-4bdc-aeb5-ebd3d0f77b93": "lightTheme",
+  "c38a6de3-ae92-4add-bd56-c6346c19ea93": "russianRoulette",
+  "84283c28-a2c2-4da6-99c2-b662417b9d49": "stealVip",
+  "1a6bd16d-2882-4125-9f8a-e3c7194ea8b6": "timeoutFriend"
+}
+```
 
 ### Create new rewards
 
