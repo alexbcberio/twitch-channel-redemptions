@@ -2,9 +2,7 @@ import { install, start } from "./webserver";
 
 import { connect } from "./chatClient";
 import { error } from "./helpers/log";
-import { isDevelopment } from "./helpers/util";
 import { registerUserListener } from "./pubSubClient";
-import { runWebpack } from "./helpers/webpack";
 
 const namespace = "App";
 
@@ -18,14 +16,7 @@ function isSetUp() {
   );
 }
 
-let runningWebpack = false;
-
 export async function bootstrap() {
-  if (isDevelopment && runningWebpack === false) {
-    runningWebpack = true;
-    await runWebpack();
-  }
-
   if (!isSetUp()) {
     await install();
     return;

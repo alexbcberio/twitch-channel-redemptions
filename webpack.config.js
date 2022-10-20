@@ -1,28 +1,25 @@
-import * as CopyPlugin from "copy-webpack-plugin";
-import * as CssMinimizerPlugin from "css-minimizer-webpack-plugin";
-import * as MiniCssExtractPlugin from "mini-css-extract-plugin";
+const CopyPlugin = require("copy-webpack-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
-import { Configuration, ProgressPlugin, webpack } from "webpack";
-import { error, extendLogger, warning } from "./log";
-import { isDevelopment, isProduction } from "./util";
-import { parse, resolve } from "path";
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-import { CleanWebpackPlugin } from "clean-webpack-plugin";
+const { parse, resolve } = require("path");
 
-const namespace = "Webpack";
-const log = extendLogger(namespace);
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const { ProgressPlugin } = require("webpack");
 
-const context = resolve(__dirname, "../../www");
+const context = resolve(process.cwd(), "src/www");
 
-const regExp: Record<string, RegExp> = {
+const regExp = {
   images: /\.(a?png|gif|jpe?g|svg|webp)$/i,
   fonts: /\.(otf|ttf|woff2?)$/i,
   multimedia: /\.(mp3|webm|mp4)$/i,
 };
 
-// TODO: declare types (d.ts) to import files from TypeScript code
+const isDevelopment = process.env.NODE_ENV === "development";
+const isProduction = !isDevelopment;
 
-const webpackConfig: Configuration = {
+module.exports = {
   mode: isDevelopment ? "development" : "production",
   context,
   devtool: isDevelopment ? "eval" : false,
@@ -58,12 +55,7 @@ const webpackConfig: Configuration = {
       if (!contentType) {
         contentType = "miscellaneous";
 
-        warning(
-          "[%s] Unknown extension %s, falling back to %s",
-          namespace,
-          ext,
-          contentType
-        );
+        console.log(`Unknown extension ${ext}, falling back to ${contentType}`);
       }
 
       return `assets/${contentType}/[name][ext]`;
@@ -130,23 +122,3 @@ const webpackConfig: Configuration = {
     },
   },
 };
-
-function runWebpack(): Promise<void> {
-  return new Promise((res, rej) => {
-    log("Running");
-    webpack(webpackConfig, (err, stats) => {
-      if (err) {
-        error("[%s] %s", namespace, err);
-        rej(err);
-      } else if (stats?.hasErrors() || stats?.hasWarnings()) {
-        error("[%s] %s", namespace, stats);
-      } else {
-        log("Compiled ok");
-      }
-
-      res();
-    });
-  });
-}
-
-export { runWebpack };
