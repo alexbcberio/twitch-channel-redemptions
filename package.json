@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@fastify/static": "^5.0.2",
-    "@fastify/websocket": "^5.0.0",
+    "@fastify/websocket": "^5.0.1",
     "@twurple/api": "^5.0.13",
     "@twurple/auth": "^5.0.13",
     "@twurple/chat": "^5.0.13",
