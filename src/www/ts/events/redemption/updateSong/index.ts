@@ -39,8 +39,9 @@ async function setData(
   skipAnimation: boolean = false
 ) {
   const { title, artist, coverArt } = data.song;
-  const [previousCoverArt, newCoverArt] =
-    player.querySelectorAll<HTMLDivElement>(".coverArt");
+  const coverArts = player.querySelectorAll<HTMLDivElement>(".coverArt");
+  const previousCoverArt = coverArts[0];
+  const newCoverArt = coverArts[1];
   const trackName = player.querySelector<HTMLElement>(".trackName");
   const trackArtist = player.querySelector<HTMLElement>(".trackArtist");
 

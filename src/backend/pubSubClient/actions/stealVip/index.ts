@@ -68,8 +68,9 @@ async function stealVip(msg: RedemptionMessage): Promise<RedemptionMessage> {
   channelVips.push(addVipUser);
   save();
 
-  // eslint-disable-next-line require-atomic-updates
-  msg.message = stealVipMessages.message(addVipUser, removeVipUser);
+  if (msg.message) {
+    msg.message = stealVipMessages.message(addVipUser, removeVipUser);
+  }
 
   await say(channel, msg.message);
 

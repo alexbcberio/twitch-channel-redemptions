@@ -16,8 +16,8 @@ const russianRouletteMessages = messages.pubSubClient.actions.russianRoulette;
 async function russianRoulette(
   msg: RedemptionMessage
 ): Promise<RedemptionMessage> {
+  const channel = await getUsernameFromId(parseInt(msg.channelId));
   const { channelId, userDisplayName } = msg;
-  const channel = await getUsernameFromId(parseInt(channelId));
 
   if (!channel) {
     throw new Error("No channel found");
@@ -38,7 +38,6 @@ async function russianRoulette(
     gunsSafeShots[channelId] = maxSafeShots;
   }
 
-  // eslint-disable-next-line require-atomic-updates
   msg.message = gotShot ? "got shot" : "";
 
   if (gotShot) {

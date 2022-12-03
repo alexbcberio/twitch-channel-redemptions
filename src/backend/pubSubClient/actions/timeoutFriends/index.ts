@@ -28,12 +28,13 @@ async function timeoutFriend(
 
   const msPerSecond = 1e3;
 
-  // eslint-disable-next-line require-atomic-updates
-  msg.message = timeoutFriendMessages.message(
-    userDisplayName,
-    message,
-    msText(time * msPerSecond)
-  );
+  if (msg.message) {
+    msg.message = timeoutFriendMessages.message(
+      userDisplayName,
+      message,
+      msText(time * msPerSecond)
+    );
+  }
 
   return msg;
 }

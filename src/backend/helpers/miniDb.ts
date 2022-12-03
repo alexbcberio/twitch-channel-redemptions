@@ -109,8 +109,13 @@ async function start(): Promise<void> {
   });
 
   setTimeout(checkScheduledActions, FIRST_CHECK_TIMEOUT);
-  // eslint-disable-next-line require-atomic-updates
-  scheduledActionsInterval = setInterval(checkScheduledActions, CHECK_INTERVAL);
+
+  if (!scheduledActionsInterval) {
+    scheduledActionsInterval = setInterval(
+      checkScheduledActions,
+      CHECK_INTERVAL
+    );
+  }
 
   try {
     const savedVipUsers = JSON.parse(
