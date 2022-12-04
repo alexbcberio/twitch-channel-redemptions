@@ -13,6 +13,7 @@ const namespace = "Twitch";
 const log = extendLogger(namespace);
 
 let refreshAuthProvider: RefreshingAuthProvider;
+let apiClient: ApiClient | null = null;
 
 function getClientCredentials(): ClientCredentials {
   if (!process.env.TWITCH_CLIENT_ID || !process.env.TWITCH_CLIENT_SECRET) {
@@ -39,22 +40,21 @@ async function onRefresh(refreshData: AccessToken): Promise<void> {
 }
 
 async function getAuthProvider(): Promise<RefreshingAuthProvider> {
-  if (refreshAuthProvider) {
-    return refreshAuthProvider;
-  }
-
   const tokenData = await getTokenData();
-  const credentials = getClientCredentials();
 
-  // eslint-disable-next-line require-atomic-updates
-  refreshAuthProvider = new RefreshingAuthProvider(
-    {
-      clientId: credentials.clientId,
-      clientSecret: credentials.clientSecret,
-      onRefresh,
-    },
-    tokenData
-  );
+  if (!refreshAuthProvider) {
+    const credentials = getClientCredentials();
+
+    log("Creating RefreshingAuthProvider instance");
+    refreshAuthProvider = new RefreshingAuthProvider(
+      {
+        clientId: credentials.clientId,
+        clientSecret: credentials.clientSecret,
+        onRefresh,
+      },
+      tokenData
+    );
+  }
 
   return refreshAuthProvider;
 }
@@ -62,7 +62,12 @@ async function getAuthProvider(): Promise<RefreshingAuthProvider> {
 async function getApiClient(): Promise<ApiClient> {
   const authProvider = await getAuthProvider();
 
-  return new ApiClient({ authProvider });
+  if (apiClient === null) {
+    log("Creating ApiClient instance");
+    apiClient = new ApiClient({ authProvider });
+  }
+
+  return apiClient;
 }
 
 async function getUsernameFromId(userId: number): Promise<string | null> {
