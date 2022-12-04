@@ -25,7 +25,7 @@
     "cross-env": "^7.0.3",
     "debug": "^4.3.4",
     "dotenv": "^8.2.0",
-    "fastify": "^3.25.3",
+    "fastify": "^3.29.4",
     "regedit": "https://github.com/ironSource/node-regedit.git",
     "tinycolor2": "^1.4.2",
     "ws": "^8.11.0"
