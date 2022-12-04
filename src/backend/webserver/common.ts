@@ -1,8 +1,7 @@
 import { ReadStream, createReadStream } from "fs";
+import { extendLogger, info } from "../helpers/log";
 import fastify, { FastifyInstance } from "fastify";
 
-import { extendLogger } from "../helpers/log";
-import { info } from "console";
 import { isDevelopment } from "../helpers/util";
 import { join } from "path";
 
