@@ -2,7 +2,7 @@
   "name": "twitch-channel-redemptions",
   "version": "0.4.0",
   "main": "dist/index.js",
-  "license": "CC0-1.0",
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "cross-env NODE_ENV=production node -r dotenv/config dist",
     "start:dev": "concurrently -r true \"cross-env NODE_ENV=development DEBUG=twitch-channel-redemptions* nodemon -r dotenv/config src/index.ts\" \"yarn webpack:dev\"",
