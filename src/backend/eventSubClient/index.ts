@@ -28,16 +28,25 @@ let ws: WebSocket;
 let isReconnect = false;
 let userId: string;
 
-async function createSubscription(
+function createSubscription(
   type: string,
+  version: string,
   condition: Record<string, unknown>,
   sessionId: string
 ) {
-  await apiClient.eventSub.createSubscription(type, "1", condition, {
+  return apiClient.eventSub.createSubscription(type, version, condition, {
     // @ts-expect-error websockets method is on beta
     method: "websocket",
     session_id: sessionId,
   });
+}
+
+async function createSubscriptionV1(
+  type: string,
+  condition: Record<string, unknown>,
+  sessionId: string
+) {
+  await createSubscription(type, "1", condition, sessionId);
 
   log('Subscribed to "%s" event', type);
 }
@@ -85,7 +94,7 @@ function subscribeToEvents(
       case SubscriptionType.ChannelGoalProgress:
       case SubscriptionType.ChannelGoalEnd:
         subscriptions.push(
-          createSubscription(
+          createSubscriptionV1(
             subscriptionType,
             {
               broadcaster_user_id: userId,
@@ -96,7 +105,7 @@ function subscribeToEvents(
         break;
       case SubscriptionType.ChannelRaid:
         subscriptions.push(
-          createSubscription(
+          createSubscriptionV1(
             subscriptionType,
             {
               to_broadcaster_user_id: userId,
