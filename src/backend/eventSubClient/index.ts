@@ -48,7 +48,17 @@ async function createSubscriptionV1(
 ) {
   await createSubscription(type, "1", condition, sessionId);
 
-  log('Subscribed to "%s" event', type);
+  log('Subscribed to "%s" v1 event', type);
+}
+
+async function createSubscriptionV2(
+  type: string,
+  condition: Record<string, unknown>,
+  sessionId: string
+) {
+  await createSubscription(type, "2", condition, sessionId);
+
+  log('Subscribed to "%s" v2 event', type);
 }
 
 function subscribeToEvents(
