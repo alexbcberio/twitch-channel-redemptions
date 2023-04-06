@@ -2,6 +2,7 @@ import {
   createCard,
   karaokeTime,
   russianRoulette,
+  snow,
   updateSong,
 } from "./events/redemption";
 
@@ -80,6 +81,9 @@ async function checkEvent(this: WebSocket, e: MessageEvent) {
           break;
         case RedemptionType.RussianRoulette:
           await russianRoulette(data);
+          break;
+        case RedemptionType.Snow:
+          snow();
           break;
         default:
           await createCard(

@@ -7,4 +7,5 @@ export enum RedemptionType {
   RussianRoulette = "russianRoulette",
   StealVip = "stealVip",
   TimeoutFriend = "timeoutFriend",
+  Snow = "snow",
 }
