@@ -12,11 +12,10 @@ import {
   availableSubscriptionTypesWithScope,
   getApiClient,
 } from "../helpers/twitch";
-import { error, warn } from "console";
+import { error, extendLogger, warning } from "../helpers/log";
 
 import { ApiClient } from "@twurple/api";
 import { SubscriptionTypeV1 as SubscriptionType } from "../../enums/EventSub";
-import { extendLogger } from "../helpers/log";
 import { handleNotification } from "./events";
 
 const namespace = "EventSubClient";
@@ -40,7 +39,7 @@ async function createSubscription(
     session_id: sessionId,
   });
 
-  log('[%s] Subscribed to "%s" event', namespace, type);
+  log('Subscribed to "%s" event', type);
 }
 
 function subscribeToEvents(
@@ -107,7 +106,11 @@ function subscribeToEvents(
         );
         break;
       default:
-        warn('unhandled subscription type "%s"', subscriptionType);
+        warning(
+          '[%s] Unhandled subscription type "%s"',
+          namespace,
+          subscriptionType
+        );
         break;
     }
   }
