@@ -148,7 +148,6 @@ function availableSubscriptionTypesWithScope(
   scopes: Array<ApiScope | ChatPubSubScope>
 ) {
   const subscriptionTypes = Array<SubscriptionType>(
-    SubscriptionType.ChannelFollow,
     SubscriptionType.ChannelRaid,
     SubscriptionType.StreamOnline,
     SubscriptionType.StreamOffline
@@ -178,6 +177,9 @@ function availableSubscriptionTypesWithScope(
           SubscriptionType.ChannelModeratorAdd,
           SubscriptionType.ChannelModeratorRemove
         );
+        break;
+      case ApiScope.UserReadFollows:
+        subscriptionTypes.push(SubscriptionType.ChannelFollow);
         break;
       case ApiScope.ChannelReadRedemptions:
       case ApiScope.ChannelManageRedemptions:

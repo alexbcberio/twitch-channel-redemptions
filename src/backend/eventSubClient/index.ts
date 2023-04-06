@@ -54,6 +54,8 @@ function subscribeToEvents(
 
     switch (subscriptionType) {
       case SubscriptionType.ChannelFollow:
+        warning("[%s] Channel follow subscription not implemented", namespace);
+        break;
       case SubscriptionType.StreamOnline:
       case SubscriptionType.ChannelSubscribe:
       case SubscriptionType.ChannelSubscriptionEnd:

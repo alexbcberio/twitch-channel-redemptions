@@ -56,6 +56,7 @@ enum ApiScope {
   ModerationRead = "moderation:read",
   ModeratorManageBanned_users = "moderator:manage:banned_users",
   ModeratorReadBlocked_terms = "moderator:read:blocked_terms",
+  ModeratorReadFollowers = "moderator:read:followers",
   ModeratorManageBlocked_terms = "moderator:manage:blocked_terms",
   ModeratorManageAutomod = "moderator:manage:automod",
   ModeratorReadAutomodSettings = "moderator:read:automod_settings",
