@@ -72,7 +72,16 @@ function subscribeToEvents(
 
     switch (subscriptionType) {
       case SubscriptionType.ChannelFollow:
-        warning("[%s] Channel follow subscription not implemented", namespace);
+        subscriptions.push(
+          createSubscriptionV2(
+            subscriptionType,
+            {
+              broadcaster_user_id: userId,
+              moderator_user_id: userId,
+            },
+            sessionId
+          )
+        );
         break;
       case SubscriptionType.StreamOnline:
       case SubscriptionType.ChannelSubscribe:
