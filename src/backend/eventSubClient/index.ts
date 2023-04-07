@@ -35,7 +35,6 @@ function createSubscription(
   sessionId: string
 ) {
   return apiClient.eventSub.createSubscription(type, version, condition, {
-    // @ts-expect-error websockets method is on beta
     method: "websocket",
     session_id: sessionId,
   });
