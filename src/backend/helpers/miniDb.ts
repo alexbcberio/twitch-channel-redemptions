@@ -20,7 +20,7 @@ const defaultScheduledTimestamp = 0;
 
 let scheduledActions: Array<Action> = [];
 
-const vipUsers: Record<string, Array<string>> = {};
+const vipUsers: Record<string, Array<string> | null> = {};
 
 let checkingScheduled = false;
 let scheduledActionsInterval: NodeJS.Timeout;

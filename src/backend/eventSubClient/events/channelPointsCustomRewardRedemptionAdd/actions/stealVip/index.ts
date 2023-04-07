@@ -26,7 +26,12 @@ async function stealVip(msg: RedemptionMessage): Promise<RedemptionMessage> {
 
   const addVipUser = msg.userDisplayName;
   const removeVipUser = msg.message.toLowerCase();
-  const channelVips = vipUsers[channelId];
+  let channelVips = vipUsers[channelId];
+
+  if (!channelVips) {
+    channelVips = [];
+    vipUsers[channelId] = channelVips;
+  }
 
   if (!channelVips.find((u) => u.toLowerCase() === removeVipUser)) {
     const noVips = 0;

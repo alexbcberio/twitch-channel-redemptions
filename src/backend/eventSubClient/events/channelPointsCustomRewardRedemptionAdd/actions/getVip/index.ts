@@ -24,7 +24,12 @@ async function getVip(msg: RedemptionMessage): Promise<RedemptionMessage> {
     throw new Error(`@${addVipUser} is already VIP`);
   }
 
-  const users = vipUsers[channelId];
+  let users = vipUsers[channelId];
+
+  if (!users) {
+    users = [];
+    vipUsers[channelId] = users;
+  }
 
   if (users.length >= MAX_VIPS) {
     const user = users.shift();
