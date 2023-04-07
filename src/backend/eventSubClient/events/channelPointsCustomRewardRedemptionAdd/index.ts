@@ -32,7 +32,7 @@ const configFilePath = `${cwd()}/config/redemptions.json`;
 const namespace = `events:ChannelPointsCustomRewardRedemptionAdd`;
 const log = extendLogger(namespace);
 
-let redemptions: Record<string, RedemptionType> = {};
+let redemptions: Record<string, Array<RedemptionType>> = {};
 
 async function loadRedemptions() {
   try {
@@ -64,29 +64,52 @@ function noop(message: RedemptionMessage): Promise<RedemptionMessage> {
   return Promise.resolve(message);
 }
 
-function getRedemptionHandlerFromRewardId(rewardId: string): RedemptionHandler {
-  switch (redemptions[rewardId]) {
-    case RedemptionType.GetVip:
-      return getVip;
-    case RedemptionType.Hidrate:
-      return hidrate;
-    case RedemptionType.HighlightMessage:
-      return highlightMessage;
-    case RedemptionType.LightTheme:
-      return lightTheme;
-    case RedemptionType.RussianRoulette:
-      return russianRoulette;
-    case RedemptionType.StealVip:
-      return stealVip;
-    case RedemptionType.TimeoutFriend:
-      return timeoutFriend;
-    default:
-      return noop;
+function redemptionsTypeFromRewardId(rewardId: string): Array<RedemptionType> {
+  return redemptions[rewardId] ?? ["noop"];
+}
+
+function getRedemptionHandlersFromRewardId(
+  rewardId: string
+): Array<RedemptionHandler> {
+  const rewards = redemptionsTypeFromRewardId(rewardId);
+  const handlers = new Array<RedemptionHandler>();
+
+  for (let i = 0; i < rewards.length; i++) {
+    switch (rewards[i]) {
+      case RedemptionType.GetVip:
+        handlers.push(getVip);
+        break;
+      case RedemptionType.Hidrate:
+        handlers.push(hidrate);
+        break;
+      case RedemptionType.HighlightMessage:
+        handlers.push(highlightMessage);
+        break;
+      case RedemptionType.LightTheme:
+        handlers.push(lightTheme);
+        break;
+      case RedemptionType.RussianRoulette:
+        handlers.push(russianRoulette);
+        break;
+      case RedemptionType.StealVip:
+        handlers.push(stealVip);
+        break;
+      case RedemptionType.TimeoutFriend:
+        handlers.push(timeoutFriend);
+        break;
+      default:
+        handlers.push(noop);
+        break;
+    }
   }
+
+  return handlers;
 }
 
 function keepInQueue(rewardId: string): boolean {
-  if (redemptions[rewardId] === RedemptionType.KaraokeTime) {
+  if (
+    redemptionsTypeFromRewardId(rewardId).includes(RedemptionType.KaraokeTime)
+  ) {
     return true;
   }
 
@@ -150,10 +173,6 @@ async function completeReward(
   }
 }
 
-function rewardTypeFromRewardId(rewardId: string): RedemptionType {
-  return redemptions[rewardId];
-}
-
 async function handle(
   notification: NotificationMessage<ChannelPointsCustomRewardRedemptionAddEvent>
 ) {
@@ -187,38 +206,42 @@ async function handle(
     return;
   }
 
-  const msg: RedemptionMessage = {
-    id: event.id,
-    channelId: event.broadcaster_user_id,
-    rewardId: reward.id,
-    rewardType: rewardTypeFromRewardId(reward.id),
-    rewardName: reward.title,
-    // eslint-disable-next-line no-magic-numbers
-    rewardImage: reward.getImageUrl(4),
-    rewardCost: reward.cost,
-    message: event.user_input,
-    userId: event.user_id,
-    userDisplayName: event.user_name,
-    backgroundColor: reward.backgroundColor,
-  };
+  const rewardsType = redemptionsTypeFromRewardId(reward.id);
+  const redemptionHandlers = getRedemptionHandlersFromRewardId(reward.id);
 
-  let handledMessage: RedemptionMessage;
+  for (let i = 0; i < rewardsType.length; i++) {
+    const rewardType = rewardsType[i];
+    const redemptionHandler = redemptionHandlers[i];
 
-  const redemptionHandler = getRedemptionHandlerFromRewardId(msg.rewardId);
+    const msg: RedemptionMessage = {
+      id: event.id,
+      channelId: event.broadcaster_user_id,
+      rewardId: reward.id,
+      rewardType,
+      rewardName: reward.title,
+      // eslint-disable-next-line no-magic-numbers
+      rewardImage: reward.getImageUrl(4),
+      rewardCost: reward.cost,
+      message: event.user_input,
+      userId: event.user_id,
+      userDisplayName: event.user_name,
+      backgroundColor: reward.backgroundColor,
+    };
 
-  try {
-    handledMessage = await redemptionHandler(msg);
-  } catch (e) {
-    if (e instanceof Error) {
-      error("[%s] %s", namespace, e.message);
+    try {
+      const handledMessage = await redemptionHandler(msg);
+
+      broadcast(JSON.stringify(handledMessage));
+    } catch (e) {
+      if (e instanceof Error) {
+        error("[%s] %s", namespace, e.message);
+      }
+
+      await cancelReward(event);
+
+      return;
     }
-
-    await cancelReward(event);
-
-    return;
   }
-
-  broadcast(JSON.stringify(handledMessage));
 
   if (isProduction) {
     await completeReward(event);
