@@ -4479,9 +4479,10 @@ rechoir@^0.7.0:
   dependencies:
     resolve "^1.9.0"
 
-"regedit@https://github.com/ironSource/node-regedit.git":
-  version "5.1.1"
-  resolved "https://github.com/ironSource/node-regedit.git#deb3b48e1f8c47688094ff05789dd54b05b12e30"
+regedit@^5.1.2:
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/regedit/-/regedit-5.1.2.tgz#51728e0cfd7bbba95d7ab09c227aeb1174abb4e1"
+  integrity sha512-pQpWqO/I40bMNoMO9kTQx3e5iK542kYcB/Z8X3Y7Hcri6ydc4KZ9ByUsEWFkBRMcwo+2irHuNK5s+pMGPr6VPw==
   dependencies:
     debug "^4.1.0"
     if-async "^3.7.4"

@@ -26,7 +26,7 @@
     "debug": "^4.3.4",
     "dotenv": "^8.2.0",
     "fastify": "^3.25.3",
-    "regedit": "https://github.com/ironSource/node-regedit.git",
+    "regedit": "^5.1.2",
     "tinycolor2": "^1.4.2",
     "ws": "^8.11.0",
     "wsnow": "^1.0.6"
