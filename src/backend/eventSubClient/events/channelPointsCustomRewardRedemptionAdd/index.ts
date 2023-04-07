@@ -250,4 +250,4 @@ async function handle(
   }
 }
 
-export { handle };
+export { handle, loadRedemptions as reloadRedemptions };
