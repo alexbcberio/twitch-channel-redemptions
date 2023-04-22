@@ -1,7 +1,7 @@
-import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
-import { getUsernameFromId } from "../../helpers/twitch";
-import { messages } from "../../../localization";
-import { say } from "../../chatClient/clientActions";
+import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
+import { getUsernameFromId } from "../../../helpers/twitch";
+import { messages } from "../../../../localization";
+import { say } from "../../../chatClient/clientActions";
 
 const hidrateMessages = messages.pubSubClient.actions.hidrate;
 

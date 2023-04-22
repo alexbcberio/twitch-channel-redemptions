@@ -17,7 +17,7 @@ import {
   russianRoulette,
   stealVip,
   timeoutFriend,
-} from "../../../actions";
+} from "../../../actions/redemption";
 
 import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
 import { RedemptionType } from "../../../../enums/RedemptionType";

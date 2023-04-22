@@ -1,8 +1,8 @@
-import { addVip, hasVip, removeVip } from "../../chatClient/clientActions";
-import { save, vipUsers } from "../../helpers/miniDb";
+import { addVip, hasVip, removeVip } from "../../../chatClient/clientActions";
+import { save, vipUsers } from "../../../helpers/miniDb";
 
-import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
-import { getUsernameFromId } from "../../helpers/twitch";
+import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
+import { getUsernameFromId } from "../../../helpers/twitch";
 
 const MAX_VIPS = 3;
 
