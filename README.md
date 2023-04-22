@@ -28,7 +28,7 @@ Bugs, no thanks. Please report them [here](https://github.com/alexbcberio/twitch
 
 ### Request new features
 
-Would you like me to implement something? Feel free to tell us everything [here](https://github.com/alexbcberio/twitch-channel-redemptions/issues/new?labels=enhancement&template=feature_request.md).
+Would you like me to implement something? Open a [feature request here](https://github.com/alexbcberio/twitch-channel-redemptions/issues/new?labels=enhancement&template=feature_request.md).
 
 ## Installation
 
@@ -42,11 +42,14 @@ Would you like me to implement something? Feel free to tell us everything [here]
 You only have to perform this step the first time you download it or if you make changes to the source code. Open a terminal or command-prompt and execute the following commands
 
 1. Install node dependencies, command might differ for other package managers
+
    ```bash
    yarn install
    ```
+
 2. Build the project
-   ```
+
+   ```bash
    yarn run build
    ```
 
@@ -82,7 +85,7 @@ There's a small utility chatbot do help performing some tasks such as this one, 
 
 #### Linking channel point reward with an action
 
-We call actions to the different integrations that can be set up with channel point rewards. The available actions are stored in [`src/backend/pubSubClient/actions`](./src/backend/pubSubClient/actions)
+We call actions to the different integrations that can be set up with channel point rewards. The available actions are stored in [`src/backend/actions`](./src/backend/actions)
 
 The actions are mapped to a reward in the configuration file `config/redemptions.json` where the ID of the reward is the key and the action is the value. You can get the available values from [`RedemptionType.ts`](./src/enums/RedemptionType.ts).
 

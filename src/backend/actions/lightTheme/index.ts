@@ -1,10 +1,10 @@
 import { changeWindowsColorTheme, isWindows } from "./helpers";
-import { isProduction, msText } from "../../../../../helpers/util";
+import { isProduction, msText } from "../../helpers/util";
 
 import { ColorTheme } from "./types";
-import { RedemptionMessage } from "../../../../../../interfaces/RedemptionMessage";
-import { extendLogger } from "../../../../../helpers/log";
-import { messages } from "../../../../../../localization";
+import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
+import { extendLogger } from "../../helpers/log";
+import { messages } from "../../../localization";
 
 const minEventDuration = 10;
 

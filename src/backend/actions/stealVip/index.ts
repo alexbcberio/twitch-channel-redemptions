@@ -1,14 +1,9 @@
-import {
-  addVip,
-  hasVip,
-  removeVip,
-  say,
-} from "../../../chatClient/clientActions";
-import { save, vipUsers } from "../../../helpers/miniDb";
+import { addVip, hasVip, removeVip, say } from "../../chatClient/clientActions";
+import { save, vipUsers } from "../../helpers/miniDb";
 
-import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
-import { getUsernameFromId } from "../../../helpers/twitch";
-import { messages } from "../../../../localization";
+import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
+import { getUsernameFromId } from "../../helpers/twitch";
+import { messages } from "../../../localization";
 
 const stealVipMessages = messages.pubSubClient.actions.stealVip;
 
@@ -26,7 +21,12 @@ async function stealVip(msg: RedemptionMessage): Promise<RedemptionMessage> {
 
   const addVipUser = msg.userDisplayName;
   const removeVipUser = msg.message.toLowerCase();
-  const channelVips = vipUsers[channelId];
+  let channelVips = vipUsers[channelId];
+
+  if (!channelVips) {
+    channelVips = [];
+    vipUsers[channelId] = channelVips;
+  }
 
   if (!channelVips.find((u) => u.toLowerCase() === removeVipUser)) {
     const noVips = 0;

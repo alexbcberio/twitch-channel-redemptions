@@ -1,9 +1,9 @@
-import { extendLogger, warning } from "../../../../../helpers/log";
+import { extendLogger, warning } from "../../helpers/log";
 
-import { RedemptionMessage } from "../../../../../../interfaces/RedemptionMessage";
-import { getUsernameFromId } from "../../../../../helpers/twitch";
-import { messages } from "../../../../../../localization";
-import { timeout } from "../../../../../chatClient/clientActions";
+import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
+import { getUsernameFromId } from "../../helpers/twitch";
+import { messages } from "../../../localization";
+import { timeout } from "../../chatClient/clientActions";
 
 const namespace = "PubSub:HighlightMessage";
 const log = extendLogger(namespace);

@@ -1,8 +1,8 @@
-import { say, timeout } from "../../../chatClient/clientActions";
+import { say, timeout } from "../../chatClient/clientActions";
 
-import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
-import { getUsernameFromId } from "../../../helpers/twitch";
-import { messages } from "../../../../localization";
+import { RedemptionMessage } from "../../../interfaces/RedemptionMessage";
+import { getUsernameFromId } from "../../helpers/twitch";
+import { messages } from "../../../localization";
 import { randomInt } from "crypto";
 
 type GunsSafeShots = Record<string, number>;
