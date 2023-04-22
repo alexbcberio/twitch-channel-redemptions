@@ -19,7 +19,7 @@ import { SubscriptionTypeV1 as SubscriptionType } from "../../enums/EventSub";
 import { handleNotification } from "./events";
 
 const namespace = "EventSubClient";
-const wsServer = "wss://eventsub-beta.wss.twitch.tv/ws";
+const wsServer = "wss://eventsub.wss.twitch.tv/ws";
 
 const log = extendLogger(namespace);
 
