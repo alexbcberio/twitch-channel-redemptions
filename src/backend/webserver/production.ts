@@ -20,10 +20,10 @@ async function start(): Promise<void> {
 
   server.route({
     method: "GET",
-    url: "/",
+    url: "/overlay",
     wsHandler,
     handler(_req, reply) {
-      reply.type("text/html").send(staticFileStream("index.html"));
+      reply.type("text/html").send(staticFileStream("overlay.html"));
     },
   });
 

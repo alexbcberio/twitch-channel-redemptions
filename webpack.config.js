@@ -28,7 +28,8 @@ module.exports = {
     aggregateTimeout: 500,
   },
   entry: {
-    app: ["./ts/index.ts", "./css/app.css"],
+    app: ["./css/app.css"],
+    overlay: ["./ts/overlay.ts"],
     "chat-overlay": ["./ts/chat-overlay.ts", "./css/chat-overlay.css"],
   },
   output: {

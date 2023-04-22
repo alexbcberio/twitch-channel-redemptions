@@ -56,7 +56,7 @@ Once the build finishes open a terminal or command-prompt and run `yarn run star
 
 Everything is managed via the web browser, to link it with your Twitch channel, go to [localhost:8080](http://localhost:8080) and follow the installation wizard.
 
-Once set up, you can add the overlay to your streaming software with the same url `http://localhost:8080`.
+Once set up, you can add the overlay to your streaming software using this url `http://localhost:8080/overlay`.
 
 Keep the terminal open, to stop it press `ctrl` + `c` and wait until it closes.
 
