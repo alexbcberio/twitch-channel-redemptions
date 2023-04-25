@@ -2,7 +2,7 @@ import { install, start } from "./webserver";
 
 import { connect } from "./chatClient";
 import { error } from "./helpers/log";
-import { registerUserListener } from "./pubSubClient";
+import { registerUserListener } from "./eventSubClient";
 
 const namespace = "App";
 
