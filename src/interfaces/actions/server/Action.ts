@@ -1,4 +1,4 @@
-import { ActionType } from "../../enums/ActionType";
+import { ActionType } from "../../../enums/ActionType";
 
 export interface Action {
   type: ActionType;
