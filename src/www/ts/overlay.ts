@@ -36,36 +36,9 @@ function reconnect() {
   setTimeout(init, reconnectTimeout);
 }
 
-const events: Array<RedemptionMessage> = [];
+const events = new Array<RedemptionMessage>();
 
-async function checkEvent(this: WebSocket, e: MessageEvent) {
-  if (!env) {
-    env = JSON.parse(e.data).env.toLowerCase();
-
-    return;
-  }
-
-  const message = JSON.parse(e.data);
-
-  if (message.song) {
-    const song: Song = message;
-    updateSong(song);
-    return;
-  } else if (!message.rewardId) {
-    return;
-  }
-
-  events.push(message);
-
-  if (env === "dev") {
-    console.log(e.data);
-  }
-
-  // eslint-disable-next-line no-magic-numbers
-  if (events.length > 1) {
-    return;
-  }
-
+async function processQueue() {
   do {
     // eslint-disable-next-line no-magic-numbers
     const data = events[0];
@@ -99,6 +72,37 @@ async function checkEvent(this: WebSocket, e: MessageEvent) {
     await sleep(500);
     // eslint-disable-next-line no-magic-numbers
   } while (events.length > 0);
+}
+
+async function checkEvent(this: WebSocket, e: MessageEvent) {
+  if (!env) {
+    env = JSON.parse(e.data).env.toLowerCase();
+
+    return;
+  }
+
+  if (env === "dev") {
+    console.log(e.data);
+  }
+
+  const message = JSON.parse(e.data);
+
+  if (message.song) {
+    const song: Song = message;
+    updateSong(song);
+    return;
+  } else if (!message.rewardId) {
+    return;
+  }
+
+  events.push(message);
+
+  // eslint-disable-next-line no-magic-numbers
+  if (events.length > 1) {
+    return;
+  }
+
+  await processQueue();
 }
 
 function init() {
