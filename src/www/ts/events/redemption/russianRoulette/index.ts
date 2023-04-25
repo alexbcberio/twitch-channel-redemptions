@@ -4,10 +4,10 @@ import * as toyGunImg from "../../../../static/img/toy-gun.png";
 
 import { createAudio, createImg, createText } from "../common";
 
-import { RedemptionMessage } from "../../../../../interfaces/RedemptionMessage";
-
-export function russianRoulette(msg: RedemptionMessage): Promise<void> {
-  const { userDisplayName, message } = msg;
+export function russianRoulette(
+  userDisplayName: string,
+  message: string
+): Promise<void> {
   return new Promise((res) => {
     const gotShot = Boolean(message);
 

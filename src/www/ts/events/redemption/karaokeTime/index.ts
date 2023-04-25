@@ -9,10 +9,8 @@ import {
   insertCssVariables,
 } from "../common";
 
-function karaokeTime(username: string, message: string): Promise<void> {
+function karaokeTime(username: string): Promise<void> {
   return new Promise((res) => {
-    console.log(username, message);
-
     const div = document.createElement("div");
     div.classList.add("alert");
 

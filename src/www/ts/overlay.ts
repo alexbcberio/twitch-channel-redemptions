@@ -50,10 +50,10 @@ async function processQueue() {
     if (data.channelId) {
       switch (data.rewardType) {
         case RedemptionType.KaraokeTime:
-          await karaokeTime(data.userDisplayName, data.message);
+          await karaokeTime(data.userDisplayName);
           break;
         case RedemptionType.RussianRoulette:
-          await russianRoulette(data);
+          await russianRoulette(data.userDisplayName, data.message);
           break;
         case RedemptionType.Snow:
           snow();
