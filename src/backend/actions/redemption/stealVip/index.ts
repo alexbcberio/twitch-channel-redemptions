@@ -6,13 +6,15 @@ import {
 } from "../../../chatClient/clientActions";
 import { save, vipUsers } from "../../../helpers/miniDb";
 
+import { CreateCard } from "../../../../interfaces/actions/redemption";
 import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
+import { RedemptionType } from "../../../../enums/RedemptionType";
 import { getUsernameFromId } from "../../../helpers/twitch";
 import { messages } from "../../../../localization";
 
 const stealVipMessages = messages.pubSubClient.actions.stealVip;
 
-async function stealVip(msg: RedemptionMessage): Promise<RedemptionMessage> {
+async function stealVip(msg: RedemptionMessage): Promise<CreateCard> {
   if (!msg.message) {
     throw new Error("Redemption has no message");
   }
@@ -79,7 +81,13 @@ async function stealVip(msg: RedemptionMessage): Promise<RedemptionMessage> {
 
   await say(channel, msg.message);
 
-  return msg;
+  return {
+    type: RedemptionType.CreateCard,
+    title: msg.rewardName,
+    image: msg.rewardImage,
+    hexColor: msg.backgroundColor,
+    message: msg.message,
+  };
 }
 
 export { stealVip };

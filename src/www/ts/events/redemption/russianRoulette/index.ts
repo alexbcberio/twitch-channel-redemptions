@@ -6,11 +6,9 @@ import { createAudio, createImg, createText } from "../common";
 
 export function russianRoulette(
   userDisplayName: string,
-  message: string
+  gotShot: boolean
 ): Promise<void> {
   return new Promise((res) => {
-    const gotShot = Boolean(message);
-
     const div = document.createElement("div");
     div.classList.add("alert");
     div.style.margin = ".5rem";

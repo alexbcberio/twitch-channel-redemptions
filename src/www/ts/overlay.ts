@@ -3,13 +3,14 @@ import {
   karaokeTime,
   russianRoulette,
   snow,
-  updateSong,
 } from "./events/redemption";
 
-import { RedemptionMessage } from "../../interfaces/RedemptionMessage";
+import { GlobalAction } from "../../interfaces/actions/global";
+import { RedemptionAction } from "../../interfaces/actions/redemption";
 import { RedemptionType } from "../../enums/RedemptionType";
 import { Song } from "../../interfaces/Song";
 import { sleep } from "./helpers/sleep";
+import { updateSong } from "./events/updateSong";
 
 let ws: WebSocket;
 let env: "dev" | "prod";
@@ -36,36 +37,29 @@ function reconnect() {
   setTimeout(init, reconnectTimeout);
 }
 
-const events = new Array<RedemptionMessage>();
+const events = new Array<RedemptionAction | GlobalAction>();
 
 async function processQueue() {
   do {
     // eslint-disable-next-line no-magic-numbers
     const data = events[0];
 
-    if (!data.message) {
-      data.message = "";
-    }
-
-    if (data.channelId) {
-      switch (data.rewardType) {
-        case RedemptionType.KaraokeTime:
-          await karaokeTime(data.userDisplayName);
-          break;
-        case RedemptionType.RussianRoulette:
-          await russianRoulette(data.userDisplayName, data.message);
-          break;
-        case RedemptionType.Snow:
-          snow();
-          break;
-        default:
-          await createCard(
-            data.rewardName,
-            data.message,
-            data.backgroundColor,
-            data.rewardImage
-          );
-      }
+    switch (data.type) {
+      case RedemptionType.CreateCard:
+        await createCard(data.title, data.message, data.hexColor, data.image);
+        break;
+      case RedemptionType.KaraokeTime:
+        await karaokeTime(data.username);
+        break;
+      case RedemptionType.RussianRoulette:
+        await russianRoulette(data.userDisplayName, Boolean(data.gotShot));
+        break;
+      case RedemptionType.Snow:
+        snow();
+        break;
+      default:
+        // @ts-ignore warn unhandled event types
+        console.warn(`Unhandled event type "%s"`, data.type);
     }
 
     events.shift();

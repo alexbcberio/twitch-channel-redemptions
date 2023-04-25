@@ -1,6 +1,8 @@
 import { say, timeout } from "../../../chatClient/clientActions";
 
 import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
+import { RedemptionType } from "../../../../enums/RedemptionType";
+import { RussianRoulette } from "../../../../interfaces/actions/redemption";
 import { getUsernameFromId } from "../../../helpers/twitch";
 import { messages } from "../../../../localization";
 import { randomInt } from "crypto";
@@ -15,7 +17,7 @@ const russianRouletteMessages = messages.pubSubClient.actions.russianRoulette;
 
 async function russianRoulette(
   msg: RedemptionMessage
-): Promise<RedemptionMessage> {
+): Promise<RussianRoulette> {
   const channel = await getUsernameFromId(parseInt(msg.channelId));
   const { channelId, userDisplayName } = msg;
 
@@ -60,7 +62,11 @@ async function russianRoulette(
     );
   }
 
-  return msg;
+  return {
+    type: RedemptionType.RussianRoulette,
+    userDisplayName: msg.userDisplayName,
+    gotShot,
+  };
 }
 
 export { russianRoulette };

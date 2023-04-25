@@ -1,5 +1,5 @@
-import { Song } from "../../../../../interfaces/Song";
-import { animate } from "../../../helpers/animate.css";
+import { Song } from "../../../../interfaces/Song";
+import { animate } from "../../helpers/animate.css";
 
 const hideTimeoutSeconds = 5e3;
 

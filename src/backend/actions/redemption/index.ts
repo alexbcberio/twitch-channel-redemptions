@@ -5,3 +5,4 @@ export * from "./hightlightMessage";
 export * from "./russianRoulette";
 export * from "./stealVip";
 export * from "./timeoutFriend";
+export * from "./karaokeTime";

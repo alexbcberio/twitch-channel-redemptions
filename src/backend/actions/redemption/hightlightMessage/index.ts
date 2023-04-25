@@ -1,6 +1,8 @@
 import { extendLogger, warning } from "../../../helpers/log";
 
+import { CreateCard } from "../../../../interfaces/actions/redemption";
 import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
+import { RedemptionType } from "../../../../enums/RedemptionType";
 import { getUsernameFromId } from "../../../helpers/twitch";
 import { messages } from "../../../../localization";
 import { timeout } from "../../../chatClient/clientActions";
@@ -10,9 +12,7 @@ const log = extendLogger(namespace);
 
 const highlightMessageMessages = messages.pubSubClient.actions.highlightMessage;
 
-async function highlightMessage(
-  msg: RedemptionMessage
-): Promise<RedemptionMessage> {
+async function highlightMessage(msg: RedemptionMessage): Promise<CreateCard> {
   if (!msg.message) {
     throw new Error("Redemption has no message");
   }
@@ -46,7 +46,13 @@ async function highlightMessage(
     throw new Error("The message cannot contain a url");
   }
 
-  return msg;
+  return {
+    type: RedemptionType.CreateCard,
+    title: msg.rewardName,
+    image: msg.rewardImage,
+    hexColor: msg.backgroundColor,
+    message: msg.message,
+  };
 }
 
 export { highlightMessage };

@@ -1,0 +1,1 @@
+export type GlobalAction = never;

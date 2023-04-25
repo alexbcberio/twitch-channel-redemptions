@@ -1,6 +1,6 @@
 import { extendLogger, warning } from "./log";
 
-import { Action } from "../../interfaces/actions/Action";
+import { Action } from "../../interfaces/actions/server/Action";
 import { promises as fs } from "fs";
 import { handleClientAction } from "../chatClient";
 import { resolve } from "path";

@@ -2,7 +2,9 @@ import { changeWindowsColorTheme, isWindows } from "./helpers";
 import { isProduction, msText } from "../../../helpers/util";
 
 import { ColorTheme } from "./types";
+import { CreateCard } from "../../../../interfaces/actions/redemption";
 import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
+import { RedemptionType } from "../../../../enums/RedemptionType";
 import { extendLogger } from "../../../helpers/log";
 import { messages } from "../../../../localization";
 
@@ -25,7 +27,7 @@ function calculateEventDurationMs(rewardCost: number): number {
   return eventDuration * ms;
 }
 
-async function lightTheme(msg: RedemptionMessage): Promise<RedemptionMessage> {
+async function lightTheme(msg: RedemptionMessage): Promise<CreateCard> {
   if (!isWindows) {
     throw new Error("Only available on Windows platform");
   }
@@ -66,7 +68,13 @@ async function lightTheme(msg: RedemptionMessage): Promise<RedemptionMessage> {
     await changeWindowsColorTheme(colorTheme);
   }, timeoutTime);
 
-  return msg;
+  return {
+    type: RedemptionType.CreateCard,
+    title: msg.rewardName,
+    image: msg.rewardImage,
+    hexColor: msg.backgroundColor,
+    message: msg.message,
+  };
 }
 
 export { lightTheme };

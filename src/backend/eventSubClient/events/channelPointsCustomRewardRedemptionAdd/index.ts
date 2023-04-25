@@ -13,12 +13,15 @@ import {
   getVip,
   hidrate,
   highlightMessage,
+  karaokeTime,
   lightTheme,
   russianRoulette,
   stealVip,
   timeoutFriend,
 } from "../../../actions/redemption";
 
+import { GlobalAction } from "../../../../interfaces/actions/global";
+import { RedemptionAction } from "../../../../interfaces/actions/redemption";
 import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
 import { RedemptionType } from "../../../../enums/RedemptionType";
 import { broadcast } from "../../../webserver";
@@ -26,7 +29,9 @@ import { constants } from "fs";
 import { cwd } from "process";
 import { isProduction } from "../../../helpers/util";
 
-type RedemptionHandler = (msg: RedemptionMessage) => Promise<RedemptionMessage>;
+type RedemptionHandler = (
+  msg: RedemptionMessage
+) => Promise<RedemptionAction | GlobalAction>;
 
 const configFilePath = `${cwd()}/config/redemptions.json`;
 const namespace = `events:ChannelPointsCustomRewardRedemptionAdd`;
@@ -59,9 +64,8 @@ async function loadRedemptions() {
   }
 }
 
-function noop(message: RedemptionMessage): Promise<RedemptionMessage> {
-  log("Unhandled redemption %s", message.rewardId);
-  return Promise.resolve(message);
+function noop(rewardId: string): void {
+  log("Unhandled redemption %s", rewardId);
 }
 
 function redemptionsTypeFromRewardId(rewardId: string): Array<RedemptionType> {
@@ -85,6 +89,9 @@ function getRedemptionHandlersFromRewardId(
       case RedemptionType.HighlightMessage:
         handlers.push(highlightMessage);
         break;
+      case RedemptionType.KaraokeTime:
+        handlers.push(karaokeTime);
+        break;
       case RedemptionType.LightTheme:
         handlers.push(lightTheme);
         break;
@@ -98,7 +105,7 @@ function getRedemptionHandlersFromRewardId(
         handlers.push(timeoutFriend);
         break;
       default:
-        handlers.push(noop);
+        noop(rewardId);
         break;
     }
   }
@@ -209,7 +216,7 @@ async function handle(
   const rewardsType = redemptionsTypeFromRewardId(reward.id);
   const redemptionHandlers = getRedemptionHandlersFromRewardId(reward.id);
 
-  const handledMessages = new Array<RedemptionMessage>();
+  const clientActions = new Array<RedemptionAction | GlobalAction>();
 
   for (let i = 0; i < rewardsType.length; i++) {
     const rewardType = rewardsType[i];
@@ -233,7 +240,7 @@ async function handle(
     try {
       const handledMessage = await redemptionHandler(msg);
 
-      handledMessages.push(handledMessage);
+      clientActions.push(handledMessage);
     } catch (e) {
       if (e instanceof Error) {
         error("[%s] %s", namespace, e.message);
@@ -245,7 +252,7 @@ async function handle(
     }
   }
 
-  broadcast(JSON.stringify({ events: handledMessages }));
+  broadcast(JSON.stringify({ events: clientActions }));
 
   if (isProduction) {
     await completeReward(event);

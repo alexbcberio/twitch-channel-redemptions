@@ -1,4 +1,6 @@
+import { CreateCard } from "../../../../interfaces/actions/redemption";
 import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
+import { RedemptionType } from "../../../../enums/RedemptionType";
 import { getUsernameFromId } from "../../../helpers/twitch";
 import { messages } from "../../../../localization";
 import { msText } from "../../../helpers/util";
@@ -6,9 +8,7 @@ import { timeout } from "../../../chatClient/clientActions";
 
 const timeoutFriendMessages = messages.pubSubClient.actions.timeoutFriend;
 
-async function timeoutFriend(
-  msg: RedemptionMessage
-): Promise<RedemptionMessage> {
+async function timeoutFriend(msg: RedemptionMessage): Promise<CreateCard> {
   const { message, channelId, userDisplayName } = msg;
 
   if (!message) {
@@ -36,7 +36,13 @@ async function timeoutFriend(
     );
   }
 
-  return msg;
+  return {
+    type: RedemptionType.CreateCard,
+    title: msg.rewardName,
+    image: msg.rewardImage,
+    hexColor: msg.backgroundColor,
+    message: msg.message ?? "",
+  };
 }
 
 export { timeoutFriend };

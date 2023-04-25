@@ -10,7 +10,7 @@ import {
   onTimeout,
 } from "./events";
 
-import { Action } from "../../interfaces/actions/Action";
+import { Action } from "../../interfaces/actions/server/Action";
 import { ActionType } from "../../enums/ActionType";
 import { ChatClient } from "@twurple/chat";
 import { broadcast } from "../webserver";

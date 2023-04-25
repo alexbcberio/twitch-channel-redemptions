@@ -1,6 +1,6 @@
 import { save, scheduledActions } from "../../helpers/miniDb";
 
-import { Action } from "../../../interfaces/actions/Action";
+import { Action } from "../../../interfaces/actions/server/Action";
 import { FastifyRequest } from "fastify";
 import { SocketStream } from "@fastify/websocket";
 import { extendLogger } from "../../helpers/log";
