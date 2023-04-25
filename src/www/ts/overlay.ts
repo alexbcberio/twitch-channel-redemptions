@@ -91,14 +91,16 @@ async function checkEvent(this: WebSocket, e: MessageEvent) {
     const song: Song = message;
     updateSong(song);
     return;
-  } else if (!message.rewardId) {
+  } else if (!message.events) {
     return;
   }
 
-  events.push(message);
-
   // eslint-disable-next-line no-magic-numbers
-  if (events.length > 1) {
+  const emptyEventList = events.length === 0;
+
+  events.push(...message.events);
+
+  if (!emptyEventList) {
     return;
   }
 

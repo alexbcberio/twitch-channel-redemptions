@@ -209,6 +209,8 @@ async function handle(
   const rewardsType = redemptionsTypeFromRewardId(reward.id);
   const redemptionHandlers = getRedemptionHandlersFromRewardId(reward.id);
 
+  const handledMessages = new Array<RedemptionMessage>();
+
   for (let i = 0; i < rewardsType.length; i++) {
     const rewardType = rewardsType[i];
     const redemptionHandler = redemptionHandlers[i];
@@ -231,7 +233,7 @@ async function handle(
     try {
       const handledMessage = await redemptionHandler(msg);
 
-      broadcast(JSON.stringify(handledMessage));
+      handledMessages.push(handledMessage);
     } catch (e) {
       if (e instanceof Error) {
         error("[%s] %s", namespace, e.message);
@@ -242,6 +244,8 @@ async function handle(
       return;
     }
   }
+
+  broadcast(JSON.stringify({ events: handledMessages }));
 
   if (isProduction) {
     await completeReward(event);
