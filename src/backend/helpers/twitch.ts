@@ -2,6 +2,7 @@ import { AccessToken, RefreshingAuthProvider } from "@twurple/auth";
 import {
   ApiClient,
   HelixCreateCustomRewardData,
+  HelixUser,
   UserIdResolvable,
 } from "@twurple/api";
 import {
@@ -19,6 +20,7 @@ const log = extendLogger(namespace);
 
 let refreshAuthProvider: RefreshingAuthProvider;
 let apiClient: ApiClient | null = null;
+let streamerUser: HelixUser | null = null;
 
 function getClientCredentials(): ClientCredentials {
   if (!process.env.TWITCH_CLIENT_ID || !process.env.TWITCH_CLIENT_SECRET) {
@@ -230,6 +232,31 @@ function availableSubscriptionTypesWithScope(
   return [...new Set(subscriptionTypes)];
 }
 
+async function getStreamerUser() {
+  if (streamerUser === null) {
+    const apiClient = await getApiClient();
+
+    const username = process.env.TWITCH_CHANNEL_NAME;
+
+    if (typeof username !== "string") {
+      throw new Error(
+        "TWITCH_CHANNEL_NAME environment variable not found in .env"
+      );
+    }
+
+    const user = await apiClient.users.getUserByName(username);
+
+    if (user === null) {
+      throw new Error(`User ${username} does not exist`);
+    }
+
+    // eslint-disable-next-line require-atomic-updates
+    streamerUser = user;
+  }
+
+  return streamerUser;
+}
+
 export {
   getAuthProvider,
   getApiClient,
@@ -239,4 +266,5 @@ export {
   cancelRewards,
   createReward,
   availableSubscriptionTypesWithScope,
+  getStreamerUser,
 };
