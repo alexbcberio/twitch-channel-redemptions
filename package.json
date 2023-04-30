@@ -13,6 +13,7 @@
     "lint-fix": "yarn lint --fix"
   },
   "dependencies": {
+    "@fastify/autoload": "^5.7.1",
     "@fastify/static": "^6.10.1",
     "@fastify/websocket": "^8.0.0",
     "@twurple/api": "^5.0.13",
