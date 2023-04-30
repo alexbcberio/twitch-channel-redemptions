@@ -1313,18 +1313,6 @@
     klona "^2.0.4"
     tslib "^2.0.3"
 
-"@twurple/pubsub@^5.0.13":
-  version "5.3.4"
-  resolved "https://registry.yarnpkg.com/@twurple/pubsub/-/pubsub-5.3.4.tgz#699f88834b208cc28279b6a1dc5b3d088a13e939"
-  integrity sha512-cYHgQNlEEEgk+vexubdd1FGXWiKWWIALlZ5hxxDDg1pnwzDDXVUoLxFWlZSHjkuTg4XrOA+a6WqMRrfV0Gwohg==
-  dependencies:
-    "@d-fischer/connection" "^7.0.0"
-    "@d-fischer/logger" "^4.0.0"
-    "@d-fischer/shared-utils" "^3.4.0"
-    "@d-fischer/typed-event-emitter" "^3.3.0"
-    "@twurple/common" "5.3.4"
-    tslib "^2.0.3"
-
 "@types/clean-css@*":
   version "4.2.6"
   resolved "https://registry.yarnpkg.com/@types/clean-css/-/clean-css-4.2.6.tgz#48b427285b2b654751a9bbc6f7d35e6173dec8d2"

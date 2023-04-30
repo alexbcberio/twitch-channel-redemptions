@@ -19,7 +19,6 @@
     "@twurple/api": "^5.0.13",
     "@twurple/auth": "^5.0.13",
     "@twurple/chat": "^5.0.13",
-    "@twurple/pubsub": "^5.0.13",
     "@types/tinycolor2": "^1.4.3",
     "axios": "^1.4.0",
     "clean-webpack-plugin": "^4.0.0",
