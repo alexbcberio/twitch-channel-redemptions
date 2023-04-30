@@ -12,14 +12,14 @@ type WebSocket = SocketStream["socket"];
 const namespaceWs = "WS";
 const logWs = extendLogger(namespaceWs);
 
-const sockets = new Set<WebSocket>();
+const sockets = new Map<WebSocket, string>();
 
 function broadcast(msg: string, socket?: WebSocket) {
-  sockets.forEach((s) => {
+  for (const s of sockets.keys()) {
     if (s !== socket) {
       s.send(msg);
     }
-  });
+  }
 }
 
 async function onMessage(this: WebSocket, rawMsg: Buffer) {
@@ -52,8 +52,9 @@ async function onMessage(this: WebSocket, rawMsg: Buffer) {
 }
 
 function onClose(this: WebSocket) {
+  const address = sockets.get(this);
   sockets.delete(this);
-  logWs("Connection closed");
+  logWs("%s Connection closed", address);
 }
 
 function wsHandler(con: SocketStream, req: FastifyRequest) {
@@ -61,7 +62,7 @@ function wsHandler(con: SocketStream, req: FastifyRequest) {
 
   logWs("%s New connection established", req.ip);
 
-  sockets.add(socket);
+  sockets.set(socket, req.ip);
 
   socket.send(JSON.stringify({ env: isDevelopment ? "dev" : "prod" }));
 
