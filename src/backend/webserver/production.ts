@@ -1,13 +1,10 @@
-import { broadcast, wsHandler } from "./ws";
-import {
-  createServer,
-  startServer,
-  staticFileStream,
-  staticPath,
-} from "./common";
+import { createServer, startServer, staticPath } from "./common";
 
+import { broadcast } from "./routes/ws";
+import { fastifyAutoload } from "@fastify/autoload";
 import fastifyStatic from "@fastify/static";
 import fastifyWebsocket from "@fastify/websocket";
+import { join } from "path";
 
 async function start(): Promise<void> {
   const server = createServer();
@@ -18,22 +15,8 @@ async function start(): Promise<void> {
     root: staticPath,
   });
 
-  server.route({
-    method: "GET",
-    url: "/overlay",
-    wsHandler,
-    handler(_req, reply) {
-      reply.type("text/html").send(staticFileStream("overlay.html"));
-    },
-  });
-
-  server.route({
-    method: "GET",
-    url: "/chat",
-    wsHandler,
-    handler(_req, reply) {
-      reply.type("text/html").send(staticFileStream("chat-overlay.html"));
-    },
+  await server.register(fastifyAutoload, {
+    dir: join(__dirname, "routes"),
   });
 
   startServer(server);
