@@ -103,8 +103,7 @@ async function install(): Promise<void> {
       const { clientId, clientSecret } = req.body as never;
 
       if (!clientId || !clientSecret) {
-        reply.status(badRequest).send("Empty or missing parameters");
-        return;
+        return reply.status(badRequest).send("Empty or missing parameters");
       }
 
       const auth = new ClientCredentialsAuthProvider(clientId, clientSecret);
@@ -112,16 +111,15 @@ async function install(): Promise<void> {
       try {
         await auth.refresh();
       } catch (e) {
-        reply
+        return reply
           .status(badRequest)
           .send("The clientId/clientSecret pair are not valid");
-        return;
       }
 
       env.clientId = clientId;
       env.clientSecret = clientSecret;
 
-      reply.status(noContent).send();
+      return reply.status(noContent).send();
     },
   });
 
@@ -134,12 +132,11 @@ async function install(): Promise<void> {
       if (!code) {
         const badRequest = 400;
 
-        reply
+        return reply
           .status(badRequest)
           .send(
             'Missing "code" query parameter, have you accepted the permission request?'
           );
-        return;
       }
 
       let oauthToken;
@@ -153,8 +150,7 @@ async function install(): Promise<void> {
           message = e.message;
         }
 
-        reply.status(internalError).send(message);
-        return;
+        return reply.status(internalError).send(message);
       }
 
       const user = await axios.get("https://id.twitch.tv/oauth2/validate", {
@@ -168,7 +164,9 @@ async function install(): Promise<void> {
         await createTokensFile(oauthToken),
       ]);
 
-      reply.type("text/html").send(staticFileStream("install-finished.html"));
+      const response = reply
+        .type("text/html")
+        .send(staticFileStream("install-finished.html"));
 
       setImmediate(async () => {
         logHttp("Restarting server...");
@@ -178,6 +176,8 @@ async function install(): Promise<void> {
 
         bootstrap();
       });
+
+      return response;
     },
   });
 

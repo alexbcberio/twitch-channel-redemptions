@@ -24,15 +24,21 @@ function startServer(server: FastifyInstance): Promise<void> {
   }
 
   return new Promise((res, rej) => {
-    server.listen(port, "0.0.0.0", (err) => {
-      if (err) {
-        rej(err);
-        return;
-      }
+    server.listen(
+      {
+        host: "0.0.0.0",
+        port,
+      },
+      (err) => {
+        if (err) {
+          rej(err);
+          return;
+        }
 
-      info("[%s] Listening on port %d", namespaceHttp, port);
-      res();
-    });
+        info("[%s] Listening on port %d", namespaceHttp, port);
+        res();
+      }
+    );
   });
 }
 
