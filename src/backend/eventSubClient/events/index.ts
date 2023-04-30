@@ -6,7 +6,6 @@ import {
 } from "../../../interfaces/events/eventSub";
 
 import { SubscriptionTypeV1 as SubscriptionType } from "../../../enums/EventSub";
-import { broadcast } from "../../webserver";
 import { handle as channelPointsCustomRewardRedemptionAdd } from "./channelPointsCustomRewardRedemptionAdd";
 import { log } from "../../chatClient";
 import { namespace } from "..";
