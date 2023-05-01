@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Twitch Channel Redemptions</title>
+    <link rel="stylesheet" href="/assets/css/app.css" />
+    <script src="/assets/js/app.js"></script>
+  </head>
+  <body class="px-4 max-w-7xl mx-auto">
+    <h1 class="text-4xl mb-2">Dashboard</h1>
+
+    <section class="mb-4">
+      <h1 class="text-3xl mb-2">Overlays</h1>
+      <button data-path="/overlay" class="copy-clipboard btn">
+        Copy Overlay URL
+      </button>
+      <button data-path="/chat" class="copy-clipboard btn">
+        Copy chat-overlay URL
+      </button>
+
+      <p class="my-2">
+        Use the buttons above to copy the URL of the browser overlays to set
+        them up on your streaming software.
+      </p>
+    </section>
+
+    <section>
+      <h1 class="text-3xl mb-2">Events</h1>
+
+      <section id="channel-point-rewards" class="mb-4">
+        <h2 class="text-2xl mb-2">Channel point rewards</h2>
+
+        <div class="rewards"></div>
+      </section>
+
+      <section>
+        <h2 class="text-2xl mb-2">Other events</h2>
+        ...
+      </section>
+    </section>
+  </body>
+</html>
