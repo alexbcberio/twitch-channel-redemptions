@@ -1,9 +1,6 @@
-*::before,
-*,
-*::after {
-  box-sizing: border-box;
-  font-family: "Open Sans", sans-serif;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --black: hsl(0, 0%, 20%);
@@ -14,10 +11,8 @@
 }
 
 body {
-  margin: 0;
   background-color: var(--black);
   color: var(--white);
-  overflow: hidden;
 }
 
 .alert p {
