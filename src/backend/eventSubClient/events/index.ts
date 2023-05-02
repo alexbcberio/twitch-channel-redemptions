@@ -1,7 +1,5 @@
 import {
-  ChannelFollowEvent,
   ChannelPointsCustomRewardRedemptionAddEvent,
-  ChannelSubscribeEvent,
   NotificationMessage,
 } from "../../../interfaces/events/eventSub";
 
@@ -84,7 +82,6 @@ function handleNotification(notification: NotificationMessage<unknown>) {
   if (isChannelChannelPointsCustomRewardRedemptionAdd(notification)) {
     channelPointsCustomRewardRedemptionAdd(notification);
   } else {
-    broadcast(JSON.stringify(notification));
     log(
       "[%s] Handle %s event",
       namespace,
