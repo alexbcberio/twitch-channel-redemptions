@@ -9,11 +9,11 @@ import {
   ApiScope,
   ChatPubSubScope,
   SubscriptionTypeV1 as SubscriptionType,
-} from "../../enums/EventSub";
-import { error, extendLogger } from "./log";
-import { getTokenData, saveTokenData } from "./tokenData";
+} from "../../../enums/EventSub";
+import { error, extendLogger } from "../log";
+import { getTokenData, saveTokenData } from "../tokenData";
 
-import { ClientCredentials } from "../../interfaces/ClientCredentials";
+import { ClientCredentials } from "../../../interfaces/ClientCredentials";
 
 const namespace = "Twitch";
 const log = extendLogger(namespace);
