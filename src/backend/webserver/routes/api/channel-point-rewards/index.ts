@@ -1,4 +1,4 @@
-import { getApiClient, getStreamerUser } from "../../../../helpers/twitch";
+import { getApiClient, getAuthenticatedUser } from "../../../../helpers/twitch";
 
 import { FastifyInstance } from "fastify";
 
@@ -8,7 +8,7 @@ export default function (server: FastifyInstance) {
     url: "/",
     async handler(_req, reply) {
       const apiClient = await getApiClient();
-      const user = await getStreamerUser();
+      const user = await getAuthenticatedUser();
 
       const rawRewards = await apiClient.channelPoints.getCustomRewards(
         user.id

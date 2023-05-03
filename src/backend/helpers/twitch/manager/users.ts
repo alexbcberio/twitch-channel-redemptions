@@ -23,31 +23,19 @@ async function getUserIdFromUsername(username: string): Promise<string | null> {
   return user.id;
 }
 
-let streamerUser: HelixUser | null = null;
+let authenticatedUser: HelixUser | null = null;
 
-async function getStreamerUser() {
-  if (streamerUser === null) {
+async function getAuthenticatedUser() {
+  if (authenticatedUser === null) {
     const apiClient = await getApiClient();
+    const user = await apiClient.users.getMe();
 
-    const username = process.env.TWITCH_CHANNEL_NAME;
-
-    if (typeof username !== "string") {
-      throw new Error(
-        "TWITCH_CHANNEL_NAME environment variable not found in .env"
-      );
+    if (authenticatedUser === null) {
+      authenticatedUser = user;
     }
-
-    const user = await apiClient.users.getUserByName(username);
-
-    if (user === null) {
-      throw new Error(`User ${username} does not exist`);
-    }
-
-    // eslint-disable-next-line require-atomic-updates
-    streamerUser = user;
   }
 
-  return streamerUser;
+  return authenticatedUser;
 }
 
-export { getUsernameFromId, getUserIdFromUsername, getStreamerUser };
+export { getUsernameFromId, getUserIdFromUsername, getAuthenticatedUser };
