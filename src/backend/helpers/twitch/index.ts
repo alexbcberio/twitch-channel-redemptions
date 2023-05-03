@@ -1,81 +1,23 @@
-import { AccessToken, RefreshingAuthProvider } from "@twurple/auth";
-import {
-  ApiClient,
-  HelixCreateCustomRewardData,
-  HelixUser,
-  UserIdResolvable,
-} from "@twurple/api";
 import {
   ApiScope,
   ChatPubSubScope,
   SubscriptionTypeV1 as SubscriptionType,
 } from "../../../enums/EventSub";
-import { error, extendLogger } from "../log";
-import { getTokenData, saveTokenData } from "../tokenData";
+import {
+  HelixCreateCustomRewardData,
+  HelixUser,
+  UserIdResolvable,
+} from "@twurple/api";
 
-import { ClientCredentials } from "../../../interfaces/ClientCredentials";
+import { extendLogger } from "../log";
+import { getApiClient } from "./manager/auth";
+
+export * from "./manager";
 
 const namespace = "Twitch";
 const log = extendLogger(namespace);
 
-let refreshAuthProvider: RefreshingAuthProvider;
-let apiClient: ApiClient | null = null;
 let streamerUser: HelixUser | null = null;
-
-function getClientCredentials(): ClientCredentials {
-  if (!process.env.TWITCH_CLIENT_ID || !process.env.TWITCH_CLIENT_SECRET) {
-    error(
-      "[%s] Missing environment parameters TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET",
-      namespace
-    );
-
-    const exitCode = 1;
-
-    process.exit(exitCode);
-  }
-
-  return {
-    clientId: process.env.TWITCH_CLIENT_ID,
-    clientSecret: process.env.TWITCH_CLIENT_SECRET,
-  };
-}
-
-async function onRefresh(refreshData: AccessToken): Promise<void> {
-  log("Tokens refreshed");
-
-  await saveTokenData(refreshData);
-}
-
-async function getAuthProvider(): Promise<RefreshingAuthProvider> {
-  const tokenData = await getTokenData();
-
-  if (!refreshAuthProvider) {
-    const credentials = getClientCredentials();
-
-    log("Creating RefreshingAuthProvider instance");
-    refreshAuthProvider = new RefreshingAuthProvider(
-      {
-        clientId: credentials.clientId,
-        clientSecret: credentials.clientSecret,
-        onRefresh,
-      },
-      tokenData
-    );
-  }
-
-  return refreshAuthProvider;
-}
-
-async function getApiClient(): Promise<ApiClient> {
-  const authProvider = await getAuthProvider();
-
-  if (apiClient === null) {
-    log("Creating ApiClient instance");
-    apiClient = new ApiClient({ authProvider });
-  }
-
-  return apiClient;
-}
 
 async function getUsernameFromId(userId: number): Promise<string | null> {
   const apiClient = await getApiClient();
@@ -258,8 +200,8 @@ async function getStreamerUser() {
 }
 
 export {
-  getAuthProvider,
-  getApiClient,
+  log,
+  namespace,
   getUsernameFromId,
   getUserIdFromUsername,
   completeRewards,
