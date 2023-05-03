@@ -3,12 +3,8 @@ import {
   ChatPubSubScope,
   SubscriptionTypeV1 as SubscriptionType,
 } from "../../../enums/EventSub";
-import {
-  HelixCreateCustomRewardData,
-  HelixUser,
-  UserIdResolvable,
-} from "@twurple/api";
 
+import { HelixUser } from "@twurple/api";
 import { extendLogger } from "../log";
 import { getApiClient } from "./manager/auth";
 
@@ -39,53 +35,6 @@ async function getUserIdFromUsername(username: string): Promise<string | null> {
   }
 
   return user.id;
-}
-
-async function createReward(
-  userId: UserIdResolvable,
-  data: HelixCreateCustomRewardData
-) {
-  const apiClient = await getApiClient();
-
-  await apiClient.channelPoints.createCustomReward(userId, data);
-}
-
-async function completeRewards(
-  channel: UserIdResolvable,
-  rewardId: string,
-  redemptionIds: Array<string> | string
-) {
-  if (!Array.isArray(redemptionIds)) {
-    redemptionIds = [redemptionIds];
-  }
-
-  const apiClient = await getApiClient();
-
-  await apiClient.channelPoints.updateRedemptionStatusByIds(
-    channel,
-    rewardId,
-    redemptionIds,
-    "FULFILLED"
-  );
-}
-
-async function cancelRewards(
-  channel: UserIdResolvable,
-  rewardId: string,
-  redemptionIds: Array<string> | string
-) {
-  if (!Array.isArray(redemptionIds)) {
-    redemptionIds = [redemptionIds];
-  }
-
-  const apiClient = await getApiClient();
-
-  await apiClient.channelPoints.updateRedemptionStatusByIds(
-    channel,
-    rewardId,
-    redemptionIds,
-    "CANCELED"
-  );
 }
 
 function availableSubscriptionTypesWithScope(
@@ -204,9 +153,6 @@ export {
   namespace,
   getUsernameFromId,
   getUserIdFromUsername,
-  completeRewards,
-  cancelRewards,
-  createReward,
   availableSubscriptionTypesWithScope,
   getStreamerUser,
 };
