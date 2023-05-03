@@ -1,10 +1,10 @@
+import { getUsernameFromId, timeout } from "../../../helpers/twitch";
+
 import { CreateCard } from "../../../../interfaces/actions/redemption";
 import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
 import { RedemptionType } from "../../../../enums/RedemptionType";
-import { getUsernameFromId } from "../../../helpers/twitch";
 import { messages } from "../../../../localization";
 import { msText } from "../../../helpers/util";
-import { timeout } from "../../../chatClient/clientActions";
 
 const timeoutFriendMessages = messages.pubSubClient.actions.timeoutFriend;
 

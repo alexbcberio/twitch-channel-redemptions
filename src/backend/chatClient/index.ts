@@ -1,6 +1,6 @@
-import { addVip, removeVip, say, timeout } from "./clientActions";
+import { addVip, removeVip, say } from "./clientActions";
 import { extendLogger, warning } from "../helpers/log";
-import { getAuthProvider, getUsernameFromId } from "../helpers/twitch";
+import { getAuthProvider, getUsernameFromId, timeout } from "../helpers/twitch";
 import {
   onBan,
   onConnect,

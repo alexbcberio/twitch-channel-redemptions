@@ -1,11 +1,10 @@
 import { extendLogger, warning } from "../../../helpers/log";
+import { getUsernameFromId, timeout } from "../../../helpers/twitch";
 
 import { CreateCard } from "../../../../interfaces/actions/redemption";
 import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
 import { RedemptionType } from "../../../../enums/RedemptionType";
-import { getUsernameFromId } from "../../../helpers/twitch";
 import { messages } from "../../../../localization";
-import { timeout } from "../../../chatClient/clientActions";
 
 const namespace = "PubSub:HighlightMessage";
 const log = extendLogger(namespace);

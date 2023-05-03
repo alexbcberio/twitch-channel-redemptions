@@ -1,11 +1,11 @@
-import { say, timeout } from "../../../chatClient/clientActions";
+import { getUsernameFromId, timeout } from "../../../helpers/twitch";
 
 import { RedemptionMessage } from "../../../../interfaces/RedemptionMessage";
 import { RedemptionType } from "../../../../enums/RedemptionType";
 import { RussianRoulette } from "../../../../interfaces/actions/redemption";
-import { getUsernameFromId } from "../../../helpers/twitch";
 import { messages } from "../../../../localization";
 import { randomInt } from "crypto";
+import { say } from "../../../chatClient/clientActions";
 
 type GunsSafeShots = Record<string, number>;
 const gunsSafeShots: GunsSafeShots = {};
