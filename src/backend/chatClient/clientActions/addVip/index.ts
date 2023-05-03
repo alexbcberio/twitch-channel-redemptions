@@ -1,20 +1,23 @@
-import { hasVip, say } from "..";
-
-import { chatClient } from "../..";
+import { getUserIdFromUsername } from "../../../helpers/twitch";
+import { say } from "..";
 
 async function addVip(
   channel: string,
   username: string,
   message?: string
 ): Promise<boolean> {
-  username = username.toLowerCase();
-  if (!(await hasVip(channel, username))) {
+  const [channelId, userId] = await Promise.all([
+    getUserIdFromUsername(channel),
+    getUserIdFromUsername(username),
+  ]);
+
+  if (!channelId || !userId) {
     return false;
   }
 
-  try {
-    await chatClient.addVip(channel, username);
-  } catch (e) {
+  const vipAdded = await addVip(channelId, userId);
+
+  if (!vipAdded) {
     return false;
   }
 

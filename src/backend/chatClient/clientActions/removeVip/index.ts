@@ -1,21 +1,23 @@
-import { hasVip, say } from "..";
-
-import { chatClient } from "../..";
+import { getUserIdFromUsername } from "../../../helpers/twitch";
+import { say } from "..";
 
 async function removeVip(
   channel: string,
   username: string,
   message?: string
 ): Promise<boolean> {
-  username = username.toLowerCase();
+  const [channelId, userId] = await Promise.all([
+    getUserIdFromUsername(channel),
+    getUserIdFromUsername(username),
+  ]);
 
-  if (await hasVip(channel, username)) {
+  if (!channelId || !userId) {
     return false;
   }
 
-  try {
-    await chatClient.removeVip(channel, username);
-  } catch (e) {
+  const vipRemoved = await removeVip(channelId, userId);
+
+  if (!vipRemoved) {
     return false;
   }
 
