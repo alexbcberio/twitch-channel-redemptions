@@ -32,7 +32,7 @@ async function highlightMessage(msg: RedemptionMessage): Promise<CreateCard> {
       const reason = highlightMessageMessages.noLinksAllowed;
       const timeoutSeconds = 10;
 
-      await timeout(channel, msg.userDisplayName, timeoutSeconds, reason);
+      await timeout(msg.channelId, msg.userId, timeoutSeconds, reason);
     } catch (e) {
       warning(
         "[%s] Username %s cannot be timed out in %s channel",

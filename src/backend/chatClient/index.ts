@@ -50,6 +50,7 @@ async function connect(channels: Array<string>): Promise<void> {
 }
 
 async function handleClientAction(action: Action): Promise<void> {
+  const { channelId, userId } = action;
   const [channel, username] = await Promise.all([
     getUsernameFromId(parseInt(action.channelId)),
     getUsernameFromId(parseInt(action.userId)),
@@ -66,7 +67,7 @@ async function handleClientAction(action: Action): Promise<void> {
       break;
     case ActionType.Timeout:
       try {
-        await timeout(channel, username, action.data.time, action.data.reason);
+        await timeout(channelId, userId, action.data.time, action.data.reason);
       } catch (e) {
         warning(
           "[%s] Username %s cannot be timed out in %s channel",

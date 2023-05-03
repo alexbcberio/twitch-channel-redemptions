@@ -15,16 +15,16 @@ async function timeoutFriend(msg: RedemptionMessage): Promise<CreateCard> {
     throw new Error("Redemption has no message");
   }
 
-  const channel = await getUsernameFromId(parseInt(channelId));
+  const userId = await getUsernameFromId(parseInt(message));
 
-  if (!channel) {
-    throw new Error("No channel found");
+  if (!userId) {
+    throw new Error(`No user has been found with username "${message}"`);
   }
 
   const time = 60;
   const reason = timeoutFriendMessages.timeoutReason(userDisplayName);
 
-  await timeout(channel, message, time, reason);
+  await timeout(channelId, userId, time, reason);
 
   const msPerSecond = 1e3;
 

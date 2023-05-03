@@ -19,7 +19,7 @@ async function russianRoulette(
   msg: RedemptionMessage
 ): Promise<RussianRoulette> {
   const channel = await getUsernameFromId(parseInt(msg.channelId));
-  const { channelId, userDisplayName } = msg;
+  const { channelId, userDisplayName, userId } = msg;
 
   if (!channel) {
     throw new Error("No channel found");
@@ -45,8 +45,8 @@ async function russianRoulette(
   if (gotShot) {
     try {
       await timeout(
-        channel,
-        userDisplayName,
+        channelId,
+        userId,
         timeoutSeconds,
         russianRouletteMessages.timeoutReason
       );
