@@ -38,8 +38,8 @@
     "utf-8-validate": "^6.0.3"
   },
   "devDependencies": {
-    "@fontsource/open-sans": "^4.5.14",
     "@fontsource/noto-sans-mono": "^4.5.11",
+    "@fontsource/open-sans": "^4.5.14",
     "@types/debug": "^4.1.7",
     "@types/html-webpack-plugin": "^3.2.6",
     "@types/node": "^16.18.25",
