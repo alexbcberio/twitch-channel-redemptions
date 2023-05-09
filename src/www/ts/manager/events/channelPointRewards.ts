@@ -1,9 +1,13 @@
-import { ChannelPointReward, getChannelPointRewards } from "../../api/rewards";
+import {
+  ChannelPointReward,
+  getChannelPointRewardActions,
+  getChannelPointRewards,
+} from "../../api/rewards";
 
 const rewardIdProperty = "data-reward-id";
 const rewardActionsClassName = "reward-actions";
 
-function editChannelPointReward(e: Event) {
+async function editChannelPointReward(e: Event) {
   const target = e.target;
 
   if (!(target instanceof HTMLElement)) {
@@ -22,7 +26,7 @@ function editChannelPointReward(e: Event) {
     return;
   }
 
-  createRewardActionsElement(rewardId);
+  await createRewardActionsElement(rewardId);
 }
 
 async function closeRewardActions(e: Event) {
@@ -41,7 +45,7 @@ async function closeRewardActions(e: Event) {
   }
 }
 
-function createRewardActionsElement(rewardId: string) {
+async function createRewardActionsElement(rewardId: string) {
   const rewardElement = document.querySelector(
     `.reward[${rewardIdProperty}="${rewardId}"]`
   );
@@ -62,15 +66,19 @@ function createRewardActionsElement(rewardId: string) {
   rewardActionsContainer.classList.add(rewardActionsClassName, "mb-4");
   rewardActionsContainer.setAttribute(rewardIdProperty, rewardId);
 
-  // TODO: obtain reward actions
+  const rewardActions = await getChannelPointRewardActions(rewardId);
+  const actions = rewardActions.actions;
+
   const actionsContainer = document.createElement("div");
   actionsContainer.classList.add("reward-actions-actions");
   actionsContainer.innerHTML = "<ul>";
 
-  for (let i = 0, size = Math.floor(Math.random() * 5) + 1; i < size; i++) {
-    actionsContainer.innerHTML += `<li>Action ${
-      Math.floor(Math.random() * 100) + 1
-    }</li>`;
+  if (actions.length === 0) {
+    actionsContainer.innerHTML += `<li class="text-red-400">No actions are setup for this reward</li>`;
+  } else {
+    for (let i = 0; i < actions.length; i++) {
+      actionsContainer.innerHTML += `<li>${actions[i]}</li>`;
+    }
   }
 
   actionsContainer.innerHTML += "</ul>";
