@@ -64,6 +64,15 @@ async function loadRedemptions() {
   }
 }
 
+async function getRedemptions() {
+  if (Object.keys(redemptions).length === 0) {
+    log("Loading redemptions");
+    await loadRedemptions();
+  }
+
+  return redemptions;
+}
+
 function noop(rewardId: string): void {
   log("Unhandled redemption %s", rewardId);
 }
@@ -261,4 +270,4 @@ async function handle(
   }
 }
 
-export { handle, loadRedemptions as reloadRedemptions };
+export { handle, loadRedemptions as reloadRedemptions, getRedemptions };
