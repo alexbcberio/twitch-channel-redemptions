@@ -5,7 +5,7 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "cross-env NODE_ENV=production node -r dotenv/config dist",
-    "start:dev": "concurrently -r true \"cross-env NODE_ENV=development DEBUG=twitch-channel-redemptions* nodemon -r dotenv/config dist\" \"yarn build:dev\" \"yarn webpack:dev\"",
+    "start:dev": "concurrently -r true \"cross-env NODE_ENV=development DEBUG=twitch-channel-redemptions* nodemon -r dotenv/config -r source-map-support/register dist\" \"yarn build:dev\" \"yarn webpack:dev\"",
     "build": "rimraf dist && tsc && yarn webpack",
     "build:dev": "cross-env NODE_ENV=development tsc -w",
     "webpack": "cross-env NODE_ENV=production webpack",
