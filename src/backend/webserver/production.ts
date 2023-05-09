@@ -17,6 +17,7 @@ async function start(): Promise<void> {
 
   await server.register(fastifyAutoload, {
     dir: join(__dirname, "routes"),
+    routeParams: true,
   });
 
   startServer(server);
