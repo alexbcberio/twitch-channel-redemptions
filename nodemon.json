@@ -1,3 +1,4 @@
 {
-  "ignore": ["*.json", "*.(jpe?g|png)", "*.mp3", "www/**/*"]
+  "ignore": ["*.json", "*.(jpe?g|png)", "*.mp3", "www/**/*"],
+  "delay": 250
 }
