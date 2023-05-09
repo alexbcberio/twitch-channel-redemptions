@@ -1244,6 +1244,11 @@
   resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.25.24.tgz#8c7688559979f7079aacaf31aa881c3aa410b718"
   integrity sha512-XJfwUVUKDHF5ugKwIcxEgc9k8b7HbznCp6eUfWgu710hMPNIO4aw4/zB5RogDQz8nd6gyCDpU9O/m6qYEWY6yQ==
 
+"@sinclair/typebox@^0.28.9":
+  version "0.28.9"
+  resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.28.9.tgz#594e4e752839868074be70a8cbb35f264de79d07"
+  integrity sha512-m98m37J9CBZ8XinStjpss2ZOW50KG45XB4cAva2NGoQHiGPxhfNL2BzUXYCs6ahXdK7/F1NIjOGh+MPP5dK8Rw==
+
 "@trysound/sax@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@trysound/sax/-/sax-0.2.0.tgz#cccaab758af56761eb7bf37af6f03f326dd798ad"

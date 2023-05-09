@@ -17,6 +17,7 @@
     "@fastify/autoload": "^5.7.1",
     "@fastify/static": "^6.10.1",
     "@fastify/websocket": "^8.0.0",
+    "@sinclair/typebox": "^0.28.9",
     "@twurple/api": "^5.0.13",
     "@twurple/auth": "^5.0.13",
     "@twurple/chat": "^5.0.13",
