@@ -10,6 +10,7 @@ class ChannelPointReward extends HTMLElement {
     return ["data-reward"];
   }
 
+  private initialized = false;
   private reward?: ChannelPointRewardType;
 
   public constructor() {
@@ -17,7 +18,10 @@ class ChannelPointReward extends HTMLElement {
   }
 
   public connectedCallback() {
-    this.initialize();
+    if (!this.initialized) {
+      this.initialize();
+      this.initialized = true;
+    }
   }
 
   public disconnectedCallback() {
