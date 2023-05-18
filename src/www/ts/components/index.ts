@@ -1,1 +1,2 @@
-import("./ChannelPointReward");
+import "./ChannelPointReward";
+import "./EventAction";

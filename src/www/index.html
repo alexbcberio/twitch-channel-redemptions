@@ -31,6 +31,61 @@
       <section id="channel-point-rewards" class="mb-4">
         <h2 class="mb-2 text-2xl">Channel point rewards</h2>
 
+        <template id="event-action-template">
+          <div class="flex items-center p-2">
+            <button class="move-up disabled:opacity-30" title="Move up">
+              <svg
+                class="w-6 h-6 fill-neutral-500 hover:fill-neutral-400 active:fill-neutral-100"
+                clip-rule="evenodd"
+                fill-rule="evenodd"
+                stroke-linejoin="round"
+                stroke-miterlimit="2"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="m9.001 10.978h-3.251c-.412 0-.75-.335-.75-.752 0-.188.071-.375.206-.518 1.685-1.775 4.692-4.945 6.069-6.396.189-.2.452-.312.725-.312.274 0 .536.112.725.312 1.377 1.451 4.385 4.621 6.068 6.396.136.143.207.33.207.518 0 .417-.337.752-.75.752h-3.251v9.02c0 .531-.47 1.002-1 1.002h-3.998c-.53 0-1-.471-1-1.002z"
+                  fill-rule="nonzero"
+                />
+              </svg>
+            </button>
+            <button class="move-down disabled:opacity-30" title="Move down">
+              <svg
+                class="w-6 h-6 fill-neutral-500 hover:fill-neutral-400 active:fill-neutral-100"
+                clip-rule="evenodd"
+                fill-rule="evenodd"
+                stroke-linejoin="round"
+                stroke-miterlimit="2"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="m9.001 13.022h-3.251c-.412 0-.75.335-.75.752 0 .188.071.375.206.518 1.685 1.775 4.692 4.945 6.069 6.396.189.2.452.312.725.312.274 0 .536-.112.725-.312 1.377-1.451 4.385-4.621 6.068-6.396.136-.143.207-.33.207-.518 0-.417-.337-.752-.75-.752h-3.251v-9.02c0-.531-.47-1.002-1-1.002h-3.998c-.53 0-1 .471-1 1.002z"
+                  fill-rule="nonzero"
+                />
+              </svg>
+            </button>
+            <button class="ml-2 btn action-edit">Edit</button>
+
+            <p class="mx-4 mr-auto action-name">Action name</p>
+
+            <button class="mr-1 action-delete" title="Delete action">
+              <svg
+                class="w-6 h-6 fill-neutral-500 hover:fill-red-400 active:fill-red-500"
+                width="24"
+                height="24"
+                xmlns="http://www.w3.org/2000/svg"
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+              >
+                <path
+                  d="M19 24h-14c-1.104 0-2-.896-2-2v-16h18v16c0 1.104-.896 2-2 2zm-7-10.414l3.293-3.293 1.414 1.414-3.293 3.293 3.293 3.293-1.414 1.414-3.293-3.293-3.293 3.293-1.414-1.414 3.293-3.293-3.293-3.293 1.414-1.414 3.293 3.293zm10-8.586h-20v-2h6v-1.5c0-.827.673-1.5 1.5-1.5h5c.825 0 1.5.671 1.5 1.5v1.5h6v2zm-8-3h-4v1h4v-1z"
+                />
+              </svg>
+            </button>
+          </div>
+        </template>
+
         <template id="channel-point-reward-template">
           <div
             class="flex items-center pb-2 mb-2 border-b-2 reward border-neutral-500"
