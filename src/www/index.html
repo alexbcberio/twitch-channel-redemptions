@@ -7,11 +7,11 @@
     <link rel="stylesheet" href="/assets/css/app.css" />
     <script src="/assets/js/app.js"></script>
   </head>
-  <body class="px-4 max-w-7xl mx-auto">
-    <h1 class="text-4xl mb-2">Dashboard</h1>
+  <body class="px-4 mx-auto max-w-7xl">
+    <h1 class="mb-2 text-4xl">Dashboard</h1>
 
     <section class="mb-4">
-      <h1 class="text-3xl mb-2">Overlays</h1>
+      <h1 class="mb-2 text-3xl">Overlays</h1>
       <button data-path="/overlay" class="copy-clipboard btn">
         Copy Overlay URL
       </button>
@@ -26,16 +26,33 @@
     </section>
 
     <section>
-      <h1 class="text-3xl mb-2">Events</h1>
+      <h1 class="mb-2 text-3xl">Events</h1>
 
       <section id="channel-point-rewards" class="mb-4">
-        <h2 class="text-2xl mb-2">Channel point rewards</h2>
+        <h2 class="mb-2 text-2xl">Channel point rewards</h2>
+
+        <template id="channel-point-reward-template">
+          <div
+            class="flex items-center pb-2 mb-2 border-b-2 reward border-neutral-500"
+          >
+            <img
+              src="https://static-cdn.jtvnw.net/custom-reward-images/default-4.png"
+              class="w-12 h-12 p-2 rounded-md reward-image"
+              alt="Reward Title"
+            />
+            <p class="flex-grow px-2 reward-title">Reward Title</p>
+            <p class="px-2 text-right reward-cost">Reward Cost</p>
+            <div class="actions">
+              <button class="btn edit-actions">Edit actions</button>
+            </div>
+          </div>
+        </template>
 
         <div class="rewards"></div>
       </section>
 
       <section>
-        <h2 class="text-2xl mb-2">Other events</h2>
+        <h2 class="mb-2 text-2xl">Other events</h2>
         ...
       </section>
     </section>

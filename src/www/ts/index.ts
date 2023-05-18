@@ -1,4 +1,5 @@
 import "@fontsource/open-sans";
+import "./components";
 
 import { copyPathUrl } from "./helpers/clipboard";
 import { fetchChannelPointRewards } from "./manager/events";

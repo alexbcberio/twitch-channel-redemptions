@@ -10,7 +10,8 @@
   --playerCoverArtSize: 5rem;
 }
 
-body {
+html {
+  color-scheme: dark;
   background-color: var(--black);
   color: var(--white);
 }
@@ -195,40 +196,17 @@ body {
  */
 
 .btn {
-  @apply border-2 py-1 px-2 border-neutral-500 text-sm rounded-md active:bg-neutral-500 transition-colors;
+  @apply px-2 py-1 text-sm transition-colors border-2 rounded-md border-neutral-500 active:bg-neutral-500;
 }
 
-#channel-point-rewards .reward.reward-disabled {
+#channel-point-rewards .reward-disabled {
   transition: 0.2s filter ease-out;
 }
 
-#channel-point-rewards .reward.reward-disabled:not(:hover) {
+#channel-point-rewards .reward-disabled:not(:hover) {
   filter: saturate(0) opacity(0.5);
 }
 
-#channel-point-rewards .reward {
-  @apply flex items-center;
-}
-
-#channel-point-rewards .reward:not(:last-child) {
-  @apply border-b-2 border-neutral-500 pb-2 mb-2;
-}
-
-#channel-point-rewards .reward img {
-  @apply p-2 rounded-md;
+#channel-point-rewards .reward-image {
   background-color: var(--color);
-  max-width: 3rem;
-}
-
-#channel-point-rewards .reward .title,
-#channel-point-rewards .reward .cost {
-  @apply px-2;
-}
-
-#channel-point-rewards .reward .title {
-  @apply flex-grow;
-}
-
-#channel-point-rewards .reward .cost {
-  @apply text-right;
 }
