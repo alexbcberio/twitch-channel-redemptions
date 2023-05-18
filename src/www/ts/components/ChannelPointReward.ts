@@ -36,9 +36,10 @@ class ChannelPointReward extends HTMLElement {
     switch (name) {
       case "data-reward":
         this.reward = JSON.parse(newValue);
-        this.updateData();
         break;
     }
+
+    this.updateData();
   }
 
   private initialize() {
@@ -94,7 +95,6 @@ class ChannelPointReward extends HTMLElement {
   }
 
   private async editActionsClick(e: Event) {
-    // TODO: handle edit actions click
     if (!this.reward) {
       return;
     }
@@ -115,47 +115,36 @@ class ChannelPointReward extends HTMLElement {
     const rewardActions = await getChannelPointRewardActions(this.reward.id);
     const actions = rewardActions.actions;
 
-    const actionsList = document.createElement("ul");
-    actionsList.classList.add("list-unstyled");
-
     if (actions.length === 0) {
-      const noActions = document.createElement("li");
+      const noActions = document.createElement("p");
       noActions.classList.add("text-red-400", "mb-1");
       noActions.innerText = "No actions are setup for this reward";
 
-      actionsList.appendChild(noActions);
+      rewardActionsContainer.appendChild(noActions);
     } else {
       for (let i = 0; i < actions.length; i++) {
         const action = actions[i];
 
-        const actionElement = document.createElement("li");
-        actionElement.classList.add("mb-1", "reward-action");
-        actionElement.setAttribute("data-action", JSON.stringify(action));
+        const eventAction = document.createElement("event-action");
+        // eventAction.setAttribute("data-action", JSON.stringify(action));
+        eventAction.setAttribute("data-action", action);
+        eventAction.setAttribute("data-first-action", `${i === 0}`);
+        eventAction.setAttribute(
+          "data-last-action",
+          `${i + 1 === actions.length}`
+        );
+        eventAction.addEventListener("move-up", this.onMoveUpAction.bind(this));
+        eventAction.addEventListener(
+          "move-down",
+          this.onMoveDownAction.bind(this)
+        );
+        eventAction.addEventListener("delete", this.onDeleteAction.bind(this));
 
-        const upBtn = document.createElement("button");
-        upBtn.classList.add("btn", "mr-1");
-        upBtn.innerText = "Move up";
-        upBtn.addEventListener("click", () => {
-          // TODO: move action up
-        });
-        actionElement.appendChild(upBtn);
-
-        const downBtn = document.createElement("button");
-        downBtn.classList.add("btn", "mr-2");
-        downBtn.innerText = "Move down";
-        downBtn.addEventListener("click", () => {
-          // TODO: move action down
-        });
-        actionElement.appendChild(downBtn);
-
-        actionElement.append(action);
-
-        actionsList.appendChild(actionElement);
+        rewardActionsContainer.appendChild(eventAction);
       }
     }
 
-    rewardActionsContainer.appendChild(actionsList);
-
+    // TODO: migrate into a component
     const addActionButton = document.createElement("button");
     addActionButton.classList.add("btn", "mt-2");
     addActionButton.innerText = "Add action";
@@ -184,6 +173,94 @@ class ChannelPointReward extends HTMLElement {
     rewardActionsContainer.appendChild(buttonsContainer);
 
     this.insertAdjacentElement("beforeend", rewardActionsContainer);
+  }
+
+  private onMoveDownAction(e: Event) {
+    const target = e.target;
+
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    const parent = target.parentElement;
+
+    if (!parent) {
+      return;
+    }
+
+    const siblings = parent.children;
+
+    let found = false;
+
+    for (let i = 0; i < siblings.length && !found; i++) {
+      if (siblings[i] === target && i < siblings.length - 1) {
+        found = true;
+        target.before(siblings[i + 1]);
+      }
+    }
+
+    this.updateMoveActionButtonsDisableState();
+  }
+
+  private onMoveUpAction(e: Event) {
+    const target = e.target;
+
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    const parent = target.parentElement;
+
+    if (!parent) {
+      return;
+    }
+
+    const siblings = parent.children;
+
+    let found = false;
+
+    for (let i = 0; i < siblings.length && !found; i++) {
+      if (siblings[i] === target && i > 0) {
+        found = true;
+        target.after(siblings[i - 1]);
+      }
+    }
+
+    this.updateMoveActionButtonsDisableState();
+  }
+
+  private onDeleteAction(_e: Event) {
+    this.updateMoveActionButtonsDisableState();
+  }
+
+  private updateMoveActionButtonsDisableState() {
+    const firstActions = this.querySelectorAll<HTMLElement>(
+      `event-action[data-first-action="true"]`
+    );
+
+    for (let i = 0; i < firstActions.length; i++) {
+      firstActions[i].setAttribute("data-first-action", "false");
+    }
+
+    const lastActions = this.querySelectorAll<HTMLElement>(
+      `event-action[data-last-action="true"]`
+    );
+
+    for (let i = 0; i < lastActions.length; i++) {
+      lastActions[i].setAttribute("data-last-action", "false");
+    }
+
+    const eventActions = this.querySelectorAll<HTMLElement>("event-action");
+
+    if (eventActions.length === 0) {
+      return;
+    }
+
+    eventActions[0].setAttribute("data-first-action", "true");
+    eventActions[eventActions.length - 1].setAttribute(
+      "data-last-action",
+      "true"
+    );
   }
 
   private closeRewardActions() {
