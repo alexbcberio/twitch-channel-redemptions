@@ -3,8 +3,6 @@ import {
   getChannelPointRewardActions,
 } from "../api/rewards";
 
-const rewardActionsClassName = "reward-actions";
-
 class ChannelPointReward extends HTMLElement {
   static get observedAttributes() {
     return ["data-reward"];
@@ -64,12 +62,24 @@ class ChannelPointReward extends HTMLElement {
     this.updateData();
 
     const editActions = this.querySelector<HTMLButtonElement>(".edit-actions");
+    const addAction = this.querySelector<HTMLElement>(".add-action");
+    const cancelSaveActions = this.querySelector<HTMLElement>(
+      ".cancel-save-actions"
+    );
+    const saveActions = this.querySelector<HTMLElement>(".save-actions");
 
-    if (!editActions) {
+    if (!editActions || !addAction || !cancelSaveActions || !saveActions) {
       return;
     }
 
-    editActions.addEventListener("click", this.editActionsClick.bind(this));
+    editActions.addEventListener("click", this.editActions.bind(this));
+    // TODO: create/open modal to add a new action and add it at the bottom of the list
+    // addAction.addEventListener("click", this.addActionClick.bind(this));
+    cancelSaveActions.addEventListener(
+      "click",
+      this.closeRewardActions.bind(this)
+    );
+    saveActions.addEventListener("click", this.saveActions.bind(this));
   }
 
   private updateData() {
@@ -94,85 +104,68 @@ class ChannelPointReward extends HTMLElement {
     this.classList.toggle("reward-disabled", !this.reward.enabled);
   }
 
-  private async editActionsClick(e: Event) {
+  private async editActions() {
     if (!this.reward) {
       return;
     }
 
-    e.preventDefault();
-
-    let rewardActionsContainer = this.querySelector(
-      `.${rewardActionsClassName}`
+    const rewardActionsContainer = this.querySelector<HTMLElement>(
+      ".reward-actions-container"
     );
+    const rewardActionsElement =
+      this.querySelector<HTMLElement>(".reward-actions");
 
-    if (rewardActionsContainer !== null) {
+    if (
+      !rewardActionsContainer ||
+      !rewardActionsElement ||
+      rewardActionsElement.childElementCount !== 0
+    ) {
       return;
     }
-
-    rewardActionsContainer = document.createElement("div");
-    rewardActionsContainer.classList.add(rewardActionsClassName, "mb-4");
 
     const rewardActions = await getChannelPointRewardActions(this.reward.id);
     const actions = rewardActions.actions;
 
     if (actions.length === 0) {
-      const noActions = document.createElement("p");
-      noActions.classList.add("text-red-400", "mb-1");
-      noActions.innerText = "No actions are setup for this reward";
-
-      rewardActionsContainer.appendChild(noActions);
+      rewardActionsElement.appendChild(this.createNoActionsMessageElement());
     } else {
       for (let i = 0; i < actions.length; i++) {
-        const action = actions[i];
-
-        const eventAction = document.createElement("event-action");
-        // eventAction.setAttribute("data-action", JSON.stringify(action));
-        eventAction.setAttribute("data-action", action);
-        eventAction.setAttribute("data-first-action", `${i === 0}`);
-        eventAction.setAttribute(
-          "data-last-action",
-          `${i + 1 === actions.length}`
+        const eventAction = this.createEventActionElement(
+          actions[i],
+          i === 0,
+          i + 1 === actions.length
         );
-        eventAction.addEventListener("move-up", this.onMoveUpAction.bind(this));
-        eventAction.addEventListener(
-          "move-down",
-          this.onMoveDownAction.bind(this)
-        );
-        eventAction.addEventListener("delete", this.onDeleteAction.bind(this));
 
-        rewardActionsContainer.appendChild(eventAction);
+        rewardActionsElement.appendChild(eventAction);
       }
     }
 
-    // TODO: migrate into a component
-    const addActionButton = document.createElement("button");
-    addActionButton.classList.add("btn", "mt-2");
-    addActionButton.innerText = "Add action";
-    addActionButton.addEventListener("click", () => {
-      // TODO: create/open modal to add a new action and add it at the bottom of the list
-    });
-    rewardActionsContainer.appendChild(addActionButton);
+    rewardActionsContainer.classList.remove("hidden");
+  }
 
-    const buttonsContainer = document.createElement("div");
-    buttonsContainer.classList.add("flex", "justify-end");
+  private createNoActionsMessageElement() {
+    const noActions = document.createElement("p");
+    noActions.classList.add("text-red-400", "mb-1");
+    noActions.innerText = "No actions are setup for this reward";
 
-    const cancelButton = document.createElement("button");
-    cancelButton.classList.add("btn", "inline-block", "mr-1");
-    cancelButton.innerText = "Cancel";
-    cancelButton.addEventListener("click", this.closeRewardActions.bind(this));
+    return noActions;
+  }
 
-    buttonsContainer.appendChild(cancelButton);
+  private createEventActionElement(
+    action: string,
+    isFirst: boolean,
+    isLast: boolean
+  ) {
+    const eventAction = document.createElement("event-action");
+    // eventAction.setAttribute("data-action", JSON.stringify(action));
+    eventAction.setAttribute("data-action", action);
+    eventAction.setAttribute("data-first-action", `${isFirst}`);
+    eventAction.setAttribute("data-last-action", `${isLast}`);
+    eventAction.addEventListener("move-up", this.onMoveUpAction.bind(this));
+    eventAction.addEventListener("move-down", this.onMoveDownAction.bind(this));
+    eventAction.addEventListener("delete", this.onDeleteAction.bind(this));
 
-    const saveButton = document.createElement("button");
-    saveButton.classList.add("btn");
-    saveButton.innerText = "Save";
-    saveButton.addEventListener("click", this.saveActionsClick.bind(this));
-
-    buttonsContainer.appendChild(saveButton);
-
-    rewardActionsContainer.appendChild(buttonsContainer);
-
-    this.insertAdjacentElement("beforeend", rewardActionsContainer);
+    return eventAction;
   }
 
   private onMoveDownAction(e: Event) {
@@ -264,16 +257,23 @@ class ChannelPointReward extends HTMLElement {
   }
 
   private closeRewardActions() {
-    const rewardActions = this.querySelector(`.${rewardActionsClassName}`);
+    const rewardActionsContainer = this.querySelector<HTMLElement>(
+      ".reward-actions-container"
+    );
+    const rewardActions = this.querySelector<HTMLElement>(".reward-actions");
 
-    if (!rewardActions) {
+    if (!rewardActions || !rewardActionsContainer) {
       return;
     }
 
-    rewardActions.remove();
+    rewardActionsContainer.classList.add("hidden");
+
+    while (rewardActions.firstChild) {
+      rewardActions.firstChild.remove();
+    }
   }
 
-  private saveActionsClick() {
+  private saveActions() {
     // TODO: handle save
 
     this.closeRewardActions();
