@@ -1,6 +1,7 @@
 import {
   ChannelPointReward as ChannelPointRewardType,
   getChannelPointRewardActions,
+  saveChannelPointRewardActions,
 } from "../api/rewards";
 
 class ChannelPointReward extends HTMLElement {
@@ -273,8 +274,23 @@ class ChannelPointReward extends HTMLElement {
     }
   }
 
-  private saveActions() {
-    // TODO: handle save
+  private async saveActions() {
+    if (!this.reward) {
+      return;
+    }
+
+    const rewardActions = this.querySelectorAll<EventAction>("event-action");
+    const actions = new Array<string>();
+
+    for (let i = 0; i < rewardActions.length; i++) {
+      const action = rewardActions[i].getAttribute("data-action");
+
+      if (action) {
+        actions.push(action);
+      }
+    }
+
+    await saveChannelPointRewardActions(this.reward.id, actions);
 
     this.closeRewardActions();
   }

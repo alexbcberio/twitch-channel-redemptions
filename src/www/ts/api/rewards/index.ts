@@ -23,7 +23,21 @@ async function getChannelPointRewardActions(
   return actions;
 }
 
+async function saveChannelPointRewardActions(
+  id: ChannelPointReward["id"],
+  actions: Actions["actions"]
+): Promise<void> {
+  await fetch(`/api/channel-point-rewards/${id}/actions`, {
+    method: "PUT",
+    body: JSON.stringify({ actions }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}
+
 export {
   getChannelPointRewards,
   getChannelPointRewardActions,
+  saveChannelPointRewardActions,
 };
