@@ -5,6 +5,7 @@ import {
 import {
   completeRewards,
   getApiClient,
+  rejectRewards,
 } from "../../../helpers/twitch";
 import { error, extendLogger } from "../../../helpers/log";
 import {
@@ -43,7 +44,7 @@ function updatableReward(
   return true;
 }
 
-async function cancelReward(
+async function rejectReward(
   rewardEvent: ChannelPointsCustomRewardRedemptionAddEvent
 ): Promise<void> {
   if (!updatableReward(rewardEvent)) {
@@ -51,7 +52,7 @@ async function cancelReward(
   }
 
   try {
-    await cancelRewards(
+    await rejectRewards(
       rewardEvent.broadcaster_user_id,
       rewardEvent.reward.id,
       rewardEvent.id
@@ -145,7 +146,7 @@ async function handle(
         error("[%s] %s", namespace, e.message);
       }
 
-      await cancelReward(event);
+      await rejectReward(event);
 
       return;
     }
@@ -156,7 +157,7 @@ async function handle(
   if (isProduction) {
     await completeReward(event);
   } else {
-    await cancelReward(event);
+    await rejectReward(event);
   }
 }
 

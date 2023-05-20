@@ -33,7 +33,7 @@ async function completeRewards(
   );
 }
 
-async function cancelRewards(
+async function rejectRewards(
   channel: UserIdResolvable,
   rewardId: string,
   redemptionIds: Array<string> | string
@@ -52,4 +52,4 @@ async function cancelRewards(
   );
 }
 
-export { createReward, completeRewards, cancelRewards };
+export { createReward, completeRewards, rejectRewards as rejectRewards };
