@@ -98,16 +98,6 @@ async function saveRedemptionActions() {
   log('Saved redemption actions on file "%s"', redemptionsConfigFilePath);
 }
 
-async function getRedemptionActions() {
-  // eslint-disable-next-line no-magic-numbers
-  if (Object.keys(redemptionActions).length === 0) {
-    log("Loading redemption actions");
-    await reloadRedemptionActions();
-  }
-
-  return redemptionActions;
-}
-
 function setRedemptionActions(
   rewardId: string,
   actions: Array<RedemptionType>
@@ -124,14 +114,14 @@ function setRedemptionActions(
   );
 }
 
-function redemptionActionsByRewardId(rewardId: string): Array<RedemptionType> {
+function getRedemptionActions(rewardId: string): Array<RedemptionType> {
   return redemptionActions[rewardId] ?? [];
 }
 
 function redemptionHandlersFromRewardId(
   rewardId: string
 ): Array<RedemptionHandler> {
-  const rewards = redemptionActionsByRewardId(rewardId);
+  const rewards = getRedemptionActions(rewardId);
   const handlers = new Array<RedemptionHandler>();
 
   // eslint-disable-next-line no-magic-numbers
@@ -178,13 +168,12 @@ function redemptionHandlersFromRewardId(
   return handlers;
 }
 
-getRedemptionActions();
+reloadRedemptionActions();
 
 export {
   RedemptionHandler,
   reloadRedemptionActions,
   getRedemptionActions,
-  redemptionActionsByRewardId,
   setRedemptionActions,
   redemptionHandlersFromRewardId,
 };

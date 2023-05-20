@@ -9,7 +9,7 @@ import {
 } from "../../../helpers/twitch";
 import { error, extendLogger } from "../../../helpers/log";
 import {
-  redemptionActionsByRewardId,
+  getRedemptionActions,
   redemptionHandlersFromRewardId,
 } from "../../../actions";
 
@@ -24,9 +24,7 @@ const namespace = `events:ChannelPointsCustomRewardRedemptionAdd`;
 const log = extendLogger(namespace);
 
 function keepInQueue(rewardId: string): boolean {
-  return redemptionActionsByRewardId(rewardId).includes(
-    RedemptionType.KaraokeTime
-  );
+  return getRedemptionActions(rewardId).includes(RedemptionType.KaraokeTime);
 }
 
 function updatableReward(
@@ -113,7 +111,7 @@ async function handle(
     return;
   }
 
-  const rewardsType = redemptionActionsByRewardId(reward.id);
+  const rewardsType = getRedemptionActions(reward.id);
   const redemptionHandlers = redemptionHandlersFromRewardId(reward.id);
 
   const clientActions = new Array<RedemptionAction | GlobalAction>();
