@@ -1,4 +1,4 @@
-import { access, constants, readFile } from "fs/promises";
+import { access, constants, readFile, writeFile } from "fs/promises";
 import { error, extendLogger, warning } from "../helpers/log";
 import {
   getVip,
@@ -27,29 +27,75 @@ const log = extendLogger(namespace);
 
 let redemptionActions: Record<string, Array<RedemptionType>> = {};
 
+const saveRedemptionActionsTimeout = 100;
+let queueSaveRedemptionActions: NodeJS.Timeout;
+
+function emptyRedemptionActions() {
+  // eslint-disable-next-line no-magic-numbers
+  return Object.keys(redemptionActions).length === 0;
+}
+
 async function reloadRedemptionActions() {
   try {
     await access(redemptionsConfigFilePath, constants.R_OK);
   } catch (e) {
     error(
-      '[%s] Cannot access configuration file "%s"',
+      '[%s] Missing read permissions on file "%s"',
       namespace,
       redemptionsConfigFilePath
     );
     return;
   }
 
+  const firstLoad = emptyRedemptionActions();
   const redemptionActionsConfig = await readFile(redemptionsConfigFilePath);
 
   try {
     redemptionActions = JSON.parse(redemptionActionsConfig.toString());
   } catch (e) {
     error(
-      '[%s] Error parsing configuration file "%s"',
+      '[%s] Error parsing redemption actions file "%s"',
       namespace,
       redemptionsConfigFilePath
     );
   }
+
+  if (firstLoad) {
+    log('Loaded redemption actions from file "%s"', redemptionsConfigFilePath);
+  } else {
+    log(
+      'Reloaded redemption actions from file "%s"',
+      redemptionsConfigFilePath
+    );
+  }
+}
+
+async function saveRedemptionActions() {
+  try {
+    await access(redemptionsConfigFilePath, constants.W_OK);
+  } catch (e) {
+    error(
+      '[%s] Missing write permissions on file "%s"',
+      namespace,
+      redemptionsConfigFilePath
+    );
+    return;
+  }
+
+  try {
+    await writeFile(
+      redemptionsConfigFilePath,
+      JSON.stringify(redemptionActions)
+    );
+  } catch (e) {
+    error(
+      '[%s] Error saving redemption actions into file "%s"',
+      namespace,
+      redemptionsConfigFilePath
+    );
+  }
+
+  log('Saved redemption actions on file "%s"', redemptionsConfigFilePath);
 }
 
 async function getRedemptionActions() {
@@ -60,6 +106,22 @@ async function getRedemptionActions() {
   }
 
   return redemptionActions;
+}
+
+function setRedemptionActions(
+  rewardId: string,
+  actions: Array<RedemptionType>
+) {
+  redemptionActions[rewardId] = actions;
+
+  if (queueSaveRedemptionActions) {
+    clearTimeout(queueSaveRedemptionActions);
+  }
+
+  queueSaveRedemptionActions = setTimeout(
+    saveRedemptionActions,
+    saveRedemptionActionsTimeout
+  );
 }
 
 function redemptionActionsByRewardId(rewardId: string): Array<RedemptionType> {
@@ -123,5 +185,6 @@ export {
   reloadRedemptionActions,
   getRedemptionActions,
   redemptionActionsByRewardId,
+  setRedemptionActions,
   redemptionHandlersFromRewardId,
 };
