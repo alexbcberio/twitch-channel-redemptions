@@ -1,8 +1,14 @@
 import {
+  Action,
   ChannelPointReward as ChannelPointRewardType,
   getChannelPointRewardActions,
   saveChannelPointRewardActions,
 } from "../api/rewards";
+import { RewardActionTypes, rewardActionTypes } from "../api/actions";
+
+let actionTypeValues: RewardActionTypes;
+
+rewardActionTypes().then((actions) => (actionTypeValues = actions));
 
 class ChannelPointReward extends HTMLElement {
   static get observedAttributes() {
@@ -63,19 +69,37 @@ class ChannelPointReward extends HTMLElement {
     this.updateData();
 
     const editActions = this.querySelector<HTMLButtonElement>(".edit-actions");
+    const actionTypes = this.querySelector<HTMLSelectElement>(".action-types");
     const addAction = this.querySelector<HTMLElement>(".add-action");
     const cancelSaveActions = this.querySelector<HTMLElement>(
       ".cancel-save-actions"
     );
     const saveActions = this.querySelector<HTMLElement>(".save-actions");
 
-    if (!editActions || !addAction || !cancelSaveActions || !saveActions) {
+    if (
+      !editActions ||
+      !actionTypes ||
+      !addAction ||
+      !cancelSaveActions ||
+      !saveActions
+    ) {
       return;
     }
 
+    for (let i = 0; i < actionTypeValues.actionTypes.length; i++) {
+      const actionType = actionTypeValues.actionTypes[i];
+      const option = document.createElement("option");
+
+      option.innerText =
+        actionType.charAt(0).toUpperCase() +
+        actionType.replace(/([A-Z])/g, " $1").slice(1);
+      option.value = actionType;
+
+      actionTypes.options.add(option);
+    }
+
     editActions.addEventListener("click", this.editActions.bind(this));
-    // TODO: create/open modal to add a new action and add it at the bottom of the list
-    // addAction.addEventListener("click", this.addActionClick.bind(this));
+    addAction.addEventListener("click", this.addNewAction.bind(this));
     cancelSaveActions.addEventListener(
       "click",
       this.closeRewardActions.bind(this)
@@ -128,16 +152,10 @@ class ChannelPointReward extends HTMLElement {
     const actions = rewardActions.actions;
 
     if (actions.length === 0) {
-      rewardActionsElement.appendChild(this.createNoActionsMessageElement());
+      this.showNoActions();
     } else {
       for (let i = 0; i < actions.length; i++) {
-        const eventAction = this.createEventActionElement(
-          actions[i],
-          i === 0,
-          i + 1 === actions.length
-        );
-
-        rewardActionsElement.appendChild(eventAction);
+        this.addAction(actions[i], i === 0, i + 1 === actions.length);
       }
     }
 
@@ -167,6 +185,37 @@ class ChannelPointReward extends HTMLElement {
     eventAction.addEventListener("delete", this.onDeleteAction.bind(this));
 
     return eventAction;
+  }
+
+  private showNoActions() {
+    const rewardActions = this.querySelector<HTMLElement>(".reward-actions");
+
+    if (!rewardActions) {
+      return;
+    }
+
+    rewardActions.appendChild(this.createNoActionsMessageElement());
+  }
+
+  private addAction(action: Action, isFirst: boolean, isLast: boolean) {
+    const rewardActions = this.querySelector<HTMLElement>(".reward-actions");
+
+    if (!rewardActions) {
+      return;
+    }
+
+    const noActions = rewardActions.firstChild;
+
+    if (
+      noActions &&
+      noActions.nodeName === this.createNoActionsMessageElement().nodeName
+    ) {
+      noActions.remove();
+    }
+
+    const eventAction = this.createEventActionElement(action, isFirst, isLast);
+
+    rewardActions.appendChild(eventAction);
   }
 
   private onMoveDownAction(e: Event) {
@@ -224,6 +273,14 @@ class ChannelPointReward extends HTMLElement {
   }
 
   private onDeleteAction(_e: Event) {
+    const rewardActions = this.querySelector<HTMLElement>(".reward-actions");
+
+    if (rewardActions && rewardActions.childElementCount === 0) {
+      this.showNoActions();
+
+      return;
+    }
+
     this.updateMoveActionButtonsDisableState();
   }
 
@@ -255,6 +312,29 @@ class ChannelPointReward extends HTMLElement {
       "data-last-action",
       "true"
     );
+  }
+
+  private addNewAction() {
+    const actionTypes = this.querySelector<HTMLSelectElement>(".action-types");
+    const rewardActionsElement =
+      this.querySelector<HTMLElement>(".reward-actions");
+
+    if (
+      !actionTypes ||
+      actionTypes.selectedIndex === 0 ||
+      !rewardActionsElement
+    ) {
+      return;
+    }
+
+    this.addAction(
+      actionTypes.options[actionTypes.selectedIndex].value,
+      false,
+      true
+    );
+
+    this.updateMoveActionButtonsDisableState();
+    actionTypes.selectedIndex = 0;
   }
 
   private closeRewardActions() {
