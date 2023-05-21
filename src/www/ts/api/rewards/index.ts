@@ -1,11 +1,6 @@
-import { ChannelPointReward } from "./types";
+import { Actions, ChannelPointReward } from "./types";
 
 export * from "./types";
-
-type Action = string;
-type Actions = {
-  actions: Array<Action>;
-};
 
 async function getChannelPointRewards(): Promise<Array<ChannelPointReward>> {
   const res = await fetch("/api/channel-point-rewards");

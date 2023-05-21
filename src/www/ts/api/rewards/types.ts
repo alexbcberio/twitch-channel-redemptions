@@ -7,4 +7,9 @@ interface ChannelPointReward {
   image: string;
 }
 
-export { ChannelPointReward };
+type Action = string;
+type Actions = {
+  actions: Array<Action>;
+};
+
+export { ChannelPointReward, Action, Actions };
