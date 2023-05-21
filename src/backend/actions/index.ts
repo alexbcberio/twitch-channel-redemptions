@@ -82,6 +82,16 @@ async function saveRedemptionActions() {
     return;
   }
 
+  const keys = Object.keys(redemptionActions);
+
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    // eslint-disable-next-line no-magic-numbers
+    if (redemptionActions[key].length === 0) {
+      delete redemptionActions[key];
+    }
+  }
+
   try {
     await writeFile(
       redemptionsConfigFilePath,
