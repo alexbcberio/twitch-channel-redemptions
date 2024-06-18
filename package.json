@@ -30,7 +30,7 @@
     "fastify": "^4.17.0",
     "regedit": "^5.1.2",
     "tinycolor2": "^1.4.2",
-    "ws": "^8.11.0",
+    "ws": "^8.17.1",
     "wsnow": "^1.0.6"
   },
   "optionalDependencies": {
