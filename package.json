@@ -22,7 +22,7 @@
     "@twurple/auth": "^5.0.13",
     "@twurple/chat": "^5.0.13",
     "@types/tinycolor2": "^1.4.3",
-    "axios": "^1.6.0",
+    "axios": "^1.7.4",
     "clean-webpack-plugin": "^4.0.0",
     "cross-env": "^7.0.3",
     "debug": "^4.3.4",
